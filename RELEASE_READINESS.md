@@ -4,7 +4,7 @@
 
 Önceki aşama 0.2.2: Öğrenci ana sayfasındaki Katılım bilgilerim düğmesi/formu kaldırıldı. Mevcut bilgiler korundu;69Chrome kontrolü tekrar geçti. Önceki kapsamlı test kayıtları tarihçedir.
 
-Araştırmacı paneli kullanıcının son isteğine göre sadeleştirildi. **Her araştırmacının ayrı çalışma alanı vardır; ortak vaka/araştırmacı üyeliği yoktur.** 0.2.10 değişiklikleri kullanıcı isteğiyle GitHub main teslimi için hazırlanıyor; gönderim sonucu CONTEXT.md içinde kaydedilir. Üretim kabulü verilmedi.
+Araştırmacı paneli kullanıcının son isteğine göre sadeleştirildi. **Her araştırmacının ayrı çalışma alanı vardır; ortak vaka/araştırmacı üyeliği yoktur.** 0.2.10 değişiklikleri kullanıcı isteğiyle GitHub main dalına 5f8a34964654bd3cbc94dc469447328ee7aab243 commit'iyle gönderildi. Teslim kaydı CONTEXT.md içindedir; gerçek hosting yayını yapılmadı. Üretim kabulü verilmedi.
 
 ## 0.2.1 kullanım güncellemesi
 
