@@ -1,0 +1,123 @@
+SCENARIO A: B14.2/B15 equivalents, real HTTP; isolated SQLite; mock
+PASS 1 draft unassigned case absent
+PASS 2 B14.2 active unassigned case absent
+PASS 3 unassigned direct start denied
+PASS 4 active assigned unstarted case visible
+PASS 5 first start pins version 2 / first text
+PASS 6 new starter pins version 3 / updated text
+PASS 7 existing version remains unchanged
+PASS 8 B15.1 unassigned third student cannot see case
+PASS 9 third student assigned but not started
+PASS 10 third student has no application
+PASS 11 B15.2 closed case absent for assigned nonstarter
+PASS 12 closed case direct new start denied
+PASS 13 B15.3 closed case visible for existing starter
+PASS 14 closed case resumes same application
+PASS 15 closed case keeps pinned old text
+PASS 16 existing starter can still save when new starts closed
+PASS 17 B15.4 stop ongoing access: case absent
+PASS 18 B15.4 stop ongoing access: resume denied
+PASS 19 B15.4 stop ongoing access: direct view denied
+PASS 20 B15.4 stop ongoing access: save denied
+PASS 21 B15.4 stop ongoing access: initial denied
+PASS 22 B15.4 stop ongoing access: submit denied
+PASS 23 B15.4 stop ongoing access: chat denied
+PASS 24 B15.4 stop ongoing access: events denied
+PASS 25 B15.4 stop ongoing access: researcher retains historical access
+PASS 26 B15.4 stop ongoing access: denied requests preserve all response/analysis/report data
+PASS 27 B15.5 restored access resumes original application
+PASS 28 restored case keeps drafts/snapshots/messages and all prior data
+PASS 29 B15.6 assignment revoked: case absent
+PASS 30 B15.6 assignment revoked: resume denied
+PASS 31 B15.6 assignment revoked: direct view denied
+PASS 32 B15.6 assignment revoked: save denied
+PASS 33 B15.6 assignment revoked: initial denied
+PASS 34 B15.6 assignment revoked: submit denied
+PASS 35 B15.6 assignment revoked: chat denied
+PASS 36 B15.6 assignment revoked: events denied
+PASS 37 B15.6 assignment revoked: researcher retains historical access
+PASS 38 B15.6 assignment revoked: denied requests preserve all response/analysis/report data
+PASS 39 reassignment reuses original assignment
+PASS 40 reassignment resumes same application
+PASS 41 reassignment preserves pinned version and exact draft
+PASS 42 reassignment preserves snapshots/messages/revisions/analysis/reports
+PASS 43 save works after reassignment
+PASS 44 case access scenario never closes global study
+PASS 45 case mutations retain actor/time/reason audit
+PASS 46 assignment creation/revoke/restore audited separately
+SCENARIO B: independent researcher workspaces, bulk operations, deletion, Disco
+PASS 47 new researcher has empty isolated workspace
+PASS 48 researcher cannot list creator students or accounts
+PASS 49 other researcher cannot view application
+PASS 50 other researcher cannot edit case
+PASS 51 other researcher cannot edit participant
+PASS 52 other researcher cannot close case
+PASS 53 other researcher cannot bulk assign
+PASS 54 other researcher cannot change late access
+PASS 55 all-data export never crosses workspace
+PASS 56 foreign selected-case export denied
+PASS 57 researcher can create own case without reason
+PASS 58 creator cannot see new researcher private case
+PASS 59 creator cannot edit another researcher student
+PASS 60 foreign student cannot be assigned to owned case
+PASS 61 bulk assignment is atomic on foreign student
+PASS 62 failed mixed bulk leaves no partial assignment
+PASS 63 bulk assignment without reason succeeds
+PASS 64 foreign new analysis denied
+PASS 65 foreign analysis step denied
+PASS 66 foreign decision denied
+PASS 67 foreign report creation denied
+PASS 68 foreign report approval denied
+PASS 69 foreign report data denied
+PASS 70 foreign research note denied
+PASS 71 foreign exclusion denied
+PASS 72 foreign rubric deletion denied
+PASS 73 foreign rubric version denied
+PASS 74 selected-case full export includes only that case
+PASS 75 full export includes selected case text and complete version history
+PASS 76 full export includes assignments/participants without password hashes
+PASS 77 full export includes reports/snapshots/messages
+PASS 78 full export supplementary tables preserve workspace isolation
+PASS 79 all cases means own workspace only
+PASS 80 Disco CSV has case/activity/start/complete columns
+PASS 81 Disco selected-case scope and UTC explicit
+PASS 82 Disco resources coded; AI separate
+PASS 83 Disco excludes identity and heartbeat noise
+PASS 84 Disco rows have unique event identifiers
+PASS 85 Disco trace is student-application, not pedagogical case
+PASS 86 Disco timestamps parse and preserve milliseconds
+PASS 87 definition removed from new choices without destroying history
+PASS 88 deleting used rubric leaves old analyses/report bodies unchanged
+PASS 89 deleted rubric cannot start new analysis
+PASS 90 old report accessible after rubric deletion
+SCENARIO C: per-case closure, selected late access, separate publication
+PASS 91 open case blocks report publication
+PASS 92 case closure preserves all historical application data
+PASS 93 case closure blocks new starts
+PASS 94 case closure blocks saves
+PASS 95 case closure blocks new AI messages
+PASS 96 case closure blocks initial confirmation
+PASS 97 case closure blocks submission
+PASS 98 closed case remains readable with closure flag
+PASS 99 closing one case leaves another open
+PASS 100 selected student can save in closed case
+PASS 101 late access can also allow a selected student first start
+PASS 102 unselected student remains closed
+PASS 103 late access can be revoked
+PASS 104 case can reopen without replacing application
+PASS 105 reopen affects all assigned students
+PASS 106 case closure does not auto-publish
+PASS 107 unapproved report still cannot publish
+PASS 108 explicit publication preserves report snapshot
+PASS 109 only published version visible to owner
+PASS 110 published report strips researcher appendix
+PASS 111 published report still denied to another researcher
+PASS 112 published report denied to other student
+PASS 113 personal late access hides own published report
+PASS 114 late access blocks direct report download
+PASS 115 late access never unlocks submitted responses
+PASS 116 revoking late access restores same published snapshot
+PASS 117 reopening case hides report data
+PASS 118 reclosing restores report without republishing or mutation
+PASS 119 legacy global study never closed
+TOTAL 119 assertions passed. HTTP / isolated SQLite / mock / application 0.2.1.

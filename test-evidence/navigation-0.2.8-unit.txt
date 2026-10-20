@@ -1,0 +1,70 @@
+PASS NAV 1 example journey has twelve separate visits
+PASS NAV 2 all seven tabs measured
+PASS NAV 3 10:00 case to 10:02 profile equals 120 seconds
+PASS NAV 4 returning to case creates separate 30-second visit
+PASS NAV 5 second initial visit closes at successful confirmation
+PASS NAV 6 final-submit tab closes when server success is confirmed
+PASS NAV 7 initial and final success recorded once
+PASS NAV 8 editing labels reflect observed field changes
+PASS NAV 9 final-confidence and reflection changes included
+PASS NAV 10 AI request linked to exact visit without clock joining
+PASS NAV 11 post-submission browsing is excluded
+PASS NAV 12 original events unchanged
+PASS NAV 13 visit records actual destination tab
+PASS NAV 14 confirmations do not invent destination tabs
+PASS NAV 15 return visits retain view activity
+PASS NAV 16 locked visit keeps requested tab and destination, with separate lock flag
+PASS NAV 17 reflection without a field change is viewing
+PASS NAV 18 unobserved final exit remains unknown
+PASS NAV 19 backward client clock not converted into positive duration
+PASS NAV 20 invalid time not replaced by receive time
+PASS NAV 21 elapsed click-to-click time is not capped at heartbeat 30 seconds
+PASS NAV 22 background state retained without subtracting elapsed time
+PASS NAV 23 CSV partitions AI visit at send boundary plus two milestones
+PASS NAV 24 CSV exposes elapsed seconds and next activity
+PASS NAV 25 Disco start and completion are actual visit boundaries
+PASS NAV 26 CSV separates destination tab and lock state from activity
+PASS NAV 27 submission is final exported activity
+PASS NAV 28 CSV has no login or raw session/tab identifiers
+PASS NAV 29 open visit omitted from duration CSV rather than given fake zero
+PASS NAV 30 backend discards newly reported post-submission browsing
+PASS NAV 31 delayed pre-submission event retained
+PASS NAV 32 first successful client submission confirmation accepted
+PASS NAV 33 repeated confirmation does not extend completed workflow
+PASS NAV 34 AI labels match visit by request key despite different client/server clocks
+PASS NAV 35 matched current AI intent labels available in visit CSV
+PASS NAV 36 visit CSV retains edited-field metadata for later sequence coding
+PASS NAV 37 researcher view puts effective message intent in AI activity
+PASS NAV 38 Disco Activity contains same intent as researcher view
+PASS NAV 39 researcher label correction renames activity
+PASS NAV 40 corrected intent also used in Disco Activity
+PASS NAV 41 explicit empty review never falls back to AI intent or viewing
+PASS NAV 42 typing without sending is viewing
+PASS NAV 43 unmatched send is not assigned another request intent
+PASS NAV 44 unlabeled actual message has explicit pending state
+PASS NAV 45 multiple questions preserve ordered intent activities, excluding assistant message
+PASS NAV 46 combining intents does not split or multiply visit duration
+PASS NAV 47 matching request keys from other application cannot name visit
+PASS NAV 48 repeated intent remains a separate question in sequence
+PASS NAV 49 AI no-match is separate from not yet labeled
+PASS NAV 50 same-visit questions are separate ordered activity rows
+PASS NAV 51 view/info/critique have separate exact 10/20/30 second durations
+PASS NAV 52 split intervals sum to original visit once
+PASS NAV 53 question and section transitions preserve actual destination
+PASS NAV 54 segments have unique identities and share original visit
+PASS NAV 55 Disco has separate sequential intent activities instead of combined parent
+PASS NAV 56 Disco preserves per-question durations and next activity
+PASS NAV 57 repeated same-intent questions keep separate durations
+PASS NAV 58 last unanswered exit stays unknown while prior question closes on next send
+PASS NAV 59 backward question clock never produces invented sub-durations
+PASS NAV 60 question, answer arrival, viewing, next question sequence is explicit
+PASS NAV 61 each question ends on its response; viewing after response measured separately
+PASS NAV 62 responses are point events and do not inflate visit duration
+PASS NAV 63 question/view/exit close at correct boundaries
+PASS NAV 64 Disco preserves question-response-view chronology at identical timestamps
+PASS NAV 65 Disco carries distinct wait and viewing durations
+PASS NAV 66 response outside chat never invents a chat-view interval
+PASS NAV 67 failed response is never named successful answer
+PASS NAV 68 response-bound question interval is distinguishable from fallback boundary
+PASS NAV 69 off-chat response keeps its own source event and zero added duration
+TOTAL NAV 69 checks passed. Synthetic example; no real working database used.

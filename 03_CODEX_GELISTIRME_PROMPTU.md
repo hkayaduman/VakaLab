@@ -1,5 +1,7 @@
 # Codex İçin Geliştirme Promptu
 
+0.2.0 kullanıcı kararı önceliklidir: araştırmacılar ayrı çalışma alanları kullanır; ortak çalışma özelliği istenmiyor. Rutin işlemlerde gerekçe yok; toplu checkbox atama, sade kullanıcı formu, etiket/rubrik Sil, vaka odaklı tam indirme ve Disco CSV uygulanır. Eski global kapanış kuralı geçersizdir.
+
 Aşağıdaki metni proje dosyalarıyla birlikte Codex'e ver. Bu dosya geliştirme talimatıdır; uygulamanın şu anda hazır olduğu anlamına gelmez.
 
 ---
@@ -33,7 +35,7 @@ Son kullanıcı kararları şartnamelerde birleştirilmiştir. Önceki fikirleri
 12. Başlangıç/nihai rubrik çağrıları bağımsız. Diğer metin/puan ve güven puanları puanlama çağrısına verilmez.
 13. Sayısal fark, toplam ve ağırlık uygulamada hesaplanır.
 14. Ham veri, AI önerisi ve araştırmacı kararı ayrıdır. Kabul/düzenle/reddet/karar verilemedi vardır.
-15. Araştırma genelindeki beş vakanın veri toplaması kapanmadan rapor/puan öğrenciye açılmaz. Kapanış + onay + ayrı yayın gerekir.
+15. Her vaka bağımsız açılır/kapanır. İlgili vaka ve öğrencinin kişisel ek süresi kapalıyken rapor onayı + ayrı yayın gerekir. Yeniden açılışta rapor erişimi gizlenir; kilitli yanıtlar açılmaz.
 16. Bölüm açılması okuma; görünür yanıt okuma; kopyalama benimseme; hareketsizlik düşünmeme değildir.
 17. AI işlem süresi ve öğrenci bölüm süreleri ayrı kulvarlardır; çakışan süreler toplanmaz.
 18. Hazır prompt, prompt puanı, yeniden üretme, dallandırma, öğrenci sıralaması yok.
@@ -65,7 +67,7 @@ Akış için hosting destekliyorsa fetch/stream veya uygun aktarım kullan; auto
 
 Şema/migration ve veri sözlüğü üret. En az şu kavramları kapsa:
 - Kullanıcılar/roller, öğrenci profili ve hesap durum geçmişi.
-- Araştırma ve global veri toplama durumu.
+- Araştırmacı sahipliği, vaka bazında veri toplama durumu ve kişisel ek süre.
 - Vakalar, sürümler, atamalar ve atama geçmişi.
 - Öğrenci-vaka uygulamaları ve durum geçişleri.
 - Profil, başlangıç, nihai, yansıtma ve kesinleşmiş snapshotlar.
@@ -109,7 +111,7 @@ Geliştirme sonunda çalıştırılabilir, tekrar çalıştırıldığında kopy
 - AI üretirken nihai metin yazma, sohbet ekranında etkileşimsiz kalma, sayfa arka planı, kopyalama, tekrar açma, kesinti/kurtarma olayları.
 - AI önerisi/araştırmacı etiketi farkı, çoklu etiket ve yeni etiket örneği.
 - Açıkça TEST RUBRİĞİ etiketli örnek rubrik; 8 → 10 güven farkı örneği; ağırlıklı hesap testleri.
-- İncelenmemiş/onaylı/yayımlanmamış raporlar; yayın testi ayrı senaryoda global kapanışla.
+- İncelenmemiş/onaylı/yayımlanmamış raporlar; yayın testi ayrı sentetik senaryoda vaka kapanışı ve kişisel ek süreyle.
 - Gecikme, kısmi yanıt, hata ve geçersiz analiz JSON'u üreten mock modları.
 
 Seed hesaplarını ve geçici parolaları yalnızca test belgesinde belirt; üretimde varsayılan ortak parola bırakma. Test kayıtlarını ve sentetik zamanları gerçek gözlem gibi gösterme. Üretim dışa aktarması test verisini varsayılan dışlasın.

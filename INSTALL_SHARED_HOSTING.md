@@ -1,5 +1,7 @@
 # Shared hosting kurulumu
 
+0.2.0 güncellemesi: Mevcut DB için önce özel yedek alın; `php bin/console.php migrate` migration 002 uygular. SQLite yerel geçişinde `php bin/upgrade-sqlite.php` özel yedek + eski tüm sütunların hash karşılaştırmasını yapar. MySQL DDL atomik değildir; yarım kalmış 002 otomatik tekrar edilmez, ayrı DB kopyasında incelenir. SSH yoksa 002.sql sonrası mevcut users(student)/cases/definitions kayıtlarının owner_id alanını mevcut ilk araştırmacı kimliğiyle doldurun ve schema_migrations içine 2 kaydını yalnız başarılı doğrulama sonrası ekleyin; eski global kapanış varsa ilgili cases.collection_closed_at alanlarına taşıyın. Birden çok eski araştırmacı varsa sahiplik eşlemesini dağıtımdan önce açıkça doğrulayın. Taze SSH'siz kurulumda da 001 + 002 birlikte gerekir; yalnız 001 güncel kod için yeterli değildir.
+
 Durum: Yerelde PHP 8.3.35, MariaDB 11.4.12 ve SQLite ile denendi. Gerçek hosting, gerçek API, HTTPS/proxy ve hosting yedeği henüz denenmedi. Kullanıcı kabulü olmadan araştırmaya başlanmamalı.
 
 ## 1. Ön kontrol

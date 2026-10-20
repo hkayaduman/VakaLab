@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "D:\VakaLab\tests\mysql_checks.py", line 18, in <module>
+    else:raise RuntimeError('MariaDB did not start; inspect test server.log')
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: MariaDB did not start; inspect test server.log

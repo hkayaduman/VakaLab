@@ -1,0 +1,21 @@
+PASS NAV 1 example journey has twelve separate visits
+PASS NAV 2 all seven tabs measured
+PASS NAV 3 10:00 case to 10:02 profile equals 120 seconds
+PASS NAV 4 returning to case creates separate 30-second visit
+PASS NAV 5 second initial visit closes at successful confirmation
+PASS NAV 6 final-submit tab closes when server success is confirmed
+PASS NAV 7 initial and final success recorded once
+PASS NAV 8 editing labels reflect observed field changes
+PASS NAV 9 final-confidence and reflection changes included
+PASS NAV 10 AI request linked to exact visit without clock joining
+PASS NAV 11 post-submission browsing is excluded
+PASS NAV 12 original events unchanged
+PASS NAV 13 visit records actual destination tab
+PASS NAV 14 confirmations do not invent destination tabs
+
+Fatal error: Uncaught Fault: return visits retain view activity in D:\VakaLab\app\bootstrap.php:17
+Stack trace:
+#0 D:\VakaLab\tests\navigation.php(4): demand(false, 'return visits r...')
+#1 D:\VakaLab\tests\navigation.php(12): navCheck(false, 'return visits r...')
+#2 {main}
+  thrown in D:\VakaLab\app\bootstrap.php on line 17

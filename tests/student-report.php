@@ -1,0 +1,16 @@
+<?php
+declare(strict_types=1);
+require __DIR__.'/../app/bootstrap.php';
+$n=0;function ok($v,$label){global $n;demand((bool)$v,$label);echo 'PASS '.(++$n).' '.$label.PHP_EOL;}
+function fails($f,$label){try{$f();}catch(Fault){ok(true,$label);return;}throw new RuntimeException($label);}
+$body=['participant'=>'TEST','case_title'=>'Vaka','rubric_name'=>'Rubrik','dimensions'=>[['id'=>'a','name'=>'Karar','min'=>0,'max'=>4,'weight'=>2],['id'=>'b','name'=>'Gerekçe','min'=>0,'max'=>4,'weight'=>1]],'parts'=>[['step'=>3,'action'=>'accept','approved'=>['scores'=>['a'=>['score'=>1,'level'=>'Başlangıç'],'b'=>['score'=>2,'level'=>'Gelişiyor']]]],['step'=>4,'action'=>'accept','approved'=>['scores'=>['a'=>['score'=>3,'level'=>'İyi'],'b'=>['score'=>4,'level'=>'Tam']]]]]];
+$draft=['problem'=>'Öğrenci problemi','decision'=>'İlk karar','reason'=>'İlk gerekçe','final_decision'=>'Son karar','final_reason'=>'Son gerekçe'];$report=StudentReport::build($body,$draft);
+ok($report['sections']['initial']['total']===4.0,'initial weighted sum');ok($report['total']===10.0&&$report['max']===12.0,'final weighted total, not initial plus final');
+ok($report['sections']['final']['answers']['Nihai kararım']==='Son karar','original final answer');ok($report['sections']['initial']['answers']['Temel problem']==='Öğrenci problemi','original initial answer');
+$feedback=['initial'=>['a'=>'İlk kararınızın sonucunu daha açık anlatabilirsiniz.','b'=>'Gerekçenizi somut olayla ilişkilendirin.'],'final'=>['a'=>'Kararınızda ilgili kişilerin ihtiyaçlarını tartışmışsınız.','b'=>'Gerekçenizde farklı sonuçları açıkça ele almışsınız.'],'overall_feedback'=>'Nihai yanıtınızda gerekçelendirme ve kararınızı ilişkilendirmişsiniz.'];
+$complete=StudentReport::feedback($report,$feedback);ok($complete['total']===$report['total'],'feedback cannot change calculated scores');ok($complete['sections']['final']['criteria'][0]['feedback']===$feedback['final']['a'],'feedback mapped to correct criterion');
+$bad=$feedback;unset($bad['final']['a']);fails(fn()=>StudentReport::feedback($report,$bad),'missing feedback rejected');$bad=$feedback;$bad['final']['extra']='Bilinmeyen boyut açıklaması';fails(fn()=>StudentReport::feedback($report,$bad),'unknown criterion rejected');$bad=$feedback;$bad['overall_feedback']='AI tarafından hazırlanmış bir rapordur.';fails(fn()=>StudentReport::feedback($report,$bad),'technical production wording rejected');$bad=$feedback;$bad['overall_feedback']='';fails(fn()=>StudentReport::feedback($report,$bad),'empty overall feedback rejected');
+$body['parts'][1]['action']='uncertain';$unscored=StudentReport::build($body,$draft);ok($unscored['total']===null&&$unscored['sections']['final']['criteria'][0]['score']===null,'uncertain is not zero');
+$body['parts'][1]['action']='reject';ok(StudentReport::build($body,$draft)['total']===null,'rejected is not approved total');
+$stored=$body+['student_report'=>$complete,'internal'=>['secret'=>'private']];$projection=StudentReport::projection($stored,[]);ok(!isset($projection['internal'],$projection['parts'],$projection['confidence']),'clean projection excludes research internals');ok($projection===$complete,'new snapshot independent of later draft');ok(str_contains(StudentReport::projection($body,$draft)['overall_feedback'],'henüz'),'legacy missing feedback explicit');
+echo "TOTAL $n student report checks passed.\n";

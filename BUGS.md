@@ -32,3 +32,34 @@ Yeni hata dönütü: Test ID, sürüm, sentetik hesap/vaka, adımlar, beklenen/g
 
 ## FIX-14 —0.1.9: Çıkış sonrası gereksiz başka sekme uyarısı
 Çıkış sessionStorage içindeki tabkimliğini temizlerken localStorage owneryetkisini20saniyebırakıyordu;hızlıyenigirişyeni tabkimliğiylesaltokunuraçılabiliyordu. releaseLease home/başarılılogouttatimerıdurdurupyalnızold.tab===tabiseleasekaydınıkaldırır. Gerçekikincisekmekorumasıdeğişmez. ÖncehataüretimiFAIL,düzeltmesonrası69ChromeGEÇTİ(test-evidence/logout-lease-*.txt). Manueltekrarbekliyor.
+
+## 0.1.9 — Ek doğrulama, yeni hata yok — 2026-10-20
+
+B14.2/B15 erişim/atama/sürüm ve ayrı global kapanış/yayın karşılıkları tests/access_publication_checks.py ile 80 HTTP kontrolünde geçti (SQLite/mock; test-evidence/access-publication-0.1.9.txt). Ürün kodu değişikliği gerekmedi. OPEN-01/02/03/04/05 ve hedef hosting hacmi doğrulaması açık kalır; gerçek AI/hosting/rubrik/cihaz/kesinti yerine sayılmaz. Yeni manuel batch istenmedi. Güncel bilgi/erişim listesi ve senaryo RELEASE_READINESS.md.
+
+## 0.2.0 — Kullanıcı isteğiyle panel/yetki/yayın kuralları değişti
+
+Eski global kapanış kuralı kullanıcı talebiyle vaka aç/kapat ve kişisel ek süreye dönüştü. Rutin form karmaşıklığı/gerekçe zorunluluğu, tekli atama, tanım kaldırma ve export ekranı sadeleştirildi. Ayrı araştırmacı sahiplik koruması eklendi; ortak vaka erişimi iptal edildi. Bu değişiklikler eski uygulama kurallarının test hatası olarak yorumlanmaz.
+
+Test altyapısındaki async bekleme/ham JSON/CSV tırnak beklentisi ve Windows MariaDB TLS hataları düzeltildi; ilk koşular ayrı saklandı. Son gerçek sayılar119HTTP/42HTTP/69Chrome/24UI/69SQLite/69MariaDB+restore/35export. Gerçek Disco import ve OPEN-01…06 dış kabul sınırları devam eder. Yerel migration yedekli ve22tabloda eski içerik eşitliğiyle tamamlandı.
+
+## 0.2.1 — Kullanıcı isteğiyle araştırmacı kullanımını kolaylaştırma
+
+Matris yerine vaka seçerek öğrenci listesi, atanmış öğrenci diyaloğu, alanlarla rubrik oluşturma ve okunaklı/aranabilir işlem geçmişi eklendi. Ek süre işlevi yeniden119HTTPve50hedefliChrome ile doğrulandı; hata bulunmadı. Rubrik doğrulamasında düzey ad/açıklama/puan/tekrar/sonlu sayı kontrolleri sunucuya da eklendi. İlk yeni UI testinin process isim gölgelemesi test kodunda düzeltildi; ürün hatası değildir. Önceki dış kabul açıkları sürer.
+
+## 0.2.1 kapsam denetimi — 2026-10-20
+
+Güncel kodda12yereltestgrubunun tamamı tekrar geçti;547bildirilen örtüşen kontrol ve8restoretablosayısıeşit. Yeni ürün hatası görülmedi. Bağlam/manuel rehberlerde kalan eski matris/global kapanış/JSONrubrik/rutin gerekçe anlatımları güncellendi; tarihsel test sonuçları korundu. OPEN-01…06vegerçekDiscoimport dış kabul sınırları açık kaldı. Kanıtlar TEST_RESULTS.md ve test-evidence/audit-0.2.1-summary.json.
+
+## 0.2.3 — Öğrenci raporu anlaşılabilirliği
+Kullanıcının teknik ve karmaşık rapor bildirimi yanıt/puan/feedback/nihai toplam görünümüyle giderildi. Öğrenciye iç inceleme alanları artık allowlist biçiminde sunulur. Eski gövdeler korunur; yeni feedback için yeni sürüm gerekir. Sentetik otomatik doğrulama TEST_RESULTS.md; gerçek sağlayıcı geri bildirim kalitesi ve Word görsel kabulü hâlâ açık.
+
+## 0.2.4 — Süreç JSON okunabilirliği ve Disco etiketleri
+Kullanıcının öğrenci-vaka dosyasında yoğun JSON bildirimi alan/liste/karşılaştırma gösterimiyle giderildi. Bağımsız AI etiketleme ve Disco mesaj etiketleri eklendi; araştırmacı boş seçimi dahil güncel seçim önceliği doğrulandı. Açık süre tablosunun mobil taşması düzeltildi. 97 Chrome ve hedefli sunucu/etiket/export kanıtı TEST_RESULTS.md içinde; gerçek AI kalitesi/Disco import dış kabulü açık.
+
+## 0.2.5 — Disco ziyaret süreleri ve tamamlanma sınırı
+0.2.4 incelemesinde saptanan ziyaret sürelerinin Disco'ya aktarılmaması, yeni click-to-click ziyaret profiliyle giderildi. Tüm yedi sekme, tekrar ziyaret, son teslimde bitiş ve sonrasını dışlama otomatik doğrulandı. İptal edilen beforeunload'un kapanış sayılması ve çıkış sırasında kuyruğun yeniden oluşması engellendi. Açık uçlar bilinmiyor kalır; gerçek cihaz/crash ve gerçek Disco import kabulü açık.
+
+## 0.2.9 — Eski AI sorularının amaç satırları görünmüyor
+
+Düzeltildi: message_send olayları eklenmeden önce oluşmuş gerçek öğrenci mesajları yalnız yanıt ve görüntüleme olarak görünüyordu; etiket mevcut olsa da soru satırı oluşmuyordu. Gerçek mesaj kaydı artık ayrı amaç noktası olarak gösterilir, sunucu zamanı ve bilinmeyen bekleme süresi açıkça belirtilir. Yerel kayıt salt okunur doğrulandı; sentetik 77 navigation/114 Chrome ve ilgili export testleri geçti. Kullanıcının yeni öğrenci denemesi sonucu henüz bildirilmedi.

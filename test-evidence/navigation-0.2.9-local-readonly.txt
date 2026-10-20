@@ -1,0 +1,4 @@
+{"message_sequence":1,"label_source":"researcher","effective_labels":["Bilgi istedi"]}
+{"message_sequence":3,"label_source":"researcher","effective_labels":["Eleştiri istedi"]}
+{"activity":"AI sohbeti · Bilgi istedi","time_source":"server_message","duration":null}
+{"activity":"AI sohbeti · Eleştiri istedi","time_source":"server_message","duration":null}

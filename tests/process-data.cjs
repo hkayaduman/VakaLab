@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict');
+const {processChanges,processDuration,processUnion,processTiming}=require('../public/assets/process.js');
+assert.deepEqual(processChanges({problem:'A',confidence:0},{problem:'B',confidence:0}).map(c=>[c.key,c.before,c.after]),[['problem','A','B']]);
+assert.deepEqual(processChanges('{"decision":"İlk"}','{"decision":"Son"}')[0],{key:'decision',before:'İlk',after:'Son'});
+assert.equal(processChanges({confidence:null},{confidence:0})[0].after,0);
+assert.equal(processDuration(-1),'Ölçülemedi');assert.equal(processDuration(null),'Ölçülemedi');assert.equal(processDuration(0),'0 sn');assert.equal(processDuration(65),'1 dk 5 sn');
+assert.equal(processUnion([[0,10],[5,15],[20,25]]),20);
+const timing=processTiming({visits:[{section:'initial',start:'2026-10-20T10:00:00Z',end:'2026-10-20T10:00:10Z',seconds:10,visible:true,focused:true},{section:'initial',start:'2026-10-20T10:00:05Z',end:'2026-10-20T10:00:15Z',seconds:10,visible:true,focused:true},{section:'initial',seconds:null},{section:'initial',seconds:10,visible:false,focused:true}]});
+assert.equal(timing.find(r=>r.section==='initial').seconds,15);assert.equal(timing.find(r=>r.section==='initial').unknown,1);assert.equal(timing.find(r=>r.section==='final').count,0);
+console.log('TOTAL PROCESS UI 11 checks passed: field differences, zero/null, durations, interval union, unknown measurements.');

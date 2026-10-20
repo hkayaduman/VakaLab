@@ -1,0 +1,8 @@
+DIAGNOSTIC: separate in-memory synthetic fixture; no product change; not actual Disco import.
+CSV rows: 9
+Derived visit intervals available in full dataset: 8
+Visit intervals exported to Disco CSV: 0
+Student/browser activity rows where Start=Complete: 7
+Message Activity: Öğrenci mesajı gönderildi; Effective Labels (separate attribute): Açıklama istedi | Alternatif fikir istedi
+CSV contains field/session/tab columns:
+Code review: text/profile events use section + generic type; specific field and locked-view flag are not exported.

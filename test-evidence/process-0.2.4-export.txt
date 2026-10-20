@@ -1,0 +1,36 @@
+PASS EXPORT 1 all accepted event types have Turkish descriptions
+PASS EXPORT 2 no event filtering or duplication
+PASS EXPORT 3 original codes and UTC preserved: section_open
+PASS EXPORT 4 original codes and UTC preserved: field_focus
+PASS EXPORT 5 original codes and UTC preserved: text_changed
+PASS EXPORT 6 original codes and UTC preserved: profile_changed
+PASS EXPORT 7 original codes and UTC preserved: question_changed
+PASS EXPORT 8 original codes and UTC preserved: copy
+PASS EXPORT 9 original codes and UTC preserved: paste
+PASS EXPORT 10 original codes and UTC preserved: scroll
+PASS EXPORT 11 original codes and UTC preserved: visibility
+PASS EXPORT 12 original codes and UTC preserved: focus
+PASS EXPORT 13 original codes and UTC preserved: heartbeat
+PASS EXPORT 14 original codes and UTC preserved: offline
+PASS EXPORT 15 original codes and UTC preserved: online
+PASS EXPORT 16 original codes and UTC preserved: recovered
+PASS EXPORT 17 original codes and UTC preserved: response_visible
+PASS EXPORT 18 original codes and UTC preserved: page_exit
+PASS EXPORT 19 heartbeat clearly marked as technical observation
+PASS EXPORT 20 section code translated
+PASS EXPORT 21 coded output still removes synthetic private content
+PASS EXPORT 22 raw output retains synthetic event payload
+PASS EXPORT 23 stored event history unchanged
+PASS EXPORT 24 dictionary documents all event codes
+PASS EXPORT 25 dictionary documents all sections
+PASS EXPORT 26 CSV includes readable Turkish columns
+PASS EXPORT 27 JSON includes readable descriptions
+PASS EXPORT 28 generated XLSX reopened with Turkish event names
+PASS EXPORT 29 XLSX contains explanatory dictionary
+PASS EXPORT 30 unknown future codes preserved with fallback
+PASS EXPORT 31 Disco invalid client clock falls back without losing event
+PASS EXPORT 32 Disco leaves original malformed timestamp unchanged
+PASS EXPORT 33 empty Disco export still has importable headers
+PASS EXPORT 34 single-application full export keeps its case/version scope
+PASS EXPORT 35 full export never includes password hash columns
+TOTAL EXPORT 35 checks passed. Separate in-memory synthetic database.

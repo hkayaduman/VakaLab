@@ -1,5 +1,26 @@
 # Değişiklik günlüğü
 
+## 0.2.2 — 2026-10-20 — Öğrenci ana ekranı
+
+- Katılım bilgilerim düğmesi ve istemci formu kaldırıldı; mevcut bilgiler korundu.69Chrome kontrolü ve syntax/lint geçti.
+
+## 0.2.1 — 2026-10-20 — Vaka/öğrenci seçimi, rubrik formu ve okunaklı geçmiş
+
+- Vaka kartında atanan öğrenci listesi ve ilgili atama yönetimine doğrudan geçiş.
+- Matris yerine vaka seçimi, öğrenci arama/durum listesi; Çalışmayı aç ve dönüşte seçim koruma.
+- JSON gerektirmeyen boyut/düzey/puan/ağırlık formu, alan odaklı hatalar, sunucu doğrulaması ve eski sürüm/kimlik koruması.
+- Türkçe aranabilir işlem geçmişi,20şer gösterim ve yetkili ham JSON indirmesi.
+- Ek süre yeniden test edildi;119HTTP,69Chrome,50yeniUI,69SQLite,14rubrik geçti. Şema/mevcut DB değişmedi. Dış ortam kabulü bekliyor.
+
+## 0.2.0 — 2026-10-20 — Sade araştırmacı paneli ve ayrı çalışma alanları
+
+- Her araştırmacı kendi vakalarını/öğrencilerini/analizlerini yönetir; yeni araştırmacı eklenebilir. Ortak çalışma talebi kullanıcı tarafından iptal edildi.
+- Kısa kullanıcı formu; onam/deneyim/araç/çekilme alanları ve rutin işlem gerekçeleri kaldırıldı. Değerlendirme/inceleme kararları gerekçeli kalır; eski metadata korunur.
+- Checkbox/Tümünü seç ile atomik toplu atama ve kişisel ek süre. Vaka kartında veri toplama aç/kapat; global kapanış kaldırıldı. Teslim ve başlangıç kilitleri korunur.
+- Etiket/rubrik Sil yeni seçimlerden kaldırır, eski analiz/raporları korur.
+- Seçili vaka/Tüm vakalar için tam Excel/JSON; Disco için kodlanmış öğrenci-vaka Case ID, etkinlik, UTC başlangıç/bitiş ve kaynak alanları hazır CSV.
+- Migration 002, sahiplik/yayın kapıları ve güncel otomatik sonuçlar TEST_RESULTS.md içinde. Gerçek AI/hosting/kurum kabulü bekliyor.
+
 ## 0.1.9 — 2026-10-20 — Çıkış sonrası sekme kilidi
 
 - Başarılı çıkışta ve Vakalarım dönüşünde yalnız mevcut sekmenin kendi lease kaydı temizlenir. Hızlı yeniden girişteki sahte başka sekme uyarısı giderildi; gerçek ikinci sekme koruması sürer.
@@ -75,3 +96,34 @@
 - Kurulum, test verisi, manuel kabul, veri sözlüğü ve devam belgeleri.
 
 Bu sürüm gerçek araştırma/hosting/AI ve kullanıcı kabulünü tamamlamış sayılmaz; açık kontroller BUGS.md ve plan.md içindedir.
+
+## 0.2.3
+Öğrenci için yanıt/puan/ölçüt geri bildirimi/nihai toplam/genel geri bildirim raporu; araştırmacı öğrenci önizlemesi ve aynı sade Word/PDF. Feedback taslağı onaylanmış puanlardan ayrı çağrıyla hazırlanır; puan hesabı uygulamadadır. Yeni değişmez rapor sürümleri, mevcut onay/yayın kapıları ve iç araştırmacı kayıtları korunur. Eski gövdeler değiştirilmedi.
+
+## 0.2.4
+Öğrenci-vaka dosyasında JSON yerine okunabilir yanıtlar, Önce/Sonra geçmişi, filtreli işlem çizelgesi, süre/eksik ölçüm tablosu ve AI bağlantı sonuçları. Analiz çıktıları ve karar düzenleme alanları sadeleştirildi. Doğrudan AI mesaj etiketleme, araştırmacı düzeltmesi ve geçmişi; Disco içinde ayrı öneri/karar/güncel etiket sütunları. Açık paneller/filtreler korunur. Mevcut veride seed/reset veya şema değişikliği yok.
+
+## 0.2.5
+Yedi sekmede girişten sonraki geçişe kadar ziyaret süresi; tekrar ziyaretler ayrı, son teslimin başarıyla kaydında izleme sona erer. Ziyaret tablosu ve varsayılan Disco geçiş/süre CSV; ayrıntılı AI olay CSV ayrı. Açık/geçersiz süreler tahmin edilmez. Çıkış/gerçek sayfa ayrılışı ve çalışma-özel kuyruklar iyileştirildi. Yeni migration yok.
+
+## 0.2.6 — Yerel geliştirme
+
+- Ziyaret tablosunda gerçek sekme adlarıyla görüntüleme/güncelleme; kilit ve görünmez sayfa bilgileri ayrı ve açıklamalı.
+- Kapanışta gerçek hedef sekme; Disco ziyaret CSV'sinde hedef bölüm ve kilit sütunları.
+- Ziyaret tablosunda metin kaydırma; süre/teslim sonrası takip davranışı korunur. Sentetik doğrulama ayrıntıları TEST_RESULTS.md içinde.
+
+## 0.2.7 — Yerel geliştirme
+
+AI sohbeti ziyaretleri gerçek gönderilmiş mesajların güncel etiketleriyle adlandırılır; soru taslağı/gönderimsiz ziyaret görüntüleme kalır. Araştırmacı düzeltmesi ve boş seçim korunur. Çoklu etiketler tek ziyaret altında gösterilir; aynı etkinlik adları Disco Activity ve Excel/JSON çıktısında da kullanılır. Sentetik doğrulama TEST_RESULTS.md içinde.
+
+## 0.2.8 — Yerel geliştirme
+
+AI soruları aynı ziyarette de gönderim sırasıyla ayrı etkinlik/süredir; tekrar amaçlar korunur. Yanıtın gelişi soruyu kapatır; ayrı anlık yanıt ve ardından AI görüntüleme aralığı başlar. Başka bölümde gelen yanıt bölüm geçişi sayılmaz. Disco/Excel/JSON ve süreç ekranı aynı aralıkları kullanır; ziyaret toplamı iki kez sayılmaz. Eksik geliş kaydı belirtilir. Sentetik test kanıtı TEST_RESULTS.md içinde.
+
+## 0.2.9 — Yerel geliştirme
+
+Eski sürümde gönderim olayı bulunmayan AI soruları güncel etiketleriyle artık görünür. Sunucu mesaj zamanı ve bilinmeyen süre açık belirtilir; Disco'ya da ayrı soru noktası eklenir. Yeni kayıtların ayrı soru/yanıt/görüntüleme süreleri korunur. Eski veriler değiştirilmez.
+
+## 0.2.10 — Yerel geliştirme
+
+Etiketli soru gönderimi ve AI yanıtı hazırlanıyor beklemesi ayrı etkinliklerdir. Hazırlık aynı isteğin yanıtına kadar, bölüm değiştirilse de ayrı kulvarda sürer. Yanıt/görüntüleme ayrımı ve eski sorular korunur. Disco CSV ayrı kulvarı belirtir; bölüm toplamlarıyla iki kez sayılmaz. Sentetik 40 saniye dahil test kanıtları TEST_RESULTS.md içinde.

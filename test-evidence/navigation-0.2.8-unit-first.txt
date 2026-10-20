@@ -1,0 +1,29 @@
+PASS NAV 1 example journey has twelve separate visits
+PASS NAV 2 all seven tabs measured
+PASS NAV 3 10:00 case to 10:02 profile equals 120 seconds
+PASS NAV 4 returning to case creates separate 30-second visit
+PASS NAV 5 second initial visit closes at successful confirmation
+PASS NAV 6 final-submit tab closes when server success is confirmed
+PASS NAV 7 initial and final success recorded once
+PASS NAV 8 editing labels reflect observed field changes
+PASS NAV 9 final-confidence and reflection changes included
+PASS NAV 10 AI request linked to exact visit without clock joining
+PASS NAV 11 post-submission browsing is excluded
+PASS NAV 12 original events unchanged
+PASS NAV 13 visit records actual destination tab
+PASS NAV 14 confirmations do not invent destination tabs
+PASS NAV 15 return visits retain view activity
+PASS NAV 16 locked visit keeps requested tab and destination, with separate lock flag
+PASS NAV 17 reflection without a field change is viewing
+PASS NAV 18 unobserved final exit remains unknown
+PASS NAV 19 backward client clock not converted into positive duration
+PASS NAV 20 invalid time not replaced by receive time
+PASS NAV 21 elapsed click-to-click time is not capped at heartbeat 30 seconds
+PASS NAV 22 background state retained without subtracting elapsed time
+
+Fatal error: Uncaught Fault: CSV contains twelve closed visits plus two milestones in D:\VakaLab\app\bootstrap.php:17
+Stack trace:
+#0 D:\VakaLab\tests\navigation.php(4): demand(false, 'CSV contains tw...')
+#1 D:\VakaLab\tests\navigation.php(23): navCheck(false, 'CSV contains tw...')
+#2 {main}
+  thrown in D:\VakaLab\app\bootstrap.php on line 17

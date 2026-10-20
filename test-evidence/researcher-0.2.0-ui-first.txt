@@ -1,0 +1,21 @@
+PASS UI 1 user creation includes student/researcher choice
+PASS UI 2 simple account form omits removed fields and reason
+PASS UI 3 researcher account created via short form
+PASS UI 4 new researcher has no other researcher students
+PASS UI 5 new researcher has no inherited cases
+PASS UI 6 bulk assignment lists all owned students as checkboxes
+PASS UI 7 select all selects every student
+PASS UI 8 select all indicates partial selection
+PASS UI 9 bulk assignment persists for all students
+PASS UI 10 working student initially editable
+PASS UI 11 case closure makes student fields read only
+PASS UI 12 student sees closure explanation
+PASS UI 13 selected late access restores working fields
+PASS UI 14 revoking late access returns fields to read only
+PASS UI 15 new label needs no reason
+PASS UI 16 label description entered as plain text
+PASS UI 17 deleted label leaves active list
+PASS UI 18 used rubric removable from active list
+Error: export selects all or single owned case
+    at check (D:\VakaLab\tests\researcher-ui.cjs:8:65)
+    at D:\VakaLab\tests\researcher-ui.cjs:44:59

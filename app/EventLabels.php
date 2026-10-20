@@ -19,6 +19,9 @@ final class EventLabels {
         'recovered'=>['Taslak kurtarıldı','Teknik durum','Aynı hesap ve çalışma için saklanan sekme taslağı kurtarıldı.'],
         'response_visible'=>['AI yanıtının gelişi kaydedildi','Yanıt durumu','Tam AI yanıtı geldi; ilgili bölüm ve sayfa görünürlüğü ayrıca değerlendirilir, okunma kanıtı değildir.'],
         'page_exit'=>['Sayfadan çıkış gözlendi','Teknik durum','Tarayıcının bildirebildiği sayfadan çıkış olayı; tüm çıkışların kaydı garanti edilmez.'],
+        'section_leave'=>['Çalışma ekranından ayrıldı','Gezinme','Vakalarım ekranına dönüş veya çıkışla mevcut bölüm ziyareti kapandı.'],
+        'workflow_confirmed'=>['Yanıtlar kesinleştirildi','Teslim durumu','Başlangıcın kesinleşmesi veya son teslimin sunucuda başarıyla kaydedilmesi doğrulandı.'],
+        'message_send'=>['AI mesajı gönderimi başlatıldı','Mesaj durumu','AI isteğinin gönderilme girişimi kaydedildi; başarı ve soru amacı sunucu isteğiyle eşleştirilerek belirlenir.'],
     ];
     public const SECTIONS = ['case'=>'Vaka metni','profile'=>'Vaka profili','initial'=>'Başlangıç değerlendirmesi','ai'=>'AI sohbeti','final'=>'Nihai değerlendirme','reflection'=>'Yansıtma','confirm'=>'Son teslim'];
     public static function describe(array $event): array {

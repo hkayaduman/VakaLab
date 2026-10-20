@@ -1,0 +1,82 @@
+{
+  "version": "0.2.1",
+  "date": "2026-10-20",
+  "groups": 12,
+  "assertions": 547,
+  "note": "547 reported checks across overlapping suites; not 547 unique scenarios. Synthetic local tests, not production approval.",
+  "restore_tables": 8,
+  "results": [
+    {
+      "group": "time",
+      "count": 10,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-time.txt"
+    },
+    {
+      "group": "labels",
+      "count": 8,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-labels.txt"
+    },
+    {
+      "group": "analysis",
+      "count": 12,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-analysis.txt"
+    },
+    {
+      "group": "rubric",
+      "count": 14,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-rubric.txt"
+    },
+    {
+      "group": "export",
+      "count": 35,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-export.txt"
+    },
+    {
+      "group": "sqlite",
+      "count": 69,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-sqlite.txt"
+    },
+    {
+      "group": "validation",
+      "count": 50,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-validation.txt"
+    },
+    {
+      "group": "browser",
+      "count": 69,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-browser.txt"
+    },
+    {
+      "group": "ui",
+      "count": 50,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-ui.txt"
+    },
+    {
+      "group": "access",
+      "count": 119,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-access.txt"
+    },
+    {
+      "group": "http",
+      "count": 42,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-http.txt"
+    },
+    {
+      "group": "mariadb",
+      "count": 69,
+      "result": "passed",
+      "evidence": "test-evidence/audit-0.2.1-mariadb.txt"
+    }
+  ]
+}

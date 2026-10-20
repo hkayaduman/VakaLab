@@ -2,6 +2,18 @@
 
 ## Mevcut durum
 
+**Güncel — 2026-10-21, 0.2.10 (yerel):** Kullanıcının onayladığı akış: etiketli soru gönderimi (anlık) → AI yanıtı hazırlanıyor (ayrı bekleme süresi) → yanıt geldi (anlık) → AI sekmesindeyse görüntüleme. Bekleme bölüm değişse de aynı trace/request eşleşmesiyle devam eder; timeline_lane=ai_wait olarak öğrenci bölüm ziyaretlerinden ayrı tutulur. Disco Timeline Lane ve Response Section alanlarını taşır. Üstteki bölüm toplamlarına bekleme ayrıca eklenmez; eksik yanıt kaydında süre null kalır. Eski soru noktaları/araştırmacı etiketleri ve teslimde takibin durması korunur. 82 navigation, 115 Chrome, 38 export, 28 etiket/süreç ve 75 SQLite kontrolü geçti; sözdizimi geçti. 40 saniye senaryosu sentetik zaman fixture'ıdır; gerçek sağlayıcı gecikme ölçümü değildir. Mevcut çalışma DB'sinde yazma/seed/reset/yayın/etiket değişikliği yok. Gerçek AI/hosting/Disco import kabulü açık; commit/push yok.
+
+**Önceki aşama — 2026-10-21, 0.2.9 (yerel):** Kullanıcının ekranında eski iki sorunun kaybolduğu saptandı. Salt okunur çalışma DB incelemesinde 2 gerçek öğrenci mesajı ve 2 response_visible var, message_send yok; ilk soru zaten Bilgi istedi etiketliydi. Kullanıcı sonradan ikinciyi Eleştiri istedi olarak etiketledi; iki güncel araştırmacı seçimi salt okunur doğrulandı. Eksik eski gönderim kaydı artık soruyu gizlemez: sunucu mesaj kaydından ayrı soru noktası gösterilir, kaynağı belirtilir, bekleme süresi null/Ölçülemedi kalır. Disco noktasında Duration Seconds boş ve Time Source server_message; istemci saatinden süre uydurulmaz. Yeni kayıtların soru/yanıt/görüntüleme aralıkları korunur, çift soru eklenmez. 77 navigation, 114 Chrome, 38 export, 28 etiket/süreç, 75 SQLite ve sözdizimi kontrolleri geçti. Kullanıcı yeni öğrenciyle denemeyi seçti; sonuç henüz bildirilmedi. Gerçek DB yazma/seed/reset/yayın/etiket değişikliği yapılmadı; yeni otomatik manuel batch dayatılmadı; commit/push yok.
+
+**Önceki aşama — 2026-10-21, 0.2.8 (yerel):** Kullanıcının son ölçüm kuralı: AI sorusu gönderildi → yanıtın tarayıcıya gelişi → öğrenci AI sekmesinde kalıyorsa görüntüleme → sonraki soru/yanıt/görüntüleme → bölüm geçişi. Soru/yanıt bekleme ve görüntüleme ayrı aralıklardır; yanıt gelişi sıfır süreli nokta olayıdır. Aynı türden tekrar sorular ayrı kalır. navigation.activities ve export navigation_activities bu sıralı aralıkları içerir; Disco varsayılanında bu satırlar kullanılır. Parent Visit ID ile özgün ziyaret korunur; süresi tekrar eklenmez. Başka bölümde gelen yanıt öğrenciyi AI sekmesine geçmiş göstermez. Eksik geliş kaydı/saat bozukluğu açık belirtilir, zaman tahmin edilmez. 69 navigation, 113 Chrome, 38 export, 28 etiket/süreç ve 75 SQLite kontrolü geçti; sözdizimi kontrolleri geçti. Mevcut çalışma DB'sinde yazma/seed/reset/yayın yok; manuel batch/commit/push yok. Gerçek AI/hosting/Disco import kabulü açık.
+
+**Önceki aşama — 2026-10-21, 0.2.7 (yerel):** AI ziyaretlerinde yalnız taslak yazma/görüntüleme = AI sohbeti görüntüleme; gerçekten gönderilen öğrenci mesajları istek anahtarıyla eşleştirilerek etkinlik adı güncel etiketlerle oluşturulur (AI sohbeti · Bilgi istedi vb.). Araştırmacı seçimi, boş seçim dahil önceliklidir. Bir ziyarette çoklu soru/etiket + ile birleştirilir; süre çoğaltılmaz. Etiket bekliyor/eşleşme yok/araştırmacı boş seçimi ve eşleşmeyen gönderme denemesi ayrılır. Aynı adlar araştırmacı API/ekranı, navigation_visits Excel/JSON ve Disco Activity alanında kullanılır. 49 navigation, 109 Chrome, 38 export, 28 etiket/süreç, 75 SQLite kontrolü ve PHP/JS sözdizimi geçti. Gerçek DB değişmedi; yeni manuel batch, commit/push yok. Gerçek AI/hosting/Disco import kabulü bekliyor.
+
+**Önceki aşama — 2026-10-21, 0.2.6 (yerel):** Ziyaret etkinliği yedi gerçek sekme adı + görüntüleme/güncelleme biçiminde. Kilit durumu etkinlik yerine ayrı Ek bilgi alanında; Nasıl bitti? gerçek hedef sekmeyi gösterir. Sayfanın görünmez olduğu gözlemi açık dille açıklanır; neden/süre tahmin edilmez. CSV aynı etkinlik adlarını ve ayrı Next Section, Next Section Name, Locked sütunlarını taşır. Süre hesabı ve son teslimde takibin durması korundu. Ayrı sentetik ortam: 36 navigation, 105 Chrome, 38 export, 11 süreç JS kontrolü; PHP/JS sözdizimi geçti. Gerçek çalışma veritabanına müdahale, yeni manuel batch, commit/push yok. Gerçek hosting/AI/Disco import kabulü bekliyor.
+
+**Önceki aşama — 2026-10-20, 0.2.2:** Kullanıcı isteğiyle öğrenci Vakalarım ekranındaki Katılım bilgilerim düğmesi ve bağlı istemci formu kaldırıldı. Mevcut metadata/araştırmacı Program-Sınıf alanları/API/DB korundu. JS syntax/indexPHP lint ve ayrı sentetik DBde69Chrome kontrolü geçti (test-evidence/student-0.2.2-browser.txt). Diğer test grupları bu küçük UI değişikliğinde yeniden çalıştırılmadı;0.2.1deki12grup547kontrol tarihsel kanıttır. Gerçek ortam kabulü açık; yeni manuel batch yok. Commit/push yok.
+
 2026-10-20: 0.1.0 sentetik pilot uygulama geliştirildi; yerel önizleme çalışıyor. SQLite ve MariaDB üzerinde 69’ar alan/dosya kontrolü, iki PHP worker ile 42 HTTP kontrolü, Chromium ile 18 browser kontrolü geçti. Bunlar gerçek hosting/AI veya kullanıcı kabulü değildir. Kanıt: TEST_RESULTS.md ve test-evidence/.
 
 Durumlar: BEKLİYOR / DEVAM EDİYOR / ENGELLİ / DOĞRULANDI. Tamamlanma için kod, test kanıtı ve belge gerekir. Tasarımın hazır olması uygulamanın hazır olması değildir.
@@ -21,22 +33,22 @@ Durumlar: BEKLİYOR / DEVAM EDİYOR / ENGELLİ / DOĞRULANDI. Tamamlanma için k
 | ID | İş | Durum | Tamamlanma kanıtı |
 |---|---|---|---|
 | P01 | Depo/hosting gereksinimleri ve mimari | DOĞRULANDI (yerel) | ARCHITECTURE + CLI check; gerçek hosting bekliyor |
-| P02 | Şema, migration, sürümleme, veri sözlüğü | DOĞRULANDI (MariaDB/SQLite) | 001.sql, 69 assertion iki DB; FK/unique ve sürümler |
+| P02 | Şema, migration, sürümleme, veri sözlüğü | DOĞRULANDI (yerel MariaDB/SQLite) | 001/002, güncel69ikiDB;0.2.0yedekli22tablo geçiş kanıtı |
 | P03 | Giriş, roller, sahiplik, kurulum güvenliği | DOĞRULANDI (yerel HTTP) | 42 HTTP kontrolünde rol/CSRF/IDOR/frozen/logout |
-| P04 | Katılımcı, vaka, atama, dinamik matris | DOĞRULANDI (yerel) | Admin/domain testleri + Chromium matris/katılımcı/filtre |
-| P05 | Öğrenci responsive ekranı ve durum makinesi | DOĞRULANDI (Chromium) | 18 browser kontrolü; fiziksel mobil kabulü bekliyor |
+| P04 | Ayrı alanlar, vaka/öğrenci listesi ve atamalar | DOĞRULANDI (yerel) | 119HTTP/50hedefliUI;kapalı vaka ve kişisel ek süre |
+| P05 | Öğrenci responsive ekranı ve durum makinesi | DOĞRULANDI (yerel Chrome) | 69browser/50validation; fiziksel mobil kabulü bekliyor |
 | P06 | Autosave, revision, kurtarma, ikinci sekme | DEVAM EDİYOR | Revision ve ikinci sekme geçti; kesinti/kurtarma kullanıcı kabulü bekliyor |
 | P07 | AI adapter, mock, tek istek kilidi, akış | DEVAM EDİYOR | Mock/attempt/fencing + 2-worker concurrency geçti; gerçek API/hosting yok |
 | P08 | Olaylar, taslaklar, süreler, kopyalama | DOĞRULANDI (yerel) | Dedup, union/belirsizlik testleri; event katalog + sentetik fixture |
 | P09 | Etiket ve rubrik yönetimi/sürümleri | DOĞRULANDI (yerel) | Sürüm ve score/kanıt kuralları geçti; gerçek rubrik bekleniyor |
 | P10 | Ayrı sıralı AI ön değerlendirme | DOĞRULANDI (mock) | Sıralı adımlar ve bağımsız payload/JSON negatif testleri geçti |
 | P11 | Araştırmacı kararları, rapor snapshotları | DOĞRULANDI (yerel) | Karar, snapshot ve özel ekin öğrenciye sızmaması geçti |
-| P12 | Global kapanış ve ayrı yayın kapısı | DOĞRULANDI (yerel HTTP) | Global kapanış + onay + ayrı yayın doğrudan HTTP negatif/pozitif test |
+| P12 | Vaka kapanışı, kişisel ek süre ve ayrı yayın | DOĞRULANDI (0.2.1 yerel HTTP) | Vaka/kişisel kapı + onay/yayın; aç/kapat sonrası rapor görünürlüğü; eski global kural iptal |
 | P13 | DOCX/PDF/XLSX/CSV/JSON çıktıları | DOĞRULANDI (yerel/sentetik) | Otomatik paket/roundtrip kontrolleri + R02-B09/B10 kullanıcı Word/PDF/Excel/CSV/JSON ekranları; gerçek hosting bekliyor |
 | P14 | Sentetik seed ve test hesapları | DOĞRULANDI (yerel) | İdempotent seed, 7 öğrenci/5+1 vaka; TEST_DATA.md |
-| P15 | Güvenlik/regresyon ve mobil testler | DEVAM EDİYOR | 69×2 + 42 + 18 yerel; fiziksel mobil/gerçek kesinti/stres bekliyor |
+| P15 | Güvenlik/regresyon ve mobil testler | DEVAM EDİYOR | Güncel12grup547örtüşen kontrol; fiziksel mobil/gerçek kesinti/stres bekliyor |
 | P16 | Shared hosting kurulumu ve geri yükleme | DEVAM EDİYOR | Kurulum rehberi + yerel ayrı DB restore 8 tablo eşit; gerçek hosting bekliyor |
-| P17 | Kullanıcı manuel testi ve düzeltmeler | DEVAM EDİYOR | R02 Batch01–11 tamamlandı; kanıtlar MANUAL_TEST_RESULTS.md; kalan senaryolar bekliyor |
+| P17 | Kullanıcı manuel testi ve düzeltmeler | DEVAM EDİYOR | Batch01–13 tamamlandı; B14 sürüm ekran kanıtı; B14.2/B15 otomatik karşılıkları geçti. Kritik gerçek cihaz/kesinti kabulü bekliyor |
 | P18 | Son kabul ve araştırma öncesi kontrol | BEKLİYOR | Rubrik/onam/AI/hosting ve kullanıcı onayı bekleniyor |
 
 ## Her aşama için kayıt şablonu
@@ -59,13 +71,13 @@ Durumlar: BEKLİYOR / DEVAM EDİYOR / ENGELLİ / DOĞRULANDI. Tamamlanma için k
 | D03 | PHP/MySQL/eklenti/timeout/streaming bilinmiyor | AÇIK | kurulum ön kontrolü ve gerçek hosting testi |
 | D04 | Autosave/heartbeat/hareketsizlik değerleri | AÇIK | yapılandırılabilir ve sürümlü varsayım |
 | D05 | Etiketleme tetikleme zamanı | AÇIK | sohbetten bağımsız, belgeli yöntem |
-| D06 | Çoklu araştırmacı hesabı | AÇIK | yetki tasarımını genişletilebilir tut |
+| D06 | Çoklu araştırmacı hesabı | DOĞRULANDI (yerel) | Her araştırmacı ayrı alan; ortak vaka erişimi kullanıcı tarafından iptal edildi |
 | D07 | Onam, saklama ve çekilme politikası | AÇIK | kurum metni bekle; uygunluk iddiası yapma |
 | D08 | Yedekleme sıklığı ve depolama | AÇIK | kurulum belgesinde doğrula |
 
 ## Sorun takip tablosu
 
-Düzeltilen sorunlar ve açık doğrulamalar BUGS.md içinde; kullanıcı hatası dönütü henüz yok. Kritik bir açık araştırma kabulü yapılmış sayılmaz.
+Düzeltilen sorunlar ve açık doğrulamalar BUGS.md içinde; kullanıcı dönütleri ve düzeltmeleri kaydedildi. Kritik bir açık araştırma kabulü yapılmış sayılmaz.
 
 | Hata ID | Başlık | Önem | Yeniden üretim | Durum | Düzeltme | Regresyon kanıtı |
 |---|---|---|---|---|---|---|
@@ -75,7 +87,7 @@ Düzeltilen sorunlar ve açık doğrulamalar BUGS.md içinde; kullanıcı hatas�
 
 ## Sonraki somut adım
 
-Kullanıcı yerel sentetik önizlemede TEST-OGR-01 ile ilk akışı deneyecek. Sonra INSTALL_SHARED_HOSTING.md ile ayrı test hostinginde T09/T21/T26/T28; gerçek AI/rubrik/onam bilgileri doğrulanacak. Açık iş bulunduğunda mevcut uygulama üzerine küçük düzeltme ve regresyon yapılacak.
+Yeni manuel batch yok. RELEASE_READINESS.md içindeki hosting/AI/kurum bilgileri sağlanınca ayrı test hostinginde kurulum, gerçek sağlayıcı ve hedefli regresyon doğrulanacak. Otomatik doğrulanamayan fiziksel cihaz ve gerçek kesinti kontrolleri kısa ayrı kabul adımları olarak kalır. Yalnız somut hata/ihtiyaç için kod değiştirilecek.
 
 ## P01 çalışma kaydı — 2026-10-20
 Depo ve tüm şartnameler okundu. ARCHITECTURE.md ve config/example.php oluşturuldu. PHP/MySQL PATH üzerinde yok; taşınabilir PHP edinme deneniyor. P01 DEVAM EDİYOR; hosting gereksinimleri gerçek ortamda doğrulanmadı. Sonraki: şema ve alan kuralları.
@@ -255,3 +267,59 @@ GitHub teslim kontrolü: otomatik onay denetimi TEST_DATA.mdde kullanılan sabit
 
 ## GitHub teslimi tamamlandı — 2026-10-20
 VakaLab0.1.9 kaynakları,belgeleri ve sentetik test kanıtları https://github.com/hkayaduman/VakaLab main dalına gönderildi. İlk kaynak commit4df25e0. Sabit test parolası commitöncesinde yer tutucuyla değiştirildi;hiçbircommitparolayıiçermiyor. Yerelconfig/DB/vendor/.tools/tests/tmp dışarıda. Sonrakiiletideyeni manuelbatchotomatikbaşlatma;kullanıcıyorulduğunuveotomasyontercihiniiletmişti. KalanB14.2/B15vegerçekhosting/AItestleribekliyor;üretimhazırilanedilmedi. Bu teslimdeuygulamakodudeğişmedi,eskigerçektestsonuçlarıkorundu,yenitestkoşulmadı.
+
+## P04/P12/P17 — 0.1.9 otomasyonla kalan erişim senaryoları — 2026-10-20
+
+- B14.2/B15 iş kurallarının otomatik karşılıkları DOĞRULANDI (46 HTTP); ayrı sentetik global kapanış/yayın DOĞRULANDI (34 HTTP). Toplam 80; test-evidence/access-publication-0.1.9.txt. Ekran/kullanıcı kabulü yerine yazılmaz.
+- Eklenenler: tests/access_publication_checks.py, RELEASE_READINESS.md, yeni test kanıtı; CONTEXT/TEST_RESULTS/MANUAL_TEST_RESULTS/BUGS kayıtları. Uygulama kodu/şema/sürüm değişmedi; mevcut config/DB kullanılmadı. Mevcut veride seed/reset/kapanış/yayın yapılmadı.
+- Bu kapsamda hata çıkmadığından ürün geliştirmesi veya geniş regresyon gerekmedi. Önceki MariaDB/HTTP/Chrome/export sonuçları yeniden çalıştırılmadı. Gerçek ortam/AI/rubrik/onam ve kritik cihaz/kesinti kabulü BEKLİYOR.
+- Sonraki: RELEASE_READINESS.md bilgi/erişim listesine göre ayrı test hostingini ve gerçek sağlayıcıyı doğrulamak. Yeni manuel batch isteme; yalnız otomatik doğrulanamayan kritik kontrolleri daha sonra kısaca iste. Test/belge değişiklikleri henüz commit/push edilmedi.
+
+## P19 — 0.2.0 araştırmacı sadeleştirmesi — DOĞRULANDI (yerel)
+
+- Ayrı çalışma alanları, araştırmacı hesabı oluşturma, kısa formlar, rutin gerekçeleri kaldırma, toplu atama, kişisel ek süre, vaka veri toplama aç/kapat, tanım silme, tam vaka export ve Disco CSV tamamlandı.
+- Migration002 yerel özel yedek sonrası uygulandı; 22 tablonun eski tüm alan/satırları eşit. Mevcut veri toplama/yayın durumuna müdahale yok.
+- Testler: 119 hedefli HTTP +42 concurrency HTTP; 69 genel Chrome +24 yeni UI; 69 SQLite +69 MariaDB; 8 restore tablo sayısı; 35 export. TEST_RESULTS.md ve test-evidence/researcher-0.2.0-*.
+- Gerçek hosting/sağlayıcı/rubrik/kurum/kritik cihaz-kesinti ve gerçek Disco import bekliyor. Kullanıcıya yeni manuel batch yok. Sonraki adım dış ortam bilgileri sağlanınca ayrı test kurulumunda doğrulama. Kod/test/belgeler henüz commit/push edilmedi.
+
+## P20 — 0.2.1 seçilebilir araştırmacı ekranları — DOĞRULANDI (yerel)
+
+- Ek süre yeniden test edildi; vaka kartında atanan öğrenci listesi/ilgili atama yönetimine geçiş; matris yerine tek vaka/öğrenci arama/durum listesi; JSON gerektirmeyen rubrik formu; okunaklı ve indirilebilir işlem geçmişi tamamlandı.
+- Güncel koşular: 119 HTTP,69Chrome,50hedefliUI,69SQLite,14rubrik. Kapsam ve kanıt TEST_RESULTS.md. Şema/mevcut DB değişmedi; önceki MariaDB/42HTTP/export/restore yeniden çalıştırılmadı.
+- Şartname/devam/kullanım belgeleri güncellendi. Kullanıcıya manuel test yükü yok. Sonraki: gerçek ortam/kurum bilgileri ve önceki dış kabul sınırları. Commit/push henüz yok.
+
+## P21 — Tüm yerel otomatik gruplar ve bağlam tutarlılığı — 2026-10-20
+
+12/12çalıştırılabilir grup GEÇTİ;547bildirilen kontrol,ayrırestore8tablosayısıeşit. TEST_RESULTS.md ve audit-0.2.1-summary.json grup bazında gerçek kanıtı gösterir. Bu tur ürün kodu/şema/mevcut DB değişmedi. Tarihsel manuel sonuçlar yeni kabul gibi yazılmadı; güncel rehber ekran haritası düzeltildi. P18gerçekortam/kurum/kritik dış kabul bekliyor. Commit/push yok.
+
+## 0.2.2 — Katılım bilgilerim kaldırıldı
+
+Öğrenci ana sayfasındaki düğme, olay bağlantısı ve kullanılmayan onboarding istemci fonksiyonu kaldırıldı. Önceden kaydedilmiş veriler, araştırmacının isteğe bağlı Program/Sınıf alanları ve backend değişmedi.69Chrome/JSsyntax/PHPlint geçti; şema/mevcut DBdeyazma yok. Yeni manuel test istenmedi. Test sonucu TEST_RESULTS.md; bu tur eski12grup yeniden koşulmadı.
+
+## Öğrenci raporu örnek gösterimi — HAZIR (ayrı yerel kopya)
+
+Kullanıcının tek rapor gösterimi isteği için localhost:8089ayrıDB/session ile açıldı. TEST-OGR-01, Akranlar arası anlaşmazlık, onaylı/yayımlanmışSürüm1;7.Son teslimdeWord/PDF. Mevcut8088durumuyazılmadı; yalnız kopyada erişim/kapanış/yayın var.6hedefliHTTP/Chrome smoke geçti (student-report-demo.txt);kullanıcı parolası değişmedi ve yeni parola-login testi yapılmadı.0.2.2ürünkodudeğişmedi. Dış kabul açık,commit/pushyok.
+
+## 0.2.3 — Sade öğrenci raporu (yerel geliştirme)
+
+Öğrenciye başlangıç/nihai özgün yanıtlar, her ölçütte puan/düzey/kısa geri bildirim, nihai toplam ve genel geri bildirim sunulur. Toplam = nihai ölçüt puanı × ağırlık toplamı; başlangıç ayrı karşılaştırmadır. Reddedilen/belirsiz puan null kalır. Üretim geri bildirimi onaylı puan/rubrik ve özgün yanıtlardan hazırlanır; puanları uygulama hesaplar. Sağlayıcı çağrısı transaction dışında, karar değişikliği kontrolüyle yeni değişmez rapora eklenir. Eksik/geçersiz/teknik üretim ifadeli geri bildirim kaydedilmez. Araştırmacı Öğrenci raporunu önizle ile inceleyip ayrı onay/yayın yapar. Öğrenci raporunda AI/teknik inceleme/iç notlar yok; iç üretim kaydı araştırmacı snapshotında korunur. Öğrenci API/Word/PDF aynı sade içeriktir. Yeni Raporu görüntüle düğmesi var. Eski gövdeler değiştirilmez, eski sürümde yeni feedback yoksa açıkça henüz hazırlanmadı gösterilir; yeni rapor sürümü oluşturulur.
+
+Ayrı localhost:8089 gösterim kopyasında TEST-OGR-01 / Akranlar arası anlaşmazlık için Sürüm3 oluşturulup onay/yayın yapıldı. Eski kopya rapor gövdeleri ve asıl cases/reports/applications/snapshots/decisions hashleri eşit. Asıl8088veri toplama/yayın/yanıtlar değişmedi. Testler yalnız sentetik mock; gerçek sağlayıcı geri bildirim kalitesi henüz doğrulanmadı. Word görsel renderer LibreOffice bulunamadığından tamamlanmadı; paket/metin ve PDF görsel kontrolü ayrıdır. Son test dökümü TEST_RESULTS.md: 15birim/75SQLite/81Chrome/119HTTP/35export/75MariaDB ve8restoretablosayısı, ayrıdemo6smoke; hepsi sentetik. Commit/push yok.
+
+## 0.2.4 — Okunabilir öğrenci-vaka dosyası (yerelde doğrulandı)
+
+Ham veriler ve süreç yerine Öğrenci yanıtları ve çalışma süreci: alan etiketli yanıtlar/kesinleşmiş kayıtlar, Önce/Sonra yanıt geçmişi, Türkçe işlem çizelgesi (bölüm/arama/periyodik kayıt filtresi ve50şer), görünür-odak süre tablosu ve bilinmeyen aralıklar, AI istek sonucu/süre/denemeler/gönderilen bağlam açıklaması. Analiz sonuçları ve karar geçmişi de okunabilir; puan/özet düzenleme alanlarla, JSON girişi yok. Ham JSON ve Disco indirmeleri ayrı düğmelerdir. Yeni AI ile mesajları etiketle bağımsız öneri çağrısıdır; aynı mesaj/tanımda cache, sahiplik/rol/çıktı/konuşma değişikliği denetimi var. Eski etiketler ve araştırmacı boş dahil kararları silinmez. Analiz6etiketleme de aynı kayıt/validasyon yoluna bağlandı. Disco'ya mesaj başına sunucu zamanlı nokta olayı; AI Labels/Researcher Labels/Effective Labels/Label Source/Label Status eklendi. Araştırmacı seçimi, boş seçimi de kapsayarak önceliklidir. Gerçek veride seed/reset/şema/veri toplama/yayın değişikliği yok. Testler ayrı sentetik DB; sonuçlar TEST_RESULTS.md içinde: 97 Chrome, 28 etiket/Disco PHP, 11 süreç JS, 11 etiket JS, 75 SQLite, 35 export, 119 HTTP, 75 MariaDB ve 8 restore tablo sayısı. Gerçek sağlayıcı/Discoimport/hosting/kurum kabulü bekliyor.
+
+## Process mining hedefi denetimi — 0.2.4
+
+Kullanıcı bölüm dönüşleri, AI soru amaçları, ziyaret süreleri ve darboğaz/sequence analysis hedefini ayrıntılandırdı. Mevcut CSV temel geçiş ve mesaj verisini taşır; ancak visits süreleri Disco'ya aktarılmıyor, mesaj amaçları Activity yerine etiket özelliğinde, bazı alan/oturum/sekme ayrıntıları kodlanmış CSV'de yok. Önceki Disco hazır ifadesi ayrıntılı süre/darboğaz analizi için yeterli doğrulama sayılmamalı. PROCESS_MINING_REVIEW.md mevcut/eksik/sonraki kapsamı kaydeder. Bu tur yalnız kod + resmî Disco belgesi incelemesi ve ayrı bellekte SQLite/mock tanı çalıştırması yapıldı (test-evidence/process-mining-review-0.2.4.txt); gerçek Disco import ve yeni ürün geliştirmesi yok. Mevcut DB/kod/raporlar değişmedi; eski testler tekrar geçmiş gibi yazılmadı. Sonraki somut ihtiyaç: davranış kodları, ayrı ziyaret/süre çıktısı ve açık sequence hazırlama kuralları; kullanıcının örnek yoluyla doğrulama. Mevcut arayüz korunacak.
+
+## 0.2.5 — Sekme giriş/çıkış süreleri ve teslimde durma (yerelde doğrulandı)
+
+Kullanıcı süreyi açıkça sekmeye girişten sonraki sekmeye geçişe kadar geçen zaman olarak tanımladı; tüm 7 sekme için aynı kural, her geri dönüş ayrı ziyaret. Son teslimin başarıyla kaydından sonra izleme gerekmiyor; yeni öğrenci telemetrisi istemci/sunucuda bu sınırla durduruluyor. Gecikmiş teslim-öncesi kayıtlar korunuyor, ilk istemci teslim doğrulaması kabul ediliyor. Önceki görünür/odak ölçümü ayrı kalıyor. Navigation sınıfı ham kayıtlardan ziyaret/başlangıç/bitiş/süre/sonuç üretir; açık uçlar tahmin edilmez. Varsayılan Disco geçiş/süre görünümü; ayrıntılı AI/olay görünümü ayrıca korunur. Excel/JSON'a navigation_visits ve navigation_milestones eklendi. Ürün asset 0.2.5; şema/çalışma DB'si değişmedi. Güncel sonuç: 30 Navigation, 103 Chrome, 50 validation, 119 erişim HTTP, 42 iki-worker HTTP, 75 SQLite, 75 MariaDB + 8 restore tablo sayısı, 38 export, 28 etiket kontrolü geçti; kanıt TEST_RESULTS.md ve navigation-0.2.5-* dosyalarında. Eski tüm-suite sonuçları bu tur tekrar koşulmadı. Gerçek Disco import/hosting/AI/kurum/fiziksel cihaz kabulü hâlâ açık. Commit/push yok.
+
+Önemli kullanıcı ölçüm kararı: Son teslim başarıyla kaydedilince araştırma süreci tamamlanır; sonradan sekmelerde/raporda dolaşma süreye ve davranış akışına katılmaz. Ölçülemeyen kapanışlar tahmin edilmez.
+
+## GitHub teslimi — 2026-10-21
+
+Kullanıcı tüm biriken düzenlemelerin GitHub'a gönderilmesini istedi. Hedef origin/main (hkayaduman/VakaLab), başlangıç commit'i 194f9d0f5b4be549c1921b027a46204ed6fc7960; uzak dal bu commit ile aynı doğrulandı. 0.2.10 kod/belge/test kanıtları commit için hazırlanıyor. 198 aday dosyada sır örüntüsü ve yapılandırılmış anahtar eşleşmesi bulunmadı; config/local.php, storage DB, vendor, .tools ve tests/tmp dışarıda. 41 PHP/JS dosyasında sözdizimi geçti; mevcut son testler yeniden yapılmış gibi yazılmadı. Gerçek ortam kabulü ayrı kalır. Gönderim sonucu henüz doğrulanmadı.

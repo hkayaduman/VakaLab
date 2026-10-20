@@ -1,0 +1,148 @@
+'use strict';
+const select=(id,label,opts,value='')=>`<label for="${id}">${label}</label><select id="${id}">${opts.map(([v,t])=>`<option value="${esc(v)}" ${String(v)===String(value)?'selected':''}>${esc(t)}</option>`).join('')}</select>`;
+
+const accountStatus=s=>({active:'Etkin',frozen:'Dondurulmuş',archived:'Arşiv'}[s]||s);
+const caseStatus=s=>({active:'Aktif',draft:'Taslak',closed:'Yeni başlangıçlara kapalı',archived:'Arşiv'}[s]||s);
+const latestDefinitions=()=>dash.definitions.filter(d=>!d.deleted_at&&!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id));
+const overviewChoice={caseId:'',query:'',status:''};
+function overviewPanel(){
+    if(!dash.cases.some(c=>c.id===overviewChoice.caseId))overviewChoice.caseId=dash.cases[0]?.id||'';
+    return `<div class="card"><h2>Vaka ve öğrenci seç</h2><p class="muted">Önce vakayı seçin. Ardından öğrenciyi bulun ve çalışmasını açın.</p>${select('overview-case','Vaka',dash.cases.length?dash.cases.map(c=>[c.id,c.title]):[['','Henüz vaka yok']],overviewChoice.caseId)}<div class="grid"><div>${field('overview-search','Öğrenci ara',overviewChoice.query)}</div><div>${select('overview-status','Çalışma durumu',[['','Tüm durumlar'],['unopened','Henüz başlamadı'],['initial','Başlangıç aşamasında'],['working','Devam ediyor'],['submitted','Teslim edildi'],['late','Ek süre verilenler']],overviewChoice.status)}</div></div><p id="overview-summary" class="muted" aria-live="polite"></p><div id="overview-students" class="student-list"></div></div>`;
+}
+function bindProcessButtons(container){container.querySelectorAll('[data-process]').forEach(b=>b.onclick=()=>processView(b.dataset.process).catch(e=>notify(e.message)));}
+function bindOverview(){
+    const render=()=>{
+        const cid=overviewChoice.caseId,query=overviewChoice.query.toLocaleLowerCase('tr'),status=overviewChoice.status;
+        const rows=dash.users.filter(u=>u.role==='student').map(u=>({u,a:dash.applications.find(a=>a.user_id===u.id&&a.case_id===cid),ass:dash.assignments.find(a=>a.user_id===u.id&&a.case_id===cid)})).filter(({a,ass})=>a||Number(ass?.active));
+        const shown=rows.filter(({u,a,ass})=>(u.login+' '+u.name).toLocaleLowerCase('tr').includes(query)&&(!status||(status==='late'?Number(ass?.active)&&Number(ass?.allow_late):status==='unopened'?!a:a?.state===status)));
+        $('#overview-summary').textContent=`${rows.length} öğrenci · ${rows.filter(r=>r.a?.state==='submitted').length} teslim · ${shown.length} gösteriliyor`;
+        $('#overview-students').innerHTML=shown.map(({u,a,ass})=>{
+            const analysis=a?dash.analysis_status.find(s=>s.app_id===a.id):null,report=a?dash.report_status.find(r=>r.app_id===a.id):null;
+            return `<article class="student-row" data-overview-row="${u.id}"><div><h3>${esc(u.login)} · ${esc(u.name)}</h3><p><span class="pill">${a?stateName(a.state):'Henüz başlamadı'}</span> ${!Number(ass?.active)?'<span class="pill warn">Atama kaldırılmış</span>':''} ${Number(ass?.allow_late)?'<span class="pill">Ek süre açık</span>':''} <small>${accountStatus(u.status)}</small></p><p class="muted">${analysis?`Analiz: ${analysis.completed_step}/8 · `:''}${report?`Rapor: ${report.published_at?'Yayımlandı':report.approved_at?'Onaylı':'İncelemede'} · `:''}Son etkinlik: ${a?.last_activity?displayTime(a.last_activity):'Henüz yok'}</p></div>${a?`<button data-process="${a.id}">Çalışmayı aç</button>`:'<span class="muted">Henüz çalışma yok</span>'}</article>`;
+        }).join('')||`<p class="empty">${dash.cases.length?'Bu seçimde öğrenci bulunamadı.':'Önce Vakalar ve atamalar bölümünden vaka ekleyin.'}</p>`;
+        bindProcessButtons($('#overview-students'));
+    };
+    $('#overview-case').onchange=e=>{overviewChoice.caseId=e.target.value;render();};
+    $('#overview-search').oninput=e=>{overviewChoice.query=e.target.value;render();};
+    $('#overview-status').onchange=e=>{overviewChoice.status=e.target.value;render();};render();
+}
+function assignedStudents(cid){
+    const c=dash.cases.find(c=>c.id===cid),assigned=dash.assignments.filter(a=>a.case_id===cid&&Number(a.active));
+    showDialog(`<h2>Atanan öğrenciler</h2><p><b>${esc(c.title)}</b> · ${assigned.length} öğrenci</p><div class="student-list">${assigned.map(ass=>{const u=dash.users.find(u=>u.id===ass.user_id),a=dash.applications.find(a=>a.user_id===ass.user_id&&a.case_id===cid);return `<article class="student-row" data-assigned-student="${u.id}"><div><h3>${esc(u.login)} · ${esc(u.name)}</h3><p>${a?stateName(a.state):'Henüz başlamadı'} · ${accountStatus(u.status)}${Number(ass.allow_late)?' · Ek süre açık':''}</p></div></article>`;}).join('')||'<p class="empty">Bu vakaya henüz öğrenci atanmamış.</p>'}</div><button id="manage-case-assignments" class="spaced">Bu vakanın atamalarını yönet</button>`);
+    $('#manage-case-assignments').onclick=()=>{$('#dialog-close').click();assignmentForm(cid);};
+}
+function definitionDetails(d){
+    const body=JSON.parse(d.body);
+    if(d.family==='label')return `<p class="prose">${esc(body.description||'Açıklama eklenmemiş.')}</p>`;
+    return `<p class="prose">${esc(body.text)}</p>${body.dimensions.map(dim=>`<section class="rubric-dimension-summary"><h4>${esc(dim.name||dim.id)} · ${esc(dim.min)}–${esc(dim.max)} puan · Ağırlık ${esc(dim.weight)}</h4>${dim.levels.map(l=>`<p><b>${esc(l.name)} (${esc(l.score)} puan):</b> ${esc(l.description)}</p>`).join('')}</section>`).join('')}`;
+}
+const auditNames={message_labels_ai:'AI mesaj etiketleri hazırlandı',participant:'Kullanıcı kaydedildi',case:'Vaka sürümü kaydedildi',assign:'Atama güncellendi',assign_bulk:'Toplu atama',late_access:'Ek süre güncellendi',collection:'Veri toplama durumu değişti',definition:'Rubrik / etiket kaydedildi',delete_definition:'Rubrik / etiket silindi',labels:'Mesaj etiketleri incelendi',note:'İç not eklendi',exclude:'Analiz kapsamı değişti',resolve_request:'Takılı AI isteği kapatıldı',resolve_analysis:'Takılı analiz adımı kapatıldı',analysis_run:'Analiz başlatıldı',analysis_step:'Analiz adımı çalıştırıldı',decision:'Araştırmacı kararı kaydedildi',report_create:'Rapor sürümü oluşturuldu',report_approve:'Rapor onaylandı',report_publish:'Rapor yayımlandı',export:'Veri paketi hazırlandı',download:'Dosya indirildi',save:'Çalışma kaydedildi',initial:'Başlangıç kesinleştirildi',submit:'Son teslim yapıldı',onboarding:'Katılım bilgileri güncellendi',close_study:'Eski global kapanış kaydı'};
+function auditEntry(row){
+    let d={};try{d=typeof row.detail==='string'?JSON.parse(row.detail):row.detail||{};}catch{}
+    let title=auditNames[row.action]||'İşlem kaydedildi';
+    if(row.action==='collection')title=d.closed?'Vakada veri toplama kapatıldı':'Vakada veri toplama açıldı';
+    if(row.action==='late_access')title=d.open?'Öğrenciye ek süre verildi':'Öğrencinin ek süresi kapatıldı';
+    if(['assign','assign_bulk'].includes(row.action))title=d.active?'Öğrenci vakaya atandı':'Öğrencinin ataması kaldırıldı';
+    const user=dash.users.find(u=>u.id===(d.user_id||(['participant','onboarding'].includes(row.action)?row.target:null))),ass=dash.assignments.find(a=>a.id===row.target),app=dash.applications.find(a=>a.id===(d.app_id||row.target));
+    const c=dash.cases.find(c=>c.id===(d.case_id||ass?.case_id||app?.case_id||(['case','collection'].includes(row.action)?row.target:null)));
+    const def=dash.definitions.find(x=>x.id===row.target),actor=dash.users.find(u=>u.id===row.actor);
+    const details=[];
+    if(c)details.push('Vaka: '+c.title);if(user||d.login)details.push('Kullanıcı: '+(user?.login||d.login));else if(ass||app){const s=dash.users.find(u=>u.id===(ass?.user_id||app?.user_id));if(s)details.push('Öğrenci: '+s.login);}
+    if(def)details.push((def.family==='rubric'?'Rubrik: ':'Etiket: ')+def.name+' · v'+def.version);
+    if(d.step)details.push('Analiz adımı: '+d.step);
+    if(d.format)details.push('Dosya: '+({xlsx:'Excel',docx:'Word',pdf:'PDF',csv:'CSV',json:'JSON',disco:'Disco CSV'}[d.format]||d.format));
+    if(d.status)details.push('Hesap durumu: '+accountStatus(d.status));
+    return {title,details,actor:actor?.login||'Geçmiş kullanıcı'};
+}
+function auditPanel(){return `<div class="card"><div class="toolbar"><h2>İşlem geçmişi</h2><button class="secondary" id="download-audit">İşlem geçmişini JSON indir</button></div><p class="muted">Çalışma alanınıza ait son ${dash.audit.length} kayıt. İşlem, hesap ve zaman otomatik tutulur.</p>${field('audit-search','İşlem, vaka veya kullanıcı ara')}<p id="audit-count" class="muted" aria-live="polite"></p><div id="audit-list" class="audit-list"></div><button class="secondary" id="more-audit">Daha fazla göster</button></div>`;}
+function bindAudit(){
+    let limit=20;
+    const render=()=>{const query=getValue('audit-search').toLocaleLowerCase('tr'),found=dash.audit.map(row=>({row,...auditEntry(row)})).filter(e=>(e.title+' '+e.details.join(' ')+' '+e.actor+' '+e.row.reason).toLocaleLowerCase('tr').includes(query));$('#audit-count').textContent=`${Math.min(limit,found.length)} / ${found.length} kayıt gösteriliyor`;$('#more-audit').hidden=limit>=found.length;$('#audit-list').innerHTML=found.slice(0,limit).map(e=>`<article class="audit-entry"><h3>${esc(e.title)}</h3><p>${displayTime(e.row.created_at)} · <b>${esc(e.actor)}</b></p>${e.details.map(t=>`<p>${esc(t)}</p>`).join('')}${e.row.reason?`<p><b>Gerekçe:</b> ${esc(e.row.reason)}</p>`:''}</article>`).join('')||'<p class="empty">Bu aramada işlem bulunamadı.</p>';};
+    $('#audit-search').oninput=()=>{limit=20;render();};handler('#more-audit',()=>{limit+=20;render();});render();handler('#download-audit',()=>saveJsonFile('vakalab-islem-gecmisi.json',dash.audit));
+}
+function saveJsonFile(filename,data){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+
+async function adminHome(){
+    dash=await api('dashboard');
+    $('#root').innerHTML=`<div class="eyebrow">Araştırmacı paneli · ${esc(me.login)}</div><h1>Çalışma alanım</h1><p class="intro">Vakalarınızı, katılımcılarınızı ve değerlendirmelerinizi yönetin.</p><nav class="tabs">${[['overview','Genel durum'],['participants','Kullanıcılar'],['cases','Vakalar ve atamalar'],['definitions','Rubrikler ve etiketler'],['exports','Veri indirme'],['system','İşlem geçmişi']].map(([k,l])=>`<button data-admin-tab="${k}" class="${adminTab===k?'active':''}">${l}</button>`).join('')}</nav><div id="admin-body" class="spaced"></div>`;
+    document.querySelectorAll('[data-admin-tab]').forEach(b=>b.onclick=()=>{adminTab=b.dataset.adminTab;adminHome().catch(e=>notify(e.message));});renderAdmin();
+}
+function renderAdmin(){
+    const students=dash.users.filter(u=>u.role==='student'),defs=latestDefinitions();let html='';
+    if(adminTab==='overview')html=overviewPanel();
+    if(adminTab==='participants'){
+        const accounts=dash.users.filter(u=>u.owner_id===me.id);
+        html=`<div class="toolbar"><h2>Kullanıcılar</h2><button id="add-participant">+ Kullanıcı ekle</button></div><p class="muted">Öğrenciler bu çalışma alanına eklenir. Yeni araştırmacı kendi boş çalışma alanıyla başlar.</p><div class="card table-wrap"><table><thead><tr><th>Hesap</th><th>Ad soyad</th><th>Tür</th><th>Durum</th><th></th></tr></thead><tbody>${accounts.map(u=>`<tr><td>${esc(u.login)}</td><td>${esc(u.name)}</td><td>${u.role==='researcher'?'Araştırmacı':'Öğrenci'}</td><td>${accountStatus(u.status)}</td><td><button class="secondary" data-edit-user="${u.id}">Düzenle</button></td></tr>`).join('')||'<tr><td colspan="5">Henüz kullanıcı yok.</td></tr>'}</tbody></table></div>`;
+    }
+    if(adminTab==='cases')html=`<div class="toolbar"><h2>Vakalar ve atamalar</h2><div class="row"><button id="add-case">+ Vaka ekle</button><button class="secondary" id="assignment">Toplu atama / Ek süre</button></div></div><div class="cards">${dash.cases.map(c=>`<div class="card"><span class="pill">${caseStatus(c.status)} · v${c.version}</span><h2>${esc(c.title)}</h2><p>${c.collection_closed_at?'Veri toplama kapalı · '+displayTime(c.collection_closed_at):'Veri toplama açık'}</p><div class="row"><button class="secondary" data-assigned="${c.id}">Atanan öğrencileri göster (${dash.assignments.filter(a=>a.case_id===c.id&&Number(a.active)).length})</button><button class="secondary" data-preview="${c.id}">Öğrenci önizlemesi</button><button class="secondary" data-edit-case="${c.id}">Düzenle</button><button class="${c.collection_closed_at?'':'danger'}" data-collection="${c.id}">${c.collection_closed_at?'Veri toplamayı aç':'Veri toplamayı kapat'}</button></div></div>`).join('')||'<div class="empty">İlk vakanızı ekleyin.</div>'}</div>`;
+    if(adminTab==='definitions')html=`<div class="toolbar"><h2>Rubrikler ve etiketler</h2><div class="row"><button id="add-rubric">+ Rubrik</button><button class="secondary" id="add-label">+ Etiket</button></div></div>${defs.map(d=>`<div class="card"><div class="toolbar"><h3>${esc(d.name)} <span class="pill">${d.family==='rubric'?'Rubrik':'Etiket'} · v${d.version}</span></h3><div class="row"><button class="secondary" data-edit-def="${d.id}">Düzenle</button><button class="danger" data-delete-def="${d.id}">Sil</button></div></div><details><summary>Tanım</summary>${definitionDetails(d)}</details></div>`).join('')||'<div class="empty">Henüz rubrik veya etiket yok.</div>'}`;
+    if(adminTab==='exports')html=`<div class="card"><h2>Vaka verilerini indir</h2>${select('export-case','Hangi vaka?',[['','Tüm vakalar'],...dash.cases.map(c=>[c.id,c.title])])}<p class="muted">Seçilen kapsamdaki tüm kayıtlar indirilir; test, deneme ve analiz dışı kayıtlar durum bilgileriyle birlikte korunur. Excel ve JSON metinleri ve kimlikleri içerir.</p><div class="row spaced"><button data-export="xlsx">Excel indir</button><button class="secondary" data-export="json">Tüm verileri JSON indir</button></div><hr><h3>Disco için süreç verisi</h3><p>Her öğrenci-vaka ayrı süreçtir. Geçiş ve süre dosyası her kapanan bölüm ziyaretini giriş/çıkış zamanı ve geçen saniyesiyle verir. Son teslimden sonrası sayılmaz. Ayrıntılı dosya mesajları, soru etiketlerini ve AI yanıt beklemelerini ayrıca içerir; öğrenci kimliği kodlanır. Periyodik teknik kayıtlar bu dosyaya girmez; AI süreleri ayrı kaynakla gösterilir.</p><button data-export="disco">Disco: geçişler ve süreler</button><button class="secondary" id="export-disco-events">Disco: ayrıntılı olaylar ve AI</button><details class="spaced"><summary>Disco içe aktarma eşleştirmesi</summary><p>Case ID → Case, Activity → Activity, Start Timestamp ve Complete Timestamp → Timestamp, Resource → Resource. Zaman biçimi: yyyy-MM-dd HH:mm:ss.SSS (UTC). Quality ve Time Source gözlemin kaynağını belirtir; etkinlik aralıkları okuma/düşünme süresi değildir.</p></details></div>`;
+    if(adminTab==='system')html=auditPanel();
+    $('#admin-body').innerHTML=html;
+    if(adminTab==='overview')bindOverview();
+    handler('#export-disco-events',()=>download({format:'disco',view:'events',case_id:getValue('export-case'),include_test:1,include_practice:1,include_excluded:1}));
+    if(adminTab==='system')bindAudit();
+    document.querySelectorAll('[data-assigned]').forEach(b=>b.onclick=()=>assignedStudents(b.dataset.assigned));
+    document.querySelectorAll('[data-process]').forEach(b=>b.onclick=()=>processView(b.dataset.process).catch(e=>notify(e.message)));
+    handler('#add-participant',()=>participantForm());document.querySelectorAll('[data-edit-user]').forEach(b=>b.onclick=()=>participantForm(dash.users.find(u=>u.id===b.dataset.editUser)));
+    handler('#add-case',()=>caseForm());document.querySelectorAll('[data-edit-case]').forEach(b=>b.onclick=()=>caseForm(dash.cases.find(c=>c.id===b.dataset.editCase)));
+    document.querySelectorAll('[data-preview]').forEach(b=>b.onclick=()=>{const c=dash.cases.find(c=>c.id===b.dataset.preview);showDialog(`<h2>${esc(c.title)} · v${c.version}</h2><div class="prose">${esc(c.body)}</div><p class="prose">${esc(c.instructions)}</p>`);});
+    document.querySelectorAll('[data-collection]').forEach(b=>b.onclick=async()=>{const c=dash.cases.find(c=>c.id===b.dataset.collection);if(!confirm(`${c.title}: veri toplama ${c.collection_closed_at?'açılsın':'kapatılsın'} mı? Mevcut kayıtlar korunur; kişiye verilen ek süreler kapanır.`))return;try{await api('admin',{action:'collection',case_id:c.id,closed:!c.collection_closed_at});await adminHome();}catch(e){notify(e.message);}});
+    handler('#assignment',assignmentForm);handler('#add-rubric',()=>definitionForm('rubric'));handler('#add-label',()=>definitionForm('label'));
+    document.querySelectorAll('[data-edit-def]').forEach(b=>b.onclick=()=>{const d=dash.definitions.find(d=>d.id===b.dataset.editDef);definitionForm(d.family,d);});
+    document.querySelectorAll('[data-delete-def]').forEach(b=>b.onclick=async()=>{const d=dash.definitions.find(d=>d.id===b.dataset.deleteDef);if(!confirm(`${d.name} silinsin mi? Yeni seçimlerden kaldırılır; önceki analiz, etiket ve rapor kayıtları korunur.`))return;try{await api('admin',{action:'delete_definition',id:d.id});await adminHome();}catch(e){notify(e.message);}});
+    document.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>download({format:b.dataset.export,case_id:getValue('export-case'),all_data:1}));
+}
+function participantForm(u){
+    const m=u?JSON.parse(u.metadata):{};
+    showDialog(`<h2>${u?'Kullanıcıyı düzenle':'Kullanıcı ekle'}</h2>${u?`<p>${u.role==='researcher'?'Araştırmacı':'Öğrenci'}</p>`:select('p-role','Hesap türü',[['student','Öğrenci'],['researcher','Araştırmacı']])}${field('p-login','Öğrenci numarası / kullanıcı adı',u?.login)}${field('p-name','Ad soyad',u?.name)}${field('p-password',u?'Yeni parola (boşsa korunur)':'Parola (en az 12 karakter)','','password')}${select('p-status','Hesap durumu',[['active','Etkin'],['frozen','Dondurulmuş'],['archived','Arşiv']],u?.status||'active')}<details class="spaced"><summary>Ek bilgiler (isteğe bağlı)</summary>${field('p-program','Program',m.program)}${field('p-year','Sınıf',m.year)}${field('p-notes','Özel not',m.researcher_notes,'textarea')}</details><button class="spaced" id="commit">Kaydet</button>`,async()=>{await api('admin',{action:'participant',...(u?{id:u.id}:{}),role:u?.role||getValue('p-role'),login:getValue('p-login'),name:getValue('p-name'),password:getValue('p-password'),status:getValue('p-status'),metadata:{program:getValue('p-program'),year:getValue('p-year'),researcher_notes:getValue('p-notes')}});await adminHome();});
+}
+function caseForm(c){
+    showDialog(`<h2>${c?'Vakayı düzenle':'Vaka oluştur'}</h2>${field('c-title','Başlık',c?.title)}${field('c-position','Sıra',c?.position||1,'number')}${field('c-body','Vaka metni',c?.body,'textarea')}${field('c-instructions','Öğrenci yönergeleri',c?.instructions,'textarea')}${select('c-status','Durum',[['draft','Taslak'],['active','Aktif'],['closed','Yeni başlangıçlara kapalı'],['archived','Arşiv']],c?.status||'draft')}${select('c-rubric','Rubrik',[['','Henüz bağlı değil'],...latestDefinitions().filter(d=>d.family==='rubric').map(d=>[d.id,d.name+' · v'+d.version])],c?.rubric_id||'')}<details class="spaced"><summary>Ek ayarlar</summary>${field('c-notes','Özel notlar',c?.notes,'textarea')}<label class="inline-check"><input type="checkbox" id="c-practice" ${Number(c?.practice)?'checked':''}>Deneme vakası</label><label class="inline-check"><input type="checkbox" id="c-stop" ${Number(c?.stop_access)?'checked':''}>Vaka görüntüleme erişimini de durdur</label></details><button class="spaced" id="commit">Vakayı kaydet</button>`,async()=>{await api('admin',{action:'case',...(c?{id:c.id}:{}),title:getValue('c-title'),body:getValue('c-body'),instructions:getValue('c-instructions'),notes:getValue('c-notes'),position:Number(getValue('c-position')),status:getValue('c-status'),rubric_id:getValue('c-rubric'),practice:$('#c-practice').checked,stop_access:$('#c-stop').checked});await adminHome();});
+}
+function assignmentForm(caseId){
+    if(!dash.cases.length){notify('Önce bir vaka ekleyin.');return;}
+    const students=dash.users.filter(u=>u.role==='student');
+    showDialog(`<h2>Toplu atama ve ek süre</h2>${select('a-case','Vaka',dash.cases.map(c=>[c.id,c.title]),caseId||dash.cases[0].id)}${select('a-active','İşlem',[['1','Seçilenlere ata'],['0','Seçilenlerin atamasını kaldır'],['late-open','Kapalı vakada seçilenlere ek süre ver'],['late-close','Seçilenlerin ek süresini kapat']])}<p class="muted">Ek süre yalnız veri toplaması kapalı vakalarda kullanılır. Teslim edilmiş yanıtlar yeniden açılmaz.</p><label class="inline-check"><input type="checkbox" id="select-all-students">Tümünü seç</label><div class="selection-list">${students.map(u=>`<label class="inline-check"><input type="checkbox" data-assign-student value="${u.id}">${esc(u.login)} · ${esc(u.name)} <small data-assignment-status="${u.id}"></small></label>`).join('')||'<p>Önce öğrenci ekleyin.</p>'}</div><button class="spaced" id="commit">Seçilenlere uygula</button>`,async()=>{const ids=[...document.querySelectorAll('[data-assign-student]:checked')].map(n=>n.value);if(!ids.length)throw new Error('En az bir öğrenci seçin.');const mode=getValue('a-active'),cid=getValue('a-case');await api('admin',{action:mode.startsWith('late')?'late_access':'assign_bulk',case_id:cid,user_ids:ids,active:mode==='1',open:mode==='late-open'});await adminHome();notify(`${ids.length} öğrenci için işlem tamamlandı.`);});
+    const status=()=>document.querySelectorAll('[data-assignment-status]').forEach(el=>{const a=dash.assignments.find(a=>a.user_id===el.dataset.assignmentStatus&&a.case_id===getValue('a-case'));el.textContent=a&&Number(a.active)?Number(a.allow_late)?'· Atanmış / Ek süre açık':'· Atanmış':'· Atanmamış';});status();$('#a-case').onchange=status;
+    $('#select-all-students').onchange=e=>document.querySelectorAll('[data-assign-student]').forEach(n=>n.checked=e.target.checked);
+    document.querySelectorAll('[data-assign-student]').forEach(n=>n.onchange=()=>{const all=[...document.querySelectorAll('[data-assign-student]')],selected=all.filter(n=>n.checked).length;$('#select-all-students').checked=selected===all.length;$('#select-all-students').indeterminate=selected>0&&selected<all.length;});
+}
+function definitionForm(family,d){
+    if(family==='rubric'){rubricForm(d);return;}
+    showDialog(`<h2>Etiket ${d?'düzenle':'ekle'}</h2>${field('d-name','Ad',d?.name)}${field('d-body','Açıklama',d?JSON.parse(d.body).description:'','textarea')}<button class="spaced" id="commit">Kaydet</button>`,async()=>{await api('admin',{action:'definition',family:'label',name:getValue('d-name'),body:{description:getValue('d-body')},parent_id:d?.id||null});await adminHome();});
+}
+function rubricForm(def){
+    const original=def?JSON.parse(def.body):{text:'',dimensions:[]};
+    showDialog(`<h2>${def?'Rubriği düzenle':'Rubrik oluştur'}</h2><p class="muted">1. Rubriğe ad ve açıklama verin. 2. Ölçmek istediğiniz boyutları ekleyin. 3. Her boyutun düzeylerini puan ve açıklamalarıyla tanımlayın. Sistem teknik yapıyı kendisi oluşturur.</p>${field('d-name','Rubrik adı',def?.name)}${field('r-text','Genel değerlendirme yönergesi',original.text,'textarea')}<p class="muted">Örneğin hangi kanıtların değerlendirileceğini ve puanlama yaklaşımını açıklayın.</p><div id="rubric-dimensions"></div><button type="button" class="secondary spaced" id="add-dimension">+ Değerlendirme boyutu ekle</button><p class="muted">Ağırlık 1 tüm boyutları eşit etkiler. Ağırlık 2, aynı puan ölçeğindeki bir boyutun ortalamaya iki kat etki etmesini sağlar.</p><p id="rubric-count" aria-live="polite"></p><button class="spaced" id="commit">Rubriği kaydet</button>`,async()=>{
+        const error=(el,message)=>{el.setAttribute('aria-invalid','true');el.focus();throw new Error(message);};
+        document.querySelectorAll('dialog [aria-invalid]').forEach(el=>el.removeAttribute('aria-invalid'));
+        if(!getValue('d-name').trim())error($('#d-name'),'Rubrik adını doldurun.');
+        if(!getValue('r-text').trim())error($('#r-text'),'Genel değerlendirme yönergesini doldurun.');
+        const readText=(row,key,label)=>{const el=row.querySelector(`[data-rubric-field="${key}"]`),value=el.value.trim();if(!value)error(el,label+' alanını doldurun.');return value;};
+        const readNumber=(row,key,label)=>{const el=row.querySelector(`[data-rubric-field="${key}"]`);if(el.value.trim()===''||!Number.isFinite(Number(el.value)))error(el,label+' için geçerli bir sayı girin.');return Number(el.value);};
+        const dimensions=[...$('#rubric-dimensions').children].map((row,index)=>{
+            const label=`${index+1}. boyut`,name=readText(row,'name',label+' adı'),min=readNumber(row,'min',label+' en düşük puan'),max=readNumber(row,'max',label+' en yüksek puan'),weight=readNumber(row,'weight',label+' ağırlık');
+            if(max<=min)error(row.querySelector('[data-rubric-field="max"]'),label+': en yüksek puan en düşük puandan büyük olmalı.');
+            if(weight<=0)error(row.querySelector('[data-rubric-field="weight"]'),label+': ağırlık sıfırdan büyük olmalı.');
+            const levelNames=new Set();
+            const levels=[...row.querySelector('.rubric-levels').children].map((level,i)=>{
+                const prefix=label+` ${i+1}. düzey`,name=readText(level,'level-name',prefix+' adı'),score=readNumber(level,'score',prefix+' puanı'),description=readText(level,'description',prefix+' açıklaması');
+                if(score<min||score>max)error(level.querySelector('[data-rubric-field="score"]'),prefix+': puan boyut aralığı içinde olmalı.');
+                if(levelNames.has(name))error(level.querySelector('[data-rubric-field="level-name"]'),label+': düzey adları birbirinden farklı olmalı.');levelNames.add(name);
+                return {...level.rubricSource,name,score,description};
+            });
+            return {...row.rubricSource,id:row.rubricSource.id,name,min,max,weight,levels};
+        });
+        await api('admin',{action:'definition',family:'rubric',name:getValue('d-name').trim(),body:{...original,text:getValue('r-text').trim(),dimensions},parent_id:def?.id||null});await adminHome();notify('Rubrik kaydedildi.');
+    });
+    const makeField=(key,label,value,type='text',placeholder='')=>{const id='rubric-'+crypto.randomUUID();return `<label for="${id}">${label}</label>${type==='textarea'?`<textarea id="${id}" data-rubric-field="${key}" placeholder="${esc(placeholder)}">${esc(value??'')}</textarea>`:`<input id="${id}" data-rubric-field="${key}" type="${type}" ${type==='number'?'step="any"':''} value="${esc(value??'')}" placeholder="${esc(placeholder)}">`}`;};
+    const update=()=>{const dimensions=[...$('#rubric-dimensions').children];dimensions.forEach((row,i)=>{row.querySelector('legend').textContent=`${i+1}. Değerlendirme boyutu`;row.querySelector('[data-remove-dimension]').disabled=dimensions.length===1;const levels=[...row.querySelector('.rubric-levels').children];levels.forEach((l,n)=>{l.querySelector('[data-level-title]').textContent=`${n+1}. başarı düzeyi`;l.querySelector('[data-remove-level]').disabled=levels.length===1;});});$('#rubric-count').textContent=`${dimensions.length} boyut · ${document.querySelectorAll('[data-rubric-level]').length} başarı düzeyi`;};
+    const addLevel=(row,level={name:'',score:'',description:''})=>{const node=document.createElement('div');node.className='rubric-level';node.setAttribute('data-rubric-level','');node.rubricSource=structuredClone(level);node.innerHTML=`<div class="toolbar"><h4 data-level-title></h4><button type="button" class="secondary" data-remove-level>Düzeyi kaldır</button></div><div class="grid"><div>${makeField('level-name','Düzey adı',level.name,'text','Örn. Gelişiyor')}</div><div>${makeField('score','Bu düzeyin puanı',level.score,'number')}</div></div>${makeField('description','Bu düzeyde beklenen performans',level.description,'textarea','Bu puanı hangi kanıt veya davranış hak eder?')}`;node.querySelector('[data-remove-level]').onclick=()=>{node.remove();update();};row.querySelector('.rubric-levels').append(node);};
+    const addDimension=(dimension={id:'dimension_'+crypto.randomUUID().replaceAll('-',''),name:'',min:0,max:4,weight:1,levels:[{name:'',score:0,description:''},{name:'',score:4,description:''}]})=>{
+        const row=document.createElement('fieldset');row.className='rubric-dimension';row.setAttribute('data-rubric-dimension','');row.rubricSource=structuredClone(dimension);
+        row.innerHTML=`<legend></legend><div class="toolbar"><p class="muted">Bir boyut, ayrı değerlendirdiğiniz bir ölçüttür.</p><button type="button" class="secondary" data-remove-dimension>Boyutu kaldır</button></div>${makeField('name','Boyut adı',dimension.name,'text','Örn. Gerekçelendirme')}<div class="rubric-numbers"><div>${makeField('min','En düşük puan',dimension.min,'number')}</div><div>${makeField('max','En yüksek puan',dimension.max,'number')}</div><div>${makeField('weight','Ağırlık',dimension.weight,'number')}</div></div><h3>Başarı düzeyleri</h3><div class="rubric-levels"></div><button type="button" class="secondary" data-add-level>+ Başarı düzeyi ekle</button>`;
+        dimension.levels.forEach(l=>addLevel(row,l));row.querySelector('[data-add-level]').onclick=()=>{addLevel(row);update();};row.querySelector('[data-remove-dimension]').onclick=()=>{row.remove();update();};$('#rubric-dimensions').append(row);update();
+    };
+    if(original.dimensions.length)original.dimensions.forEach(d=>addDimension(d));else addDimension();$('#add-dimension').onclick=()=>addDimension();
+}

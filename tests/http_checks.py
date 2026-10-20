@@ -101,7 +101,7 @@ try:
     status,res=student.call('view',app_id=aid);check('steps' not in res['data'] and 'labels' not in res['data'],'student view excludes internal analysis and labels')
     check(student.call('admin',{'action':'delete','id':aid,'reason':'test'})[0]==403,'no destructive student endpoint')
     check(researcher.call('admin',{'action':'delete','id':aid,'reason':'test'})[0]==404,'no permanent delete admin endpoint')
-    check(researcher.call('admin',{'action':'close_study','confirm':True,'reason':'SENTETİK beş vaka kapalı; eksikler fixture'})[0]==200,'global close HTTP')
+    check(researcher.call('admin',{'action':'collection','case_id':'test-case-1','closed':True})[0]==200,'case collection close HTTP')
     check(researcher.call('report',{'action':'publish','id':report})[0]==200,'separate HTTP publication')
     check(s6.call('report_data',id=report)[0]==200,'published own report readable')
     pdf=s6.download(report_ids=report,format='pdf');check(pdf.startswith(b'%PDF-'),'student real PDF download over HTTP')
@@ -109,7 +109,7 @@ try:
     xml=zipfile.ZipFile(io.BytesIO(docx)).read('word/document.xml').decode();check('Araştırmacı iç eki' not in xml,'student DOCX excludes private appendix')
     internal=researcher.download(report_ids=report,format='docx');xml=zipfile.ZipFile(io.BytesIO(internal)).read('word/document.xml').decode();check('Araştırmacı iç eki' in xml,'researcher DOCX contains private appendix')
     xlsx=researcher.download(format='xlsx',include_test=1,coded=1);check('xl/workbook.xml' in zipfile.ZipFile(io.BytesIO(xlsx)).namelist(),'real XLSX HTTP download')
-    check(student.call('save',{'app_id':aid,'revision':a['revision'],'draft':d})[0]==409,'global closed blocks student changes')
+    check(student.call('save',{'app_id':aid,'revision':a['revision'],'draft':d})[0]==409,'closed case blocks student changes')
     check(student.call('logout',{})[0]==200 and student.call('view',app_id=aid)[0]==401,'logout revokes session')
     connection.close();pool.shutdown();print(f'TOTAL HTTP {count} assertions passed. Two PHP workers; SQLite; mock.',flush=True)
 finally:

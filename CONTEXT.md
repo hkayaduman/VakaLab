@@ -8,6 +8,18 @@ Bu dosya Codex'in yeni oturumda kaldığı yerden devam etmesi içindir. Sır, g
 
 ## Şu anda gerçekten yapılan
 
+**Güncel — 2026-10-21, 0.2.10 (yerel):** Kullanıcının onayladığı akış: etiketli soru gönderimi (anlık) → AI yanıtı hazırlanıyor (ayrı bekleme süresi) → yanıt geldi (anlık) → AI sekmesindeyse görüntüleme. Bekleme bölüm değişse de aynı trace/request eşleşmesiyle devam eder; timeline_lane=ai_wait olarak öğrenci bölüm ziyaretlerinden ayrı tutulur. Disco Timeline Lane ve Response Section alanlarını taşır. Üstteki bölüm toplamlarına bekleme ayrıca eklenmez; eksik yanıt kaydında süre null kalır. Eski soru noktaları/araştırmacı etiketleri ve teslimde takibin durması korunur. 82 navigation, 115 Chrome, 38 export, 28 etiket/süreç ve 75 SQLite kontrolü geçti; sözdizimi geçti. 40 saniye senaryosu sentetik zaman fixture'ıdır; gerçek sağlayıcı gecikme ölçümü değildir. Mevcut çalışma DB'sinde yazma/seed/reset/yayın/etiket değişikliği yok. Gerçek AI/hosting/Disco import kabulü açık; commit/push yok.
+
+**Önceki aşama — 2026-10-21, 0.2.9 (yerel):** Kullanıcının ekranında eski iki sorunun kaybolduğu saptandı. Salt okunur çalışma DB incelemesinde 2 gerçek öğrenci mesajı ve 2 response_visible var, message_send yok; ilk soru zaten Bilgi istedi etiketliydi. Kullanıcı sonradan ikinciyi Eleştiri istedi olarak etiketledi; iki güncel araştırmacı seçimi salt okunur doğrulandı. Eksik eski gönderim kaydı artık soruyu gizlemez: sunucu mesaj kaydından ayrı soru noktası gösterilir, kaynağı belirtilir, bekleme süresi null/Ölçülemedi kalır. Disco noktasında Duration Seconds boş ve Time Source server_message; istemci saatinden süre uydurulmaz. Yeni kayıtların soru/yanıt/görüntüleme aralıkları korunur, çift soru eklenmez. 77 navigation, 114 Chrome, 38 export, 28 etiket/süreç, 75 SQLite ve sözdizimi kontrolleri geçti. Kullanıcı yeni öğrenciyle denemeyi seçti; sonuç henüz bildirilmedi. Gerçek DB yazma/seed/reset/yayın/etiket değişikliği yapılmadı; yeni otomatik manuel batch dayatılmadı; commit/push yok.
+
+**Önceki aşama — 2026-10-21, 0.2.8 (yerel):** Kullanıcının son ölçüm kuralı: AI sorusu gönderildi → yanıtın tarayıcıya gelişi → öğrenci AI sekmesinde kalıyorsa görüntüleme → sonraki soru/yanıt/görüntüleme → bölüm geçişi. Soru/yanıt bekleme ve görüntüleme ayrı aralıklardır; yanıt gelişi sıfır süreli nokta olayıdır. Aynı türden tekrar sorular ayrı kalır. navigation.activities ve export navigation_activities bu sıralı aralıkları içerir; Disco varsayılanında bu satırlar kullanılır. Parent Visit ID ile özgün ziyaret korunur; süresi tekrar eklenmez. Başka bölümde gelen yanıt öğrenciyi AI sekmesine geçmiş göstermez. Eksik geliş kaydı/saat bozukluğu açık belirtilir, zaman tahmin edilmez. 69 navigation, 113 Chrome, 38 export, 28 etiket/süreç ve 75 SQLite kontrolü geçti; sözdizimi kontrolleri geçti. Mevcut çalışma DB'sinde yazma/seed/reset/yayın yok; manuel batch/commit/push yok. Gerçek AI/hosting/Disco import kabulü açık.
+
+**Önceki aşama — 2026-10-21, 0.2.7 (yerel):** AI ziyaretlerinde yalnız taslak yazma/görüntüleme = AI sohbeti görüntüleme; gerçekten gönderilen öğrenci mesajları istek anahtarıyla eşleştirilerek etkinlik adı güncel etiketlerle oluşturulur (AI sohbeti · Bilgi istedi vb.). Araştırmacı seçimi, boş seçim dahil önceliklidir. Bir ziyarette çoklu soru/etiket + ile birleştirilir; süre çoğaltılmaz. Etiket bekliyor/eşleşme yok/araştırmacı boş seçimi ve eşleşmeyen gönderme denemesi ayrılır. Aynı adlar araştırmacı API/ekranı, navigation_visits Excel/JSON ve Disco Activity alanında kullanılır. 49 navigation, 109 Chrome, 38 export, 28 etiket/süreç, 75 SQLite kontrolü ve PHP/JS sözdizimi geçti. Gerçek DB değişmedi; yeni manuel batch, commit/push yok. Gerçek AI/hosting/Disco import kabulü bekliyor.
+
+**Önceki aşama — 2026-10-21, 0.2.6 (yerel):** Ziyaret etkinliği yedi gerçek sekme adı + görüntüleme/güncelleme biçiminde. Kilit durumu etkinlik yerine ayrı Ek bilgi alanında; Nasıl bitti? gerçek hedef sekmeyi gösterir. Sayfanın görünmez olduğu gözlemi açık dille açıklanır; neden/süre tahmin edilmez. CSV aynı etkinlik adlarını ve ayrı Next Section, Next Section Name, Locked sütunlarını taşır. Süre hesabı ve son teslimde takibin durması korundu. Ayrı sentetik ortam: 36 navigation, 105 Chrome, 38 export, 11 süreç JS kontrolü; PHP/JS sözdizimi geçti. Gerçek çalışma veritabanına müdahale, yeni manuel batch, commit/push yok. Gerçek hosting/AI/Disco import kabulü bekliyor.
+
+**Önceki aşama — 2026-10-20, 0.2.2:** Kullanıcı isteğiyle öğrenci Vakalarım ekranındaki Katılım bilgilerim düğmesi ve bağlı istemci formu kaldırıldı. Mevcut metadata/araştırmacı Program-Sınıf alanları/API/DB korundu. JS syntax/indexPHP lint ve ayrı sentetik DBde69Chrome kontrolü geçti (test-evidence/student-0.2.2-browser.txt). Diğer test grupları bu küçük UI değişikliğinde yeniden çalıştırılmadı;0.2.1deki12grup547kontrol tarihsel kanıttır. Gerçek ortam kabulü açık; yeni manuel batch yok. Commit/push yok.
+
 2026-10-20: 0.1.0 sentetik pilot uygulama kodlandı. PHP/MySQL iki panel, revision/kilitler, mock/compatible adapter, olaylar, sürümlü tanımlar, sıralı analiz, karar/rapor/yayın ve gerçek format indirme var. Yerel SQLite/MariaDB/HTTP/Chromium testleri çalıştırıldı; ayrıntı TEST_RESULTS.md. Gerçek AI/hosting/kurum rubriği/onam ve kullanıcı kabulü henüz yok.
 
 ## Okuma sırası
@@ -29,8 +41,8 @@ Bu dosya Codex'in yeni oturumda kaldığı yerden devam etmesi içindir. Sır, g
 - Yanıt sürerken ikinci AI mesajı veya kuyruk yok. Soru taslağı yazılabilir; diğer bölümler çalışır.
 - Nihai/yansıtma tek teslimle kilitlenir; süreç salt okunur görünür kalır.
 - Kalıcı silme yok. Arşiv/dondurma/analiz dışı ve tüm geçmiş sürümleri korunur.
-- Öğrenci numarası panel kimliği; iç teknik kimlik değişmez. Kodlanmış export ayrı.
-- Araştırmacı katılımcı/vaka/atama yönetir; vaka eklenince matris genişler.
+- Öğrenci numarası panel kimliği; iç teknik kimlik değişmez. Her araştırmacının ayrı çalışma alanı vardır, ortak vaka üyeliği yoktur. Kodlanmış export ayrı.
+- Araştırmacı katılımcı/vaka/atama yönetir; Genel durum vaka seçimi ve aranabilir öğrenci listesidir, geniş matris kaldırıldı.
 - Olay, taslak ve süreler process mining için tutulur. Kopyalama kaynak metin/sürüm/aralıkla kaydedilir.
 - Görünürlük/odak/etkileşimsizlik okuma veya düşünme diye yorumlanmaz.
 - AI üretimi ve öğrenci etkinliği ayrı kulvar; süreler çift sayılmaz.
@@ -40,10 +52,10 @@ Bu dosya Codex'in yeni oturumda kaldığı yerden devam etmesi içindir. Sır, g
 - Başlangıç ve nihai rubrik çağrıları bağımsız; diğer metin/puan gösterilmez.
 - Sayısal fark/toplam uygulamada; AI yalnızca öneri ve kanıt sağlar.
 - Kabul/düzenle/reddet/karar verilemedi. Araştırmacı kararı ham veri/AI önerisini ezmez.
-- Rapor onayı ve yayını ayrı. Araştırma genelindeki beş vaka veri toplaması kapanmadan hiçbir öğrenciye puan/rapor yok.
+- Rapor onayı ve yayını ayrı. İlgili vakada veri toplama ve öğrencinin kişisel ek süresi kapalı değilse rapor/puan yok. Vaka yeniden açılır/kapanır; global beş vaka koşulu kaldırıldı.
 - Öğrenci yalnızca onaylı yayımlanmış karar/puan/rapor görür; iç AI taslakları görünmez.
 - Word/PDF rapor, gerçek XLSX/CSV süreç çıktısı ve JSON yapısal çıktı. Toplu indirme var.
-- Kullanıcı test verisi ve adım adım manuel test rehberi istiyor; sonra dönütle düzeltilecek.
+- Kullanıcı yeni manuel batch istemiyor; yerel otomatik kontroller önce yürütülür. Yalnız otomatik doğrulanamayan kritik dış kabul adımları kısa ve açık istenir.
 
 ## Geçersiz kalan önceki fikirler
 
@@ -55,7 +67,7 @@ PHP session lock uzun AI isteğinde autosave'i engelleyebilir. Oturum kilidini g
 
 ## Bilinmeyenler
 
-Hosting sürüm/limitleri; AI sağlayıcısı/modeli; gerçek rubrik; onam/saklama metni; autosave/heartbeat/idle eşikleri; etiketleme tetikleme zamanı; çoklu araştırmacı; yedek düzeni. Teknik varsayımı belgele; kullanıcı kararı gibi gösterme.
+Hosting sürüm/limitleri; AI sağlayıcısı/modeli; gerçek rubrik; kurum onam/saklama süreci; autosave/heartbeat/idle eşikleri; etiketleme tetikleme zamanı; yedek düzeni. Çoklu araştırmacı ayrı alanlar olarak uygulandı. Teknik varsayımı belgele; kullanıcı kararı gibi gösterme.
 
 ## Oturum sonu güncelleme şablonu
 
@@ -254,3 +266,76 @@ GitHub teslim kontrolü: otomatik onay denetimi TEST_DATA.mdde kullanılan sabit
 
 ## GitHub teslimi tamamlandı — 2026-10-20
 VakaLab0.1.9 kaynakları,belgeleri ve sentetik test kanıtları https://github.com/hkayaduman/VakaLab main dalına gönderildi. İlk kaynak commit4df25e0. Sabit test parolası commitöncesinde yer tutucuyla değiştirildi;hiçbircommitparolayıiçermiyor. Yerelconfig/DB/vendor/.tools/tests/tmp dışarıda. Sonrakiiletideyeni manuelbatchotomatikbaşlatma;kullanıcıyorulduğunuveotomasyontercihiniiletmişti. KalanB14.2/B15vegerçekhosting/AItestleribekliyor;üretimhazırilanedilmedi. Bu teslimdeuygulamakodudeğişmedi,eskigerçektestsonuçlarıkorundu,yenitestkoşulmadı.
+
+## SON DEVAM — 2026-10-20 · 0.1.9 otomatik erişim ve yayın doğrulaması
+
+- Kullanıcının yorulma/otomasyon tercihi uygulandı; yeni manuel batch istenmedi.
+- tests/access_publication_checks.py eklendi: B14.2/B15 karşılıkları 46, ayrı global kapanış/yayın 34; toplam **80 HTTP kontrolü geçti**, SQLite/mock. Kanıt test-evidence/access-publication-0.1.9.txt. Kullanıcı bildirimi veya yeni ekran kanıtı değildir; tarihsel manuel BEKLİYOR satırları korunur, tekrar istenmez.
+- Sadece benzersiz tests/tmp fixture oluşturuldu/seed edildi/kapatıldı/yayımlandı; config/local.php, mevcut çalışma DB'si ve 8088 kullanılmadı. Kullanıcının teslimleri, devam eden ikinci vaka, analiz/rapor sürümleri ve TEST-YONETIM-02 korunur. Ürün kodu/şema/sürüm değişmedi.
+- RELEASE_READINESS.md: üçlü durum özeti, gerçek hosting/AI/kurum için gereken bilgiler ve gerçek düğme adlarıyla ayrı kapanış/yayın senaryosu. Test/manuel/plan kayıtları güncellendi.
+- Çalıştırılmayanlar: eski Chrome/MariaDB/42HTTP/export/genelSQLite/restore suite'leri, gerçek hosting/AI ve fiziksel cihaz/kesinti. Önceki sonuçlar yeniden koşulmuş sayılmayacak.
+- Sonraki somut adım: hosting ve AI yapılandırma bilgileri/erişimi, gerçek kurum rubriği/onam sağlanınca ayrı test ortamında doğrula. Şu anda yeni manuel batch veya gereksiz özellik yok; üretime hazır ilan edilmez. Bu oturumun test/belge değişiklikleri henüz commit/push edilmedi.
+
+## SON DEVAM — 0.2.0 araştırmacı sadeleştirmesi · 2026-10-20
+
+- Kullanıcının son kararı her araştırmacı ayrı çalışma alanı; kısa süre gündeme gelen ortak vaka erişimi iptal edildi, koda/şemaya eklenmedi.
+- Kod: Migration/Scope, 002.sql, sade researcher.js; Admin/App/Analysis/Export/api yetki ve vaka kapıları; bin/upgrade-sqlite.php, CLI/Seed ve hedefli testler. Ürün asset sürümü 0.2.0.
+- Yeni araştırmacı eklenir ve boş alanla başlar; sahiplik tüm alt uçlarda denetlenir. Basit kullanıcı formundan onam/deneyim/araç/çekilme kalktı, eski metadata korunur. Rutin işlemlerde gerekçe yok; inceleme/değerlendirme ve teknik müdahale gerekçeli kalır.
+- Toplu checkbox atama ve kişisel ek süre; vakayı aç/kapat, raporu yalnız vaka/kişisel süre kapalıyken ayrı yayınla. Eski global kapı geçersiz. Teslim/başlangıç kilitleri korunur. Etiket/rubrik Sil geçmiş başvuruları yok etmez.
+- Tam export tek/tüm vakalar için kapsamlı Excel/JSON; kodlanmış Disco CSV. Kimlikli/metinli tam paket sadece yetkili araştırmacıya. Disco'da gerçek import henüz yok.
+- Gerçek sonuçlar: 119 HTTP, 42 iki-worker HTTP, 69 eski Chrome +24 yeni UI, 69 SQLite, 69 MariaDB11.4.12, 8 tablo ayrı restore sayımı, 35 export. Kanıt test-evidence/researcher-0.2.0-*. İlk test-harness hataları TEST_RESULTS'de açıklandı.
+- Mevcut yerel DB özel yedeklendi; migration 002 sonrası 22 tablonun eski sütun/satır hashleri eşit, tekrar migration değişmedi. Yeni sahiplik mevcut ilk araştırmacıya verildi. TEST-OGR-01 teslimleri/ikinci vaka taslağı/analiz f2e4.../rapor1ve2/TEST-YONETIM-02 aynı. Mevcut veride seed/reset/kapanış/yayın yok.
+- Şartnameler, kurulum, mimari, veri sözlüğü, plan ve sonuçlar güncel. Yeni manuel batch istenmedi. Gerçek hosting/AI/rubrik/onam/cihaz/kesinti kabulü açık; üretime hazır beyanı yok. Commit/push yapılmadı; önceki oturumun 0.1.9 test/belge değişiklikleri de çalışma ağacında korunuyor.
+
+## SON DEVAM — 0.2.1 · 2026-10-20
+
+- Kullanıcı ek süre testini tekrar istedi; ayrı fixture'da yeniden yapıldı. 50 hedefli Chrome kontrolünde seçili TEST-OGR-05 açılıyor, seçilmeyen TEST-OGR-04 kapalı kalıyor, ek süre kaldırılınca05tekrar kapalı. 119 HTTP'de yeni başlangıca ek süre, diğer vaka bağımsızlığı, teslim kilidi, rapor gizleme/geri gelme de geçti. Kullanıcıdan manuel test istenmedi.
+- Vaka kartına Atanan öğrencileri göster (sayılı) eklendi. Yalnız aktif atamalar; öğrenci adı/hesap/çalışma ve ek süre durumu. Bu vakanın atamalarını yönet doğru vakayı önseçer.
+- Genel durumdaki geniş matris kaldırıldı: Vaka ve öğrenci seç → vaka dropdown, Öğrenci ara, Çalışma durumu, öğrenci satırları/Çalışmayı aç. Başlamamış çalışmayı açmaz; kaldırılan atamaların geçmiş uygulaması görünür. Geri dönüşte vaka/arama/durum korunur. Eski filterMatrix kodu kaldırıldı.
+- Rubrik adı/yönerge, ekle-kaldır boyutlar, min/max/ağırlık ve ekle-kaldır düzey adı/puan/açıklama formu var. JSON kullanıcıdan istenmez. Eski sürüm ve boyut kimlikleri korunur. Client/server doğrulaması ve alan odaklı hata; tanım görüntüsü okunaklı.
+- İşlem geçmişi Türkçe işlem/hesap/vaka/öğrenci/zaman/gerekçe satırları, arama,20şerDaha fazla göster ve son100yetkili kaydın JSON indirmesi. Ham JSON ekranda yok.
+- Gerçek yeni sonuç: 119 HTTP,69Chrome,50hedefliUI,69SQLite,14rubrik; test-evidence/researcher-0.2.1-*. İlk UI testinde test değişkeni Node process adını gölgeledi; düzeltildi ve50tamamlandı,ilk başarısız çıktı korunur. Genel durum/rubrik/işlem geçmişi sentetik ekranları görsel incelendi.
+- Ürün asset0.2.1. Şema/çalışma DB'si değişmedi, seed/reset/kapanış/yayın yapılmadı. Gerçek rubrik/onam/hosting/AI ve kalan dış kabul hâlâ bekliyor. Commit/push yok. Yeni manuel batch isteme.
+
+## SON DEVAM — 0.2.1 kapsam ve bağlam denetimi
+
+- Kullanıcının tüm testler/context isteği üzerine CONTEXT/plan/TEST_RESULTS/MANUAL_TEST_RESULTS/BUGS/RELEASE_READINESS,iki manuel rehber ve şartname bağlantıları karşılaştırıldı. Güncel kararlarda kalan matris ifadesi ve eski manuel ekran haritası düzeltildi; önceki test kanıtları silinmedi.
+- Çalıştırılabilir12testgrubunun tamamı bu tur güncel0.2.1'de geçti: time10,labels8,analysis-progress12,rubric14,export35,SQLite69,validation50,browser69,researcherUI50,access119,iki-workerHTTP42,MariaDB69;ayrırestore8tablosayısıeşit. Kanıtlar audit-0.2.1-*;547bildirilen kontrol örtüşür ve bağımsız547senaryo değildir.
+- Ürün kodu/şema/mevcut DB değişmedi. bin/upgrade-sqlite.php tekrar çalıştırılmadı; önceki22tabloyadokunmayan migration kanıtı0.2.0tarihçesidir. Mevcut DB'de seed/reset/kapanış/yayın yok.
+- Otomatik suite tamlığı gerçekAI/hosting/kurumrubriği/onam/fizikselcihaz/Wordgörselaçılış/gerçekkesinti/stres/Discoimport kabulü değildir. Bunlar açıktır; kullanıcıdan yeni manuel batch istenmedi. Commit/push henüz yok.
+
+## 0.2.2 — Katılım bilgilerim kaldırıldı
+
+Öğrenci ana sayfasındaki düğme, olay bağlantısı ve kullanılmayan onboarding istemci fonksiyonu kaldırıldı. Önceden kaydedilmiş veriler, araştırmacının isteğe bağlı Program/Sınıf alanları ve backend değişmedi.69Chrome/JSsyntax/PHPlint geçti; şema/mevcut DBdeyazma yok. Yeni manuel test istenmedi. Test sonucu TEST_RESULTS.md; bu tur eski12grup yeniden koşulmadı.
+
+## Rapor öğrenci gösterimi — 2026-10-20 · 0.2.2
+
+Kullanıcı bir öğrenci raporunu görmek istedi. Mevcut8088veri toplama/yayın durumuna dokunmadan tests/tmp altında ayrı SQLite kopyası ve ayrı PHP session dizini oluşturuldu; önizleme **http://localhost:8089/**. localhost kullanımı8088deki127.0.0.1oturum çerezinden ayrıdır. TEST-OGR-01 mevcut parolasıyla giriş yapabilir; hiçbir parola değiştirilmedi veya Git'e yazılmadı.
+
+Yalnız kopyada test-case-3 Akranlar arası anlaşmazlık erişimi/ataması görünür yapıldı, veri toplama kapatıldı ve onaylı Rapor Sürüm1ayrıca yayımlandı. Sürüm2yayımlanmadı;rapor gövdeleri değişmedi. Asıl vaka ve rapor alanları kurulumda karşılaştırılarak değişmez doğrulandı. İlk kopya denemesinde devralınmış vaka erişimi kapalıydı; yalnız yeni gösterim kopyasında erişim açılarak hazırlandı.
+
+Öğrenci yolu: TEST-OGR-01 → Vakalarım → Akranlar arası anlaşmazlık → Görüntüle →7.Son teslim → Yayımlanan raporlar →Sürüm1Word/PDF.6ayrıSmoke geçti: sentetik öğrenci oturumunda doğru vaka, yalnızv1ikiindirme,teslimkilidi,içekçıkarma,gerçekPDFveDOCXHTTP200. Kanıt test-evidence/student-report-demo.txt;sentetik görüntü tests/tmp/student-report-demo.png. Doğrulamada yalnız kopyaya ait CLIfixture oturumu kullanıldı; kullanıcının parolasıyla yeni login testi yapılmadı. Sunucu geçicidir; PCyenidenbaşlarsa tekrar hazırlanır. Gerçekhosting/AIkurumkabulü değildir. Yeni manuel batch yok.
+
+## 0.2.3 — Sade öğrenci raporu (yerel geliştirme)
+
+Öğrenciye başlangıç/nihai özgün yanıtlar, her ölçütte puan/düzey/kısa geri bildirim, nihai toplam ve genel geri bildirim sunulur. Toplam = nihai ölçüt puanı × ağırlık toplamı; başlangıç ayrı karşılaştırmadır. Reddedilen/belirsiz puan null kalır. Üretim geri bildirimi onaylı puan/rubrik ve özgün yanıtlardan hazırlanır; puanları uygulama hesaplar. Sağlayıcı çağrısı transaction dışında, karar değişikliği kontrolüyle yeni değişmez rapora eklenir. Eksik/geçersiz/teknik üretim ifadeli geri bildirim kaydedilmez. Araştırmacı Öğrenci raporunu önizle ile inceleyip ayrı onay/yayın yapar. Öğrenci raporunda AI/teknik inceleme/iç notlar yok; iç üretim kaydı araştırmacı snapshotında korunur. Öğrenci API/Word/PDF aynı sade içeriktir. Yeni Raporu görüntüle düğmesi var. Eski gövdeler değiştirilmez, eski sürümde yeni feedback yoksa açıkça henüz hazırlanmadı gösterilir; yeni rapor sürümü oluşturulur.
+
+Ayrı localhost:8089 gösterim kopyasında TEST-OGR-01 / Akranlar arası anlaşmazlık için Sürüm3 oluşturulup onay/yayın yapıldı. Eski kopya rapor gövdeleri ve asıl cases/reports/applications/snapshots/decisions hashleri eşit. Asıl8088veri toplama/yayın/yanıtlar değişmedi. Testler yalnız sentetik mock; gerçek sağlayıcı geri bildirim kalitesi henüz doğrulanmadı. Word görsel renderer LibreOffice bulunamadığından tamamlanmadı; paket/metin ve PDF görsel kontrolü ayrıdır. Son test dökümü TEST_RESULTS.md: 15birim/75SQLite/81Chrome/119HTTP/35export/75MariaDB ve8restoretablosayısı, ayrıdemo6smoke; hepsi sentetik. Commit/push yok.
+
+## 0.2.4 — Okunabilir öğrenci-vaka dosyası (yerelde doğrulandı)
+
+Ham veriler ve süreç yerine Öğrenci yanıtları ve çalışma süreci: alan etiketli yanıtlar/kesinleşmiş kayıtlar, Önce/Sonra yanıt geçmişi, Türkçe işlem çizelgesi (bölüm/arama/periyodik kayıt filtresi ve50şer), görünür-odak süre tablosu ve bilinmeyen aralıklar, AI istek sonucu/süre/denemeler/gönderilen bağlam açıklaması. Analiz sonuçları ve karar geçmişi de okunabilir; puan/özet düzenleme alanlarla, JSON girişi yok. Ham JSON ve Disco indirmeleri ayrı düğmelerdir. Yeni AI ile mesajları etiketle bağımsız öneri çağrısıdır; aynı mesaj/tanımda cache, sahiplik/rol/çıktı/konuşma değişikliği denetimi var. Eski etiketler ve araştırmacı boş dahil kararları silinmez. Analiz6etiketleme de aynı kayıt/validasyon yoluna bağlandı. Disco'ya mesaj başına sunucu zamanlı nokta olayı; AI Labels/Researcher Labels/Effective Labels/Label Source/Label Status eklendi. Araştırmacı seçimi, boş seçimi de kapsayarak önceliklidir. Gerçek veride seed/reset/şema/veri toplama/yayın değişikliği yok. Testler ayrı sentetik DB; sonuçlar TEST_RESULTS.md içinde: 97 Chrome, 28 etiket/Disco PHP, 11 süreç JS, 11 etiket JS, 75 SQLite, 35 export, 119 HTTP, 75 MariaDB ve 8 restore tablo sayısı. Gerçek sağlayıcı/Discoimport/hosting/kurum kabulü bekliyor.
+
+## Process mining hedefi denetimi — 0.2.4
+
+Kullanıcı bölüm dönüşleri, AI soru amaçları, ziyaret süreleri ve darboğaz/sequence analysis hedefini ayrıntılandırdı. Mevcut CSV temel geçiş ve mesaj verisini taşır; ancak visits süreleri Disco'ya aktarılmıyor, mesaj amaçları Activity yerine etiket özelliğinde, bazı alan/oturum/sekme ayrıntıları kodlanmış CSV'de yok. Önceki Disco hazır ifadesi ayrıntılı süre/darboğaz analizi için yeterli doğrulama sayılmamalı. PROCESS_MINING_REVIEW.md mevcut/eksik/sonraki kapsamı kaydeder. Bu tur yalnız kod + resmî Disco belgesi incelemesi ve ayrı bellekte SQLite/mock tanı çalıştırması yapıldı (test-evidence/process-mining-review-0.2.4.txt); gerçek Disco import ve yeni ürün geliştirmesi yok. Mevcut DB/kod/raporlar değişmedi; eski testler tekrar geçmiş gibi yazılmadı. Sonraki somut ihtiyaç: davranış kodları, ayrı ziyaret/süre çıktısı ve açık sequence hazırlama kuralları; kullanıcının örnek yoluyla doğrulama. Mevcut arayüz korunacak.
+
+## 0.2.5 — Sekme giriş/çıkış süreleri ve teslimde durma (yerelde doğrulandı)
+
+Kullanıcı süreyi açıkça sekmeye girişten sonraki sekmeye geçişe kadar geçen zaman olarak tanımladı; tüm 7 sekme için aynı kural, her geri dönüş ayrı ziyaret. Son teslimin başarıyla kaydından sonra izleme gerekmiyor; yeni öğrenci telemetrisi istemci/sunucuda bu sınırla durduruluyor. Gecikmiş teslim-öncesi kayıtlar korunuyor, ilk istemci teslim doğrulaması kabul ediliyor. Önceki görünür/odak ölçümü ayrı kalıyor. Navigation sınıfı ham kayıtlardan ziyaret/başlangıç/bitiş/süre/sonuç üretir; açık uçlar tahmin edilmez. Varsayılan Disco geçiş/süre görünümü; ayrıntılı AI/olay görünümü ayrıca korunur. Excel/JSON'a navigation_visits ve navigation_milestones eklendi. Ürün asset 0.2.5; şema/çalışma DB'si değişmedi. Güncel sonuç: 30 Navigation, 103 Chrome, 50 validation, 119 erişim HTTP, 42 iki-worker HTTP, 75 SQLite, 75 MariaDB + 8 restore tablo sayısı, 38 export, 28 etiket kontrolü geçti; kanıt TEST_RESULTS.md ve navigation-0.2.5-* dosyalarında. Eski tüm-suite sonuçları bu tur tekrar koşulmadı. Gerçek Disco import/hosting/AI/kurum/fiziksel cihaz kabulü hâlâ açık. Commit/push yok.
+
+Önemli kullanıcı ölçüm kararı: Son teslim başarıyla kaydedilince araştırma süreci tamamlanır; sonradan sekmelerde/raporda dolaşma süreye ve davranış akışına katılmaz. Ölçülemeyen kapanışlar tahmin edilmez.
+
+## GitHub teslimi — 2026-10-21
+
+Kullanıcı tüm biriken düzenlemelerin GitHub'a gönderilmesini istedi. Hedef origin/main (hkayaduman/VakaLab), başlangıç commit'i 194f9d0f5b4be549c1921b027a46204ed6fc7960; uzak dal bu commit ile aynı doğrulandı. 0.2.10 kod/belge/test kanıtları commit için hazırlanıyor. 198 aday dosyada sır örüntüsü ve yapılandırılmış anahtar eşleşmesi bulunmadı; config/local.php, storage DB, vendor, .tools ve tests/tmp dışarıda. 41 PHP/JS dosyasında sözdizimi geçti; mevcut son testler yeniden yapılmış gibi yazılmadı. Gerçek ortam kabulü ayrı kalır. Gönderim sonucu henüz doğrulanmadı.

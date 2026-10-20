@@ -16,8 +16,16 @@ final class Rules {
         demand($d['final_confidence']!==null,'Nihai güveni seçin');
     }
     public static function rubric(array $r): void {
-        demand(isset($r['text'],$r['dimensions'])&&is_string($r['text'])&&is_array($r['dimensions'])&&count($r['dimensions'])>0,'Rubrik metni ve boyutlar gerekli');$ids=[];
-        foreach($r['dimensions'] as $d){demand(isset($d['id'],$d['min'],$d['max'],$d['weight'],$d['levels'])&&is_array($d['levels'])&&$d['levels']!==[],'Boyut/düzey eksik');demand(!in_array($d['id'],$ids,true),'Boyut ID tekrarı');$ids[]=$d['id'];demand(is_numeric($d['min'])&&is_numeric($d['max'])&&is_numeric($d['weight'])&&$d['max']>$d['min']&&$d['weight']>0,'Rubrik aralık/ağırlık geçersiz');}
+        demand(isset($r['text'],$r['dimensions'])&&is_string($r['text'])&&trim($r['text'])!==''&&is_array($r['dimensions'])&&count($r['dimensions'])>0,'Rubrik metni ve boyutlar gerekli');$ids=[];
+        foreach($r['dimensions'] as $d){
+            demand(is_array($d)&&isset($d['id'],$d['name'],$d['min'],$d['max'],$d['weight'],$d['levels'])&&is_string($d['id'])&&trim($d['id'])!==''&&is_string($d['name'])&&trim($d['name'])!==''&&is_array($d['levels'])&&$d['levels']!==[],'Boyut adı ve düzeyler gerekli');
+            demand(!in_array($d['id'],$ids,true),'Boyut ID tekrarı');$ids[]=$d['id'];demand(is_numeric($d['min'])&&is_numeric($d['max'])&&is_numeric($d['weight'])&&is_finite((float)$d['min'])&&is_finite((float)$d['max'])&&is_finite((float)$d['weight'])&&$d['max']>$d['min']&&$d['weight']>0,'Rubrik aralık/ağırlık geçersiz');
+            $names=[];foreach($d['levels'] as $level){
+                demand(is_array($level)&&isset($level['name'],$level['score'],$level['description'])&&is_string($level['name'])&&trim($level['name'])!==''&&is_string($level['description'])&&trim($level['description'])!=='','Düzey adı, puanı ve açıklaması gerekli');
+                demand(!in_array(trim($level['name']),$names,true),'Düzey adları tekrarlanamaz');$names[]=trim($level['name']);
+                demand(is_numeric($level['score'])&&is_finite((float)$level['score'])&&$level['score']>=$d['min']&&$level['score']<=$d['max'],'Düzey puanı boyut aralığı içinde olmalı');
+            }
+        }
     }
     public static function scores(array $out,array $rubric,array $sources): float {
         demand(isset($out['scores'])&&count($out['scores'])===count($rubric['dimensions']),'Eksik puan');$sum=0;$weight=0;

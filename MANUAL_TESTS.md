@@ -1,22 +1,21 @@
 # VakaLab Manuel Testleri ve Dönüt
 
-Durum: Kullanıcıyla yürütülen R02 turunda Batch01–11 tamamlandı; tek tek kanıt ve sonuçlar MANUAL_TEST_RESULTS.md içindedir. Aşağıdaki T01–T28 kataloğunun tümü geçti sayılmaz. Otomatik kontroller TEST_RESULTS.md içindedir.
+Durum 0.2.1: Kullanıcıyla Batch01–13 tamamlandı; B14sürüm ekran kanıtı ve B14.2/B15otomatik karşılıkları MANUAL_TEST_RESULTS.md'de ayrıdır. **Bu belge yeni bir manuel batch isteği değildir.** Yerel12otomatikgrup tamamlandı; gerçek hosting/AI/kurum/fiziksel cihaz-kesinti ve Disco import açık. T01–T28kataloğunun tümü manuel GEÇTİ sayılmaz.
 
-Önce INSTALL_SHARED_HOSTING.md ve TEST_DATA.md ile ayrı test ortamını kurun. Yerel deneme adresi http://127.0.0.1:8088/. Araştırmacı TEST-ARASTIRMACI; öğrenciler TEST-OGR-01…07. Geçici parola yalnız TEST_DATA.md içinde. Seed tekrar çalıştırmak test akışını sıfırlamaz; yeni senaryo için ayrı test DB kullanın.
+## Güncel ekran ve işlem haritası
 
-## Gerçek ekran ve işlem haritası
+- Öğrenci: Vakalarım → Başla / Devam et / Görüntüle; altı çalışma bölümü ve7.Son teslim. Katılım bilgilerim düğmesi/formu kaldırıldı; isteğe bağlı Program/Sınıf araştırmacı kullanıcı formundadır.
+- Araştırmacı: Genel durum → Vaka ve öğrenci seç → Vaka / Öğrenci ara / Çalışma durumu → Çalışmayı aç. Matris yoktur.
+- Kullanıcılar → + Kullanıcı ekle → Öğrenci/Araştırmacı. Yeni araştırmacı boş ayrı alanda başlar. Kısa form, isteğe bağlı Ek bilgiler; rutin işlem gerekçesi yoktur. Başka araştırmacının verilerine erişemez.
+- Vakalar ve atamalar: +Vaka ekle, Öğrenci önizlemesi, Düzenle, Atanan öğrencileri göster; Toplu atama / Ek süre ile checkbox/Tümünü seç. Her kartta Veri toplamayı kapat / Veri toplamayı aç. Kapalı vaka okunur; yalnız seçilen öğrenciye ek süre verilebilir. Başlangıç/teslim kilitleri açılmaz.
+- Rubrikler ve etiketler → +Rubrik: ad/yönerge, boyutlar/min/max/ağırlık ve düzey adı/puan/açıklaması. JSON sistem tarafından üretilir. Düzenle yeni sürüm; Sil yeni seçimlerden kaldırır, geçmişi korur.
+- Tek öğrenci-vaka dosyasında Yeni analiz sürümü → 1…8sırayla;3…7için gerekçeli karar;8sonrasında Yeni rapor snapshotı oluştur. Raporu onayla ve Ayrıca öğrenciye yayımla ayrıdır. Yayın yalnız ilgili vaka ve öğrencinin ek süresi kapalıysa mümkündür; başka vakaların kapanması gerekmez.
+- Mesaj etiketi: Öğrenci yanıtları ve çalışma süreci →3.AI konuşması ve mesaj etiketleri → Etiketleri incele / Değiştir → çoklu seçim/gerekçe → Etiket değişikliğini kaydet.
+- Veri indirme → Hangi vaka?:Tüm vakalar/tek vaka; Excel indir / Tüm verileri JSON indir seçilen kapsamdaki tüm kayıtları içerir. Disco CSV indir kodlanmış Case ID/Activity/UTC/Resource alanlarını hazır verir; teknik gürültü ayrı tutulur. Eski filtre checkboxları yoktur.
+- İşlem geçmişi: Türkçe okunaklı kayıtlar,arama,20şerDaha fazla göster ve İşlem geçmişini JSON indir. Global kapanış düğmesi yoktur.
+- Takılı AI/analiz: timeout+60s sonrası gerekçeli kapatma; sağlayıcı maliyetini iptal etmiş sayılmaz. Streaming/ilk parça ölçümü yoktur.
 
-- Öğrenci: Vakalarım → Başla / Devam et / Görüntüle → Vaka, Vaka profili, Başlangıç değerlendirmesi, AI sohbeti, Nihai değerlendirme, Yansıtma. Katılım bilgilerim başlangıç bilgi/onam alanıdır.
-- Araştırmacı: Genel durum → matris hücresi → Öğrenci-vaka dosyası. Ham verilerde açılır bölümler: AI konuşması, taslaklar, olay çizelgesi, süreler, AI istekleri/girdi snapshotı. İç araştırmacı notu ekle öğrenciden gizlidir.
-- Katılımcılar → Katılımcı ekle / Düzenle-Dondur-Arşivle; parola boşsa korunur. Her yönetim işlemi gerekçe ister.
-- Vakalar ve atamalar → Vaka ekle / Öğrenci önizlemesi / Düzenle-Yeni sürüm / Atama yönet. closed yeni başlangıçları kapatır, devam eden erişimi durdur seçimi ayrı.
-- Rubrikler ve etiketler → yeni tanım / Yeni sürüm-Kullanımdan kaldır. Rubrik JSON alanı örneği önceden doldurulur; gerçek rubrik henüz yok.
-- AI ön değerlendirmesi matris hücresindeki tek uygulama dosyasında: Yeni analiz sürümü → 1…8 sırayla. 3…7 her adımın Kabul-Düzenle-Reddet-Karar verilemedi düğmesi. 8. adım öncesinde beş karar gerekli. Girdi snapshotı her adımın altında açılır.
-- Rapor: 8. adım → Yeni rapor snapshotı oluştur → Rapor geçmişi → Raporu onayla → global kapanıştan sonra Ayrıca öğrenciye yayımla. İç Word/PDF araştırmacı eki taşır; öğrenci indirmesi bu eki çıkarır.
-- Mesaj etiketi: dosyada AI konuşmasını aç → Etiketleri incele-Değiştir → çoklu seç → gerekçe → Yeni etiket kararını kaydet. Yeni tanım için Rubrikler ve etiketler menüsünü kullanın.
-- Veri indirme: varsayılan test verisini dışlar. Seed çıktısı için Sentetik test verisini dahil et. Kodlanmış çıktı metinleri çıkarır; kimlikli ham veri gerekiyorsa seçimi kaldırın. CSV her seferinde seçili tek tabloyu, XLSX/JSON bütün tabloları verir.
-- Sistem ve işlem geçmişi → Global kapanış ve audit. Kapanış sonrası öğrenci yazmaları kapanır. Bunu diğer testlerin sonunda ayrı test DB üzerinde yapın.
-- Takılı AI/analiz: timeout + 60 s sonrası gerekçeli kapatma. Bu sağlayıcı maliyetini iptal etmez. Streaming yok; ilk parça testinde beklenen sonuç ölçülmedi olarak kayıttır.
+Senaryolar ancak gerekirse ayrı yeni sentetik ortamda uygulanır. Mevcut8088çalışma DB'sini seed/reset ile değiştirmeyin. Parolalar/anahtarlar chat/Git/kanıtta yer almaz. Ayrı test fixture parola ve yapılandırmaları Git dışındadır; TEST_DATA.md'deki yer tutucu gerçek giriş parolası değildir.
 
 ## Her test için kanıt kaydı
 
@@ -26,7 +25,7 @@ Test ID, uygulama sürümü, test DB adı (parola yok), cihaz/tarayıcı, mock m
 
 1. INSTALL_SHARED_HOSTING.md ile ayrı test ortamını kur.
 2. Üretim verisi olmayan ayrı test veritabanı kullan.
-3. TEST_DATA.md içindeki seed'i çalıştır; bütün verilerin SENTETİK/TEST olarak işaretlendiğini doğrula.
+3. Yalnız yeni ayrı test DB'sinde sentetik fixture oluştur; bütün verilerin SENTETİK/TEST olarak işaretlendiğini doğrula.
 4. Araştırmacı ve iki öğrenci için ayrı tarayıcı profili veya gizli pencere aç. Aynı hesabın iki sekme testi ayrıca yapılacak.
 5. Test sürümünü, tarayıcıyı, cihazı, saat dilimini ve mock/gerçek AI seçimini kaydet.
 6. Gerçek API anahtarını ekran görüntüsüne veya hata dönütüne ekleme.
@@ -48,7 +47,7 @@ Beklenen: veri korunur; teknik kimlik/ilişkiler değişmez; dondurulmuş giriş
 2. Öğrenciye atamadan aktif yap; öğrenci hesabını kontrol et.
 3. Öğrenciye ata; aktif vakayı aç.
 4. Başka öğrenciye atanmadığını doğrula.
-5. Araştırmacı matrisinde yeni sütunu kontrol et.
+5. Genel durum → Vaka listesinde yeni vakayı ve atanmış öğrencilerini kontrol et.
 Beklenen: yalnızca aktif + atanmış öğrenci erişir. Doğrudan adres erişimi de korunur.
 
 ### T03 : Vaka sürümü
@@ -136,7 +135,7 @@ Beklenen: sürümler ve mesajlar kronolojik bağlanır; yalnız son metin kalmaz
 4. Teslim sonrası tüm alanları ve sohbeti kontrol et.
 Beklenen: eksik/aktif AI engellenir; başarılı teslimde her şey salt okunur; zaman görünür; tüm süreç görüntülenebilir.
 
-### T15 : Matris ve teknik durum
+### T15 : Vaka/öğrenci listesi ve teknik durum
 1. Açmamış, taslak, AI, nihai ve teslim fixturelarını incele.
 2. Son etkinlik ve son bölüm bilgilerini kontrol et.
 3. Hata üreten mock senaryosunu çalıştır.
@@ -177,17 +176,18 @@ Beklenen: uygulama hesapları doğru; AI yanlış toplamı kabul ettiremez; kan�
 Beklenen: ilk AI önerisi korunur; araştırmacı kararı ayrıdır; kararsız boyut tamamlanmış toplam gibi gösterilmez; eski analiz kaybolmaz.
 
 ### T21 : Erken yayın engeli
-1. Veri toplama açıkken onaylı raporu yayımlamayı dene.
-2. Kendi beş vakasını bitirmiş öğrenciyle rapora erişmeyi dene.
-3. Doğrudan rapor indirme adresini test et.
-Beklenen: global kapanış olmadan erişim yok; yalnızca arayüzde gizlemekle yetinilmez.
+1. Ayrı sentetik testte ilgili vaka açıkken onaylı raporu ayrıca yayımlamayı dene.
+2. Vaka kapalı ama rapor sahibine ek süre açıkken tekrar dene.
+3. Öğrenci doğrudan rapor verisi/indirme adresine erişmeyi denesin.
+Beklenen: ilgili vaka veya kişisel ek süre açıkken erişim yok; sunucu da denetler.
 
-### T22 : Global kapanış, onay ve yayın
-1. Ayrı test senaryosunda beş vaka veri toplamasını gerekçeli kapat.
-2. Henüz onaylanmamış raporu yayımlamayı dene.
-3. Raporu onayla; otomatik yayımlanmadığını doğrula.
-4. Ayrıca yayımla ve öğrenciyle aç.
-Beklenen: üç koşul gerekir; öğrenci onaylı karar/puan/rapor görür, iç not ve AI taslağı görmez. Yanıt kilitleri korunur.
+### T22 : Vaka kapanışı, kişisel ek süre, onay ve yayın
+1. Ayrı testte yalnız seçili vakanın Veri toplamayı kapat düğmesini kullan; başka vaka açık kalsın.
+2. Öğrenci eski kaydı görüntüleyebilmeli; yeni başlangıç/kayıt/AI/teslim engellenmeli.
+3. Toplu atama / Ek süre ile yalnız seçili öğrenciye ek süre ver; seçilmeyen kapalı kalmalı. Süreyi iptal et; yeniden salt okunur olmalı.
+4. İlgili vaka ve rapor sahibinin ek süresi kapalıyken onaylı raporu ayrıca yayımla. Başka vakaların açık olması engel değildir.
+5. Vakayı/kişisel ek süreyi yeniden aç; yayımlanmış rapor gizlenmeli. Kapatınca aynı rapor dönmeli.
+Beklenen: vaka bağımsızlığı,kişisel erişim ve ayrı yayın; başlangıç/teslim kilidi ve geçmiş rapor gövdesi değişmez.
 
 ### T23 : Word/PDF
 1. Tek öğrenci-vaka raporunu iki biçimde indir.
@@ -200,9 +200,9 @@ Beklenen: gerçek DOCX/PDF açılır; aynı rapor sürümü; birleştirme yeni t
 1. Tek öğrenci-vaka ve tüm öğrenciler için indir.
 2. Olaylar, ziyaretler, mesajlar, etiketler, taslaklar ve veri sözlüğünü kontrol et.
 3. Çoklu etiketin olayları çoğaltmadığını doğrula.
-4. Kodlanmış çıktı indir; öğrenci numarası/ad/eşleme sızıntısı kontrol et.
+4. Disco CSV indir; kodlanmış öğrenci-vaka kimliği/etkinlik/UTC/zaman kaynağını ve kimlik sızıntısı yokluğunu kontrol et.
 5. Yalnız testte formül benzeri metin içeren fixtureı aç.
-Beklenen: gerçek xlsx; UTF-8 CSV; güvenli metin; açık saat dilimi; test/analiz dışı filtreleri; AI ve araştırmacı etiketleri ayrı.
+Beklenen: gerçek xlsx; UTF-8 CSV; güvenli metin; açık saat dilimi; seçili vaka/tüm vakalar kapsamı ve kayıtların test/deneme/analiz dışı durumları; AI ve araştırmacı etiketleri ayrı.
 
 ### T25 : Süre çakışması
 1. AI üretirken nihai yazma fixtureını incele.
@@ -222,7 +222,7 @@ Beklenen: erişim reddi; veri ve sır sızıntısı yok. Teknik endpoint testler
 1. Katılımcı/vaka/etiket/rubrik/raporun arşiv veya eski sürümünü aç.
 2. Analiz dışı işaretle ve gerekçe gir.
 3. Filtreli export al.
-Beklenen: kalıcı silme yok; geçmiş korunur; varsayılan araştırma exportu analiz dışı/test verisini karıştırmaz.
+Beklenen: kalıcı silme yok; geçmiş korunur; tam Excel/JSON test/analiz dışı durumlarını korur; Disco çıktısı kodlanmıştır.
 
 ### T28 : Gerçek hosting ve geri yükleme
 1. Gerçek test hostinginde HTTPS, alt klasör, API bağlantısı ve akışı kontrol et.

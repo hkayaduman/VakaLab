@@ -1,0 +1,3 @@
+Private SQLite backup verified.
+MIGRATION 002 OK: original columns and records identical in 22 tables; seed/reset/collection changes not performed.
+REPEAT MIGRATION OK: no changes.

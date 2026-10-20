@@ -1,0 +1,114 @@
+PASS BROWSER 1 only assigned active cases shown
+PASS BROWSER 2 profile starts unselected
+PASS BROWSER 3 AI unlocked after server initial confirmation
+PASS BROWSER 4 initial rendered read only
+PASS BROWSER 5 logout page exit does not recreate cleared event queues
+PASS BROWSER 6 immediate logout and relogin does not leave false other-tab lock
+PASS BROWSER 7 returning through home releases owned tab lease
+PASS BROWSER 8 pinned workspace title preserved after save
+PASS BROWSER 9 initial not automatically shown beside final
+PASS BROWSER 10 mock assistant rendered as text
+PASS BROWSER 11 final draft survives chat navigation
+PASS BROWSER 12 second tab read-only lease
+PASS BROWSER 13 mobile no document horizontal overflow
+PASS BROWSER 14 mobile section navigation present
+PASS BROWSER 15 all seven tabs stop telemetry after successful final submission
+PASS BROWSER 16 submission locks final fields
+PASS BROWSER 17 selected case lists seven synthetic participants
+PASS BROWSER 18 student list timestamps formatted as semantic time elements
+PASS BROWSER 19 student list shows explicit configured time zone
+PASS BROWSER 20 student list submitted filter
+PASS BROWSER 21 case selection shows only the selected case students
+PASS BROWSER 22 researcher can add participant through form
+PASS BROWSER 23 single application analysis UI
+PASS BROWSER 24 process summary readable dates with precise raw UTC preserved on hover
+PASS BROWSER 25 process panels contain no raw JSON
+PASS BROWSER 26 click-to-click visit summary visible separately from focus measurements
+PASS BROWSER 27 visit table names actual destination and field updates
+PASS BROWSER 28 locked and visibility notices stay separate from named activity
+PASS BROWSER 29 unreviewed message has no preselected research labels
+PASS BROWSER 30 live label preview uses names
+PASS BROWSER 31 latest saved selection prechecked on reopen
+PASS BROWSER 32 replacement label preview
+PASS BROWSER 33 criticism checkbox toggles by its visible label
+PASS BROWSER 34 missing reason error appears inside modal
+PASS BROWSER 35 failed save retains criticism selection
+PASS BROWSER 36 missing reason receives focus
+PASS BROWSER 37 refresh retains exact latest selection
+PASS BROWSER 38 both review versions retained
+PASS BROWSER 39 history shows removed labels by name
+PASS BROWSER 40 history shows added label by name
+PASS BROWSER 41 each review keeps its reason
+PASS BROWSER 42 review history dates readable
+PASS BROWSER 43 label dialog no horizontal overflow on mobile
+PASS BROWSER 44 explicit empty review overrides previous nonempty selection
+PASS BROWSER 45 empty review appears in history
+PASS BROWSER 46 server save failure visible within modal
+PASS BROWSER 47 server failure preserves selection and reason
+PASS BROWSER 48 successful save names actual current selection
+PASS BROWSER 49 criticism selection saved and persists through reload
+PASS BROWSER 50 only successful saves create review versions
+PASS BROWSER 51 answers readable by field names
+PASS BROWSER 52 saved response history compares before and after
+PASS BROWSER 53 event codes translated to Turkish
+PASS BROWSER 54 event section filter shows only matching section (or empty result)
+PASS BROWSER 55 event search empty result readable
+PASS BROWSER 56 unknown measurement separate from known seconds
+PASS BROWSER 57 AI connection result readable
+PASS BROWSER 58 AI generation preserves previous researcher selection
+PASS BROWSER 59 AI suggested labels shown by name
+PASS BROWSER 60 real browser workflow records all seven tab types
+PASS BROWSER 61 client final-submit marker preserved
+PASS BROWSER 62 real message request links researcher intent to visit activity
+PASS BROWSER 63 actual question has its own closed elapsed interval
+PASS BROWSER 64 AI activity intervals partition visit duration without double counting
+PASS BROWSER 65 actual reply arrival is recorded once as separate point event
+PASS BROWSER 66 real reply closes question and starts new viewing interval
+PASS BROWSER 67 AI visit without sending remains viewing
+PASS BROWSER 68 corrected intent displayed in navigation table
+PASS BROWSER 69 default Disco download carries durations and completion milestones
+PASS BROWSER 70 Disco download names activity using same current researcher intent
+PASS BROWSER 71 message label generation requires POST
+PASS BROWSER 72 message label generation requires CSRF
+PASS BROWSER 73 Disco HTTP download includes effective labels
+PASS BROWSER 74 editing after AI starts with current researcher review
+PASS BROWSER 75 label editing contains no JSON
+PASS BROWSER 76 readable process panels fit mobile width
+PASS BROWSER 77 all eight analysis steps visible before starting
+PASS BROWSER 78 only first step initially enabled
+PASS BROWSER 79 future step visibly locked
+PASS BROWSER 80 all run buttons disabled during request
+PASS BROWSER 81 current running state visible
+PASS BROWSER 82 step one completion unlocks step two
+PASS BROWSER 83 step 2 completed with all eight stages retained
+PASS BROWSER 84 step 3 unlocks in order
+PASS BROWSER 85 step 3 completed with all eight stages retained
+PASS BROWSER 86 step 4 unlocks in order
+PASS BROWSER 87 step 4 completed with all eight stages retained
+PASS BROWSER 88 step 5 unlocks in order
+PASS BROWSER 89 analysis steps no horizontal overflow on mobile
+PASS BROWSER 90 reload preserves four completed stages and fifth ready
+PASS BROWSER 91 step 5 completed with all eight stages retained
+PASS BROWSER 92 step 6 unlocks in order
+PASS BROWSER 93 step 6 completed with all eight stages retained
+PASS BROWSER 94 step 7 unlocks in order
+PASS BROWSER 95 step 7 completed with all eight stages retained
+PASS BROWSER 96 report merge waits for missing researcher decisions
+PASS BROWSER 97 research scoring edit uses fields instead of JSON
+PASS BROWSER 98 all required decisions unlock report merge
+PASS BROWSER 99 all eight complete without rerun controls
+PASS BROWSER 100 report snapshot offered only after all eight stages
+PASS BROWSER 101 researcher previews unapproved student feedback
+PASS BROWSER 102 researcher can download same student preview
+PASS BROWSER 103 researcher can export unapproved student preview
+PASS BROWSER 104 initial and final criteria shown separately
+PASS BROWSER 105 researcher explicitly approves feedback snapshot
+PASS BROWSER 106 student sees original initial and final answers
+PASS BROWSER 107 student sees server calculated final weighted total
+PASS BROWSER 108 approved feedback visible to student
+PASS BROWSER 109 student report omits technical and private review details
+PASS BROWSER 110 student report fits mobile dialog
+PASS BROWSER 111 simple student pdf actual download
+PASS BROWSER 112 simple student docx actual download
+PASS BROWSER 113 no browser JavaScript errors:
+TOTAL BROWSER 113 checks passed. Chromium desktop/mobile emulation; no physical mobile keyboard test.

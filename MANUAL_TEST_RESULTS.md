@@ -1,5 +1,7 @@
 # Birlikte manuel test kaydı
 
+Güncel devam — 0.2.1 kapsam denetimi: Yerel12otomatikgrup tamamlandı; bu yeni manuel kabul değildir. Kullanıcı Batch01–13veB14sürüm kanıtları tarihsel olarak korunur. Yeni manuel batch başlatılmadı; geniş matris/JSONrubrik/global kapanış yönergeleri güncel değildir. Güncel ekran haritası MANUAL_TESTS.md; kalan dış kabul RELEASE_READINESS.md.
+
 Başlangıç: 2026-10-20. Ortam: kullanıcının yeniden başlatma sonrası yerel VakaLab kurulumu; sürüm 0.1.0, sentetik/mock. İlk kanıt: Windows üzerinde Chrome; paylaşılan ekran görüntüsü 1920×1080 (tarayıcı viewport'u ayrıca ölçülmedi).
 
 Durumlar: BEKLİYOR / GEÇTİ / KALDI / KISMEN DOĞRULANDI / ÇALIŞTIRILAMADI. Yalnız ekran görüntüsünün veya çıktının kanıtladığı davranış doğrulanır. Eski otomatik sonuçlar manuel kabul yerine yazılmaz. Hatalar BUGS.md'ye ve düzeltme/regresyon kayıtlarına bağlanır.
@@ -324,3 +326,36 @@ Başlık:SENTETİK TEST · Vaka sürümü;Sıra7;Vakametni:[İLK METİN] Öğren
 | R02-B15.6 | TEST-YONETIM-02yenitestvakasıatamasınıkaldır>öğrencirefreshyok;yenidenata>refreshDevamet | Atamaerişimdenetimi;eskiuygulama/sürüm2korunur | BEKLİYOR |
 
 HerişlemgerekçesiSENTETİK TEST: Vaka erişimi kontrolü.YalnızSENTETİK TEST · Vaka sürümüdenemevakası;orijinalaraştırmavakalarınıdeğiştirme. TEST-OGR-03bu batchvakayıbaşlatmayacak. Kapanışglobaldeğilvakadüzeyinde;globalstudyclose/yayın/teslimyok.
+
+## 0.2.0 — Yeni kurallar, yeni manuel batch yok
+
+Kullanıcı araştırmacı panelini sadeleştirme ve ayrı çalışma alanlarını istedi; ortak vaka araştırmacısı fikrini sonradan açıkça iptal etti. Güncel akış RELEASE_READINESS.md'dedir. Önceki global kapanış ve beş vaka kapısı yönergeleri tarihsel kalır. Yeni özellikler otomatik HTTP/Chrome testleriyle doğrulandı; kullanıcı yapmış gibi manuel GEÇTİ yazılmadı. Mevcut kayıtların korunması yedekli migration ile doğrulandı; hiçbir batch ilerletilmedi.
+
+## 0.2.1 — Ek süre için kullanıcıya yeni batch gerekmedi
+
+Kullanıcının tekrar isteği otomatik karşılandı: seçili öğrenci açılıyor, seçilmeyen kapalı kalıyor, süre iptalinde yeniden salt okunur. Yeni arayüz/rubrik/geçmiş otomatik test ve sentetik görsellerle doğrulandı; kullanıcı yeni manuel test yapmış sayılmadı. Mevcut çalışma DB'sinde yeni yazma yok.
+
+## 0.2.3 — Sade rapor otomatik doğrulaması
+Yeni kullanıcı manuel kabulü yok. Otomatik Chrome/HTTP ve sentetik ekran/PDF incelemesi TEST_RESULTS.md kayıtlarındadır. Ayrı8089kopyasındaSürüm3hazır; gerçek değerlendirme veya ana8088yayını değildir. Yeni manuel batch istenmedi.
+
+## 0.2.4 — Süreç ekranı sadeleştirmesi
+Kullanıcının JSON okunabilirliği ve AI etiketleme bildirimi uygulandı; yeni manuel kullanıcı kabulü yapılmış sayılmaz. Otomatik Chrome/etiket/Disco/sunucu sonuçları ve sentetik görsel inceleme TEST_RESULTS.md içindedir. Kullanıcıya yeni manuel batch çıkarılmadı.
+
+## 0.2.5 — Yedi sekme süresi
+Kullanıcı süreyi girişten sonraki geçişe kadar geçen zaman ve son teslimde bitiş olarak tanımladı. Bu kural otomatik fixture/Chrome/HTTP testleriyle doğrulandı; kullanıcı manuel test yapmış gibi işaretlenmedi. Yeni batch istenmedi. Gerçek cihaz/Disco kabulü bekliyor.
+
+## 0.2.6 — Ziyaret açıklamaları
+
+Kullanıcının belirsiz etkinlik ve kapanış adları bildirimi uygulandı. Otomatik sonuçlar TEST_RESULTS.md içinde; kullanıcı manuel doğrulaması yapılmış sayılmadı, yeni batch istenmedi. Sentetik Chrome ekranı geliştirici tarafından görsel incelendi.
+
+## 0.2.8 — AI akışı ve süre sınırları
+
+Kullanıcı akışı soru → yanıt geldi → sohbet görüntüleme → yeni soru → yanıt geldi → görüntüleme → başka bölüm olarak netleştirdi. Bu kural ayrı sentetik fixture ve Chrome ile doğrulandı; yeni manuel batch istenmedi. Kullanıcı manuel kabulü veya gerçek Disco import tamamlandı sayılmaz. Otomatik kanıtlar TEST_RESULTS.md içindedir.
+
+## 0.2.9 — Eksik eski soru satırı bildirimi
+
+Kullanıcı ekranında yalnız görüntüleme/yanıt satırlarını bildirdi ve sonra iki öğrenci sorusunu etiketlediğini söyledi. Yerel DB salt okunur inceleme, soruların Bilgi istedi ve Eleştiri istedi araştırmacı seçimlerini doğruladı. Sorun eski gönderim telemetrisi eksikliğiydi; düzeltme türetilmiş görünümde uygulandı. Kullanıcı yeni öğrenciyle test etmeyi seçti; sonucu henüz gelmedi, geçti olarak işaretlenmedi. Yeni manuel batch talep edilmedi. Otomatik kanıt TEST_RESULTS.md içinde.
+
+## 0.2.10 — Kullanıcının yeni akış önerisi
+
+Kullanıcı yeni öğrenci ekranındaki Bilgi istedi/Eleştiri istedi ve yanıt/görüntüleme sırasını ekranla gösterip olumlu bildirdi. Bu, gösterilen akış için kullanıcı bildirimi/ekran kanıtıdır; 40 saniye veya tüm cihazlar manuel geçti sayılmaz. Ardından kullanıcı etiketli gönderim → AI hazırlanıyor → yanıt geldi → görüntüleme ayrımını önerip uygulamayı onayladı. Bu değişiklik otomatik sentetik testlerle doğrulandı; yeni manuel batch istenmedi. 40 saniye testi zaman fixture'ıdır, gerçek sağlayıcı çağrısı değildir.

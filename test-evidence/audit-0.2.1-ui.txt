@@ -1,0 +1,51 @@
+PASS UI 1 user creation includes student/researcher choice
+PASS UI 2 simple account form omits removed fields and reason
+PASS UI 3 researcher account created via short form
+PASS UI 4 new researcher has no other researcher students
+PASS UI 5 new researcher has no inherited cases
+PASS UI 6 overview finds one student within selected case
+PASS UI 7 unstarted student has no misleading process-open button
+PASS UI 8 return from process preserves case and student selection
+PASS UI 9 overview status filter works within case
+PASS UI 10 selected-case student list fits mobile
+PASS UI 11 case card displays all and only assigned students
+PASS UI 12 assigned list opens bulk management with correct case selected
+PASS UI 13 bulk assignment lists all owned students as checkboxes
+PASS UI 14 select all selects every student
+PASS UI 15 select all indicates partial selection
+PASS UI 16 bulk assignment persists for all students
+PASS UI 17 working student initially editable
+PASS UI 18 case closure makes student fields read only
+PASS UI 19 student sees closure explanation
+PASS UI 20 selected late access restores working fields
+PASS UI 21 unselected student stays closed while selected student receives late access
+PASS UI 22 revoking late access returns fields to read only
+PASS UI 23 rubric creation uses guided fields instead of JSON
+PASS UI 24 missing rubric name directs focus to field
+PASS UI 25 rubric level can be added
+PASS UI 26 removing level preserves other level data
+PASS UI 27 out-of-range level score has readable error and field focus
+PASS UI 28 removing dimension preserves existing input
+PASS UI 29 guided rubric form fits mobile dialog
+PASS UI 30 system builds and saves complete rubric JSON from fields
+PASS UI 31 saved rubric displays readable dimensions and levels
+PASS UI 32 rubric editor restores saved field values
+PASS UI 33 rubric editing preserves old version and stable dimension identity
+PASS UI 34 new label needs no reason
+PASS UI 35 label description entered as plain text
+PASS UI 36 deleted label leaves active list
+PASS UI 37 used rubric removable from active list
+PASS UI 38 export selects all or single owned case
+PASS UI 39 export has no complicated checkbox or table selectors
+PASS UI 40 Disco button downloads prepared CSV
+PASS UI 41 simplified export fits mobile viewport
+PASS UI 42 global closure button removed
+PASS UI 43 audit initially shows twenty readable records
+PASS UI 44 audit can reveal older records without losing history
+PASS UI 45 audit history is readable records instead of raw JSON
+PASS UI 46 audit translates late access operation into Turkish
+PASS UI 47 audit search resolves deleted definition names
+PASS UI 48 audit JSON download contains complete scoped recent history
+PASS UI 49 readable audit history fits mobile
+PASS UI 50 new workflows have no JavaScript page errors:
+TOTAL NEW UI 50 checks passed. Isolated SQLite/mock, Chrome desktop/mobile emulation.

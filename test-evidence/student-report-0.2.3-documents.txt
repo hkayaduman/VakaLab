@@ -1,0 +1,2 @@
+PASS PDF: 2 pages; final section starts page2; answer-score-feedback present; technical sections absent.
+PASS DOCX: valid package/XML; integer A4 geometry; same simple content; Word visual opening NOT verified (LibreOffice missing).

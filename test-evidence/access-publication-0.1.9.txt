@@ -1,0 +1,83 @@
+SCENARIO A: B14.2/B15 equivalents, real HTTP; isolated SQLite; mock
+PASS 1 draft unassigned case absent
+PASS 2 B14.2 active unassigned case absent
+PASS 3 unassigned direct start denied
+PASS 4 active assigned unstarted case visible
+PASS 5 first start pins version 2 / first text
+PASS 6 new starter pins version 3 / updated text
+PASS 7 existing version remains unchanged
+PASS 8 B15.1 unassigned third student cannot see case
+PASS 9 third student assigned but not started
+PASS 10 third student has no application
+PASS 11 B15.2 closed case absent for assigned nonstarter
+PASS 12 closed case direct new start denied
+PASS 13 B15.3 closed case visible for existing starter
+PASS 14 closed case resumes same application
+PASS 15 closed case keeps pinned old text
+PASS 16 existing starter can still save when new starts closed
+PASS 17 B15.4 stop ongoing access: case absent
+PASS 18 B15.4 stop ongoing access: resume denied
+PASS 19 B15.4 stop ongoing access: direct view denied
+PASS 20 B15.4 stop ongoing access: save denied
+PASS 21 B15.4 stop ongoing access: initial denied
+PASS 22 B15.4 stop ongoing access: submit denied
+PASS 23 B15.4 stop ongoing access: chat denied
+PASS 24 B15.4 stop ongoing access: events denied
+PASS 25 B15.4 stop ongoing access: researcher retains historical access
+PASS 26 B15.4 stop ongoing access: denied requests preserve all response/analysis/report data
+PASS 27 B15.5 restored access resumes original application
+PASS 28 restored case keeps drafts/snapshots/messages and all prior data
+PASS 29 B15.6 assignment revoked: case absent
+PASS 30 B15.6 assignment revoked: resume denied
+PASS 31 B15.6 assignment revoked: direct view denied
+PASS 32 B15.6 assignment revoked: save denied
+PASS 33 B15.6 assignment revoked: initial denied
+PASS 34 B15.6 assignment revoked: submit denied
+PASS 35 B15.6 assignment revoked: chat denied
+PASS 36 B15.6 assignment revoked: events denied
+PASS 37 B15.6 assignment revoked: researcher retains historical access
+PASS 38 B15.6 assignment revoked: denied requests preserve all response/analysis/report data
+PASS 39 reassignment reuses original assignment
+PASS 40 reassignment resumes same application
+PASS 41 reassignment preserves pinned version and exact draft
+PASS 42 reassignment preserves snapshots/messages/revisions/analysis/reports
+PASS 43 save works after reassignment
+PASS 44 case access scenario never closes global study
+PASS 45 case mutations retain actor/time/reason audit
+PASS 46 assignment creation/revoke/restore audited separately
+SCENARIO B: global closure and separate report publication, same disposable fixture only
+PASS 47 approved v1 and draft v2 fixture
+PASS 48 global open hides all student reports
+PASS 49 global open blocks approved publication
+PASS 50 unpublished report direct data denied
+PASS 51 unpublished report JSON download denied
+PASS 52 unpublished report direct data denied
+PASS 53 unpublished report JSON download denied
+PASS 54 global close requires explicit confirmation
+PASS 55 global close requires reason
+PASS 56 student cannot close global study
+PASS 57 global closure stores actor/time/reason
+PASS 58 closure does not rewrite responses/snapshots/analysis/reports
+PASS 59 global closure does not automatically publish
+PASS 60 closed but unpublished report still denied
+PASS 61 global closure blocks new start
+PASS 62 global closure blocks draft save
+PASS 63 global closure blocks final submission
+PASS 64 global closure blocks initial confirmation
+PASS 65 global closure blocks new AI request
+PASS 66 global closure retains read access to working application
+PASS 67 rejected post-closure writes leave research data unchanged
+PASS 68 closed study still rejects unapproved v2 publication
+PASS 69 separate publication preserves immutable report body
+PASS 70 only separately published v1 visible to owner
+PASS 71 published student report excludes private appendix
+PASS 72 owner can download only the reviewed published JSON report
+PASS 73 researcher keeps private appendix
+PASS 74 draft v2 remains invisible after v1 publication
+PASS 75 other student cannot read published report
+PASS 76 other student cannot download published report
+PASS 77 student cannot publish reports
+PASS 78 repeated global closure rejected
+PASS 79 repeat closure preserves original closure record
+PASS 80 all report version bodies unchanged after closure/publication
+TOTAL 80 assertions passed. HTTP / isolated SQLite / mock / application 0.1.9.

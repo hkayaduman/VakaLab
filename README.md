@@ -1,8 +1,14 @@
 # VakaLab
 
+**0.2.10 — Güncel geliştirme sürümü:** Ayrı araştırmacı çalışma alanları, sadeleştirilmiş yönetim, öğrenci raporu ve okunabilir süreç kayıtları. Etiketli AI soru gönderimi, yanıt hazırlık beklemesi, yanıt gelişi ve görüntüleme ayrı etkinliklerdir; Disco CSV aynı akışı ve ayrı bekleme kulvarını taşır. Eski sorular da korunur. Güncel test kapsamı [TEST_RESULTS.md](TEST_RESULTS.md), devam bilgisi [CONTEXT.md](CONTEXT.md). Gerçek hosting/AI/kurum rubriği kabulü tamamlanmadı.
+
+0.2.1: Genel durumda matris yerine vaka/öğrenci listesi, vaka kartında atanan öğrenci diyaloğu; JSON gerektirmeyen rubrik boyut/düzey formu ve okunaklı/aranabilir/JSON indirilebilir işlem geçmişi. Şema değişikliği yok. Güncel koşular TEST_RESULTS.md, kullanım RELEASE_READINESS.md.
+
+**0.2.0 — Araştırmacı paneli sadeleştirildi:** Ayrı araştırmacı çalışma alanları, kısa kullanıcı formu, toplu atama, etiket/rubrik Sil, vaka bazında veri toplama ve kişisel ek süre; vaka seçerek Excel/JSON veya Disco CSV indirme. [Kullanım ve yayın durumu](RELEASE_READINESS.md). Mevcut kurulumda önce özel yedek ve migration 002 gerekir; yerel SQLite için `php bin/upgrade-sqlite.php` yedeği ve eski alanların korunmasını doğrular.
+
 Öğretmen adaylarının pedagojik vakalarda AI öncesi muhakemesini, vaka bazında AI etkileşimini, nihai kararını ve yansıtmasını toplayan Türkçe araştırma uygulaması. PHP/MySQL + vanilla JS/CSS; shared hosting için kalıcı worker gerektirmez.
 
-Öğrenci paneli: altı çalışma bölümü + ayrı Son teslim sekmesi, başlangıç/profil atomik kilidi, revision/autosave, aynı hesap için sekme kurtarması, tek AI isteği, nihai/yansıtma tek teslimi. Araştırmacı: dinamik matris, katılımcı/vaka/atama, sürümlü rubrik/etiket, olaylar/taslaklar/süreler, ayrı sıralı analiz, kararlar, rapor snapshot/onay/yayın, gerçek DOCX/PDF/XLSX/CSV/JSON indirme.
+Öğrenci paneli: altı çalışma bölümü + ayrı Son teslim sekmesi, başlangıç/profil atomik kilidi, revision/autosave, aynı hesap için sekme kurtarması, tek AI isteği, nihai/yansıtma tek teslimi. Araştırmacı: vaka/öğrenci seçimi, katılımcı/vaka/atama, sürümlü rubrik/etiket, olaylar/taslaklar/süreler, ayrı sıralı analiz, kararlar, rapor snapshot/onay/yayın, gerçek DOCX/PDF/XLSX/CSV/JSON indirme.
 
 **Araştırmada kullanıma onay verilmedi.** Gerçek rubrik/onam ve AI sağlayıcısı bekleniyor. Mock sentetiktir. Gerçek hosting ve fiziksel mobil testleri yapılmadı. Çalıştırılan testlerin kapsamı [TEST_RESULTS.md](TEST_RESULTS.md), açık işler [plan.md](plan.md), devam bağlamı [CONTEXT.md](CONTEXT.md).
 
@@ -61,4 +67,4 @@ HTTP testleri PHP_BIN ortam değişkenini veya Windows `.tools/php/php.exe` yolu
 
 [Shared hosting kurulumu](INSTALL_SHARED_HOSTING.md) · [Sentetik veri](TEST_DATA.md) · [Manuel test](MANUAL_TESTS.md) · [Test sonuçları](TEST_RESULTS.md) · [Mimari](ARCHITECTURE.md) · [Veri sözlüğü](DATA_DICTIONARY.md) · [Olaylar](EVENT_CATALOG.md) · [AI girdileri](AI_INPUT_CONTRACTS.md) · [Hatalar](BUGS.md).
 
-Kabul edilmiş özgün şartnameler 01_OGRENCI_PANELI.md ve 02_ARASTIRMACI_PANELI.md; 03_CODEX_GELISTIRME_PROMPTU.md görev kaynağıdır. Kalıcı silme yoktur. Veri toplama kapanışı + rapor onayı + ayrı yayın olmadan öğrenciye puan/rapor erişimi verilmez.
+Kabul edilmiş özgün şartnameler 01_OGRENCI_PANELI.md ve 02_ARASTIRMACI_PANELI.md; 03_CODEX_GELISTIRME_PROMPTU.md görev kaynağıdır. Kalıcı silme yoktur. İlgili vaka ve kişisel ek süre kapanışı + rapor onayı + ayrı yayın olmadan öğrenciye puan/rapor erişimi verilmez.

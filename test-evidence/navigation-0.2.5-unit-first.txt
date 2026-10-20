@@ -1,0 +1,25 @@
+PASS NAV 1 example journey has twelve separate visits
+PASS NAV 2 all seven tabs measured
+PASS NAV 3 10:00 case to 10:02 profile equals 120 seconds
+PASS NAV 4 returning to case creates separate 30-second visit
+PASS NAV 5 second initial visit closes at successful confirmation
+PASS NAV 6 final-submit tab closes when server success is confirmed
+PASS NAV 7 initial and final success recorded once
+PASS NAV 8 editing labels reflect observed field changes
+PASS NAV 9 final-confidence and reflection changes included
+PASS NAV 10 AI request linked to exact visit without clock joining
+PASS NAV 11 post-submission browsing is excluded
+PASS NAV 12 original events unchanged
+PASS NAV 13 unobserved final exit remains unknown
+PASS NAV 14 backward client clock not converted into positive duration
+PASS NAV 15 invalid time not replaced by receive time
+PASS NAV 16 elapsed click-to-click time is not capped at heartbeat 30 seconds
+PASS NAV 17 background state retained without subtracting elapsed time
+
+Fatal error: Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 19 NOT NULL constraint failed: events.client_key in D:\VakaLab\app\Db.php:10
+Stack trace:
+#0 D:\VakaLab\app\Db.php(10): PDOStatement->execute(Array)
+#1 D:\VakaLab\app\Db.php(14): Db->q('INSERT INTO eve...', Array)
+#2 D:\VakaLab\tests\navigation.php(15): Db->insert('events', Array)
+#3 {main}
+  thrown in D:\VakaLab\app\Db.php on line 10

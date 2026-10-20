@@ -1,0 +1,74 @@
+VERSION()
+11.4.12-MariaDB
+PASS 1 seven synthetic students + researcher
+PASS 2 seed idempotent; existing responses untouched
+PASS 3 unassigned case denied
+PASS 4 draft case denied
+PASS 5 start idempotent
+PASS 6 IDOR denied
+PASS 7 researcher role denied
+PASS 8 AI locked before initial
+PASS 9 empty profile/initial blocked
+PASS 10 profile range
+PASS 11 profile integer only
+PASS 12 autosave increments revision
+PASS 13 unchanged content creates no revision
+PASS 14 stale revision rejected
+PASS 15 initial lock idempotent
+PASS 16 initial immutable after locking
+PASS 17 researcher cannot overwrite locked response
+PASS 18 AI idempotency no duplicate messages
+PASS 19 chat payload excludes private fields
+PASS 20 chat includes pinned case version
+PASS 21 second AI blocked by server
+PASS 22 autosave allowed during active AI
+PASS 23 submit blocked during AI
+PASS 24 missing final confidence blocked
+PASS 25 single final submission
+PASS 26 submit idempotent
+PASS 27 editing after submission blocked
+PASS 28 chat after submission blocked
+PASS 29 used case version immutable
+PASS 30 case edit adds version
+PASS 31 event dedup
+PASS 32 duration union no overlap double count
+PASS 33 missing/long gap remains unknown
+PASS 34 analysis requires sequential steps
+PASS 35 confidence 8 to 10 equals +2
+PASS 36 initial scoring isolated
+PASS 37 final scoring isolated, no confidence
+PASS 38 weighted mean computed in app
+PASS 39 out of range AI score rejected
+PASS 40 invented evidence rejected
+PASS 41 invalid mock JSON fails without score
+PASS 42 analysis step 3
+PASS 43 analysis step 4
+PASS 44 analysis step 5
+PASS 45 analysis step 6
+PASS 46 analysis step 7
+PASS 47 uncertain score never becomes approved total
+PASS 48 unapproved report cannot publish
+PASS 49 approval does not publish
+PASS 50 case collection open blocks publication
+PASS 51 student cannot download approved but unpublished report
+PASS 52 coded export no identity or private text
+PASS 53 default export excludes synthetic data
+PASS 54 CSV formula escaped
+PASS 55 label definition version preserves prior
+PASS 56 login edit preserves technical ID
+PASS 57 archive/freeze preserves applications
+PASS 58 separate publish after case collection closure
+PASS 59 student report removes internal appendix
+PASS 60 researcher report preserves private snapshot appendix
+PASS 61 student report contains only reviewed snapshot (approved evidence allowed)
+PASS 62 report ownership enforced
+PASS 63 case collection closure prevents response changes
+PASS 64 real XLSX package
+PASS 65 XLSX separate event and label sheets
+PASS 66 real DOCX package
+PASS 67 DOCX Turkish text preserved
+PASS 68 real PDF signature
+PASS 69 PDF font/content generated
+TOTAL 69 assertions passed. mysql functional tests; hosting/browser tests separate.
+BACKUP RESTORE: 8 table counts match in separate restored database.
+MYSQL schema, seed, workflow, FK, formats: passed on isolated MariaDB.

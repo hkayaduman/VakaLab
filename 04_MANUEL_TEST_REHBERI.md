@@ -1,6 +1,6 @@
 # Manuel Test Rehberi ve Geri Bildirim Şablonu
 
-Durum: Geliştirme öncesi test senaryolarıdır; testler henüz uygulanmadı. Codex uygulamayı geliştirdikten sonra gerçek menü adları, hesaplar, kurulum yolları ve mock ayarlarıyla bu rehberden `MANUAL_TESTS.md` üretmelidir. Aşağıdaki adımlar tasarlanan davranışın kabul testleridir; mevcut bir uygulamada doğrulanmış prosedür iddiası değildir.
+Durum: Bu dosya geliştirme öncesi hazırlanmış **tarihsel kabul taslağıdır**; eski matris/global kapanış gibi hükümler güncel ürünü tanımlamaz. Güncel ekran/işlem rehberi MANUAL_TESTS.md, gerçek kullanıcı kanıtı MANUAL_TEST_RESULTS.md, otomatik sonuçlar TEST_RESULTS.md ve güncel devam CONTEXT.md içindedir. Bu belge üzerinden yeni manuel batch başlatılmaz; tarihsel senaryoları uygulamadan önce güncel vaka bazlı kurallarla karşılaştırın.
 
 ## 1. Teste hazırlık
 

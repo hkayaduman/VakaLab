@@ -14,13 +14,7 @@ try{
     }
     $c=cfg();$db=new Db($c);
     if($cmd==='migrate'){
-        $exists=$db->sqlite()?$db->one("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_migrations'"):$db->one("SHOW TABLES LIKE 'schema_migrations'");
-        if($exists){demand((bool)$db->one('SELECT version FROM schema_migrations WHERE version=1'),'Yarım kalmış migration: şemayı inceleyin; otomatik devam edilmedi');echo "Migration zaten kurulu; veri değiştirilmedi.\n";exit;}
-        $sql=file_get_contents(__DIR__.'/../migrations/001.sql');
-        if(!$db->sqlite()){$db->pdo->exec("SET default_storage_engine=InnoDB");$db->pdo->exec('SET NAMES utf8mb4');}
-        // DDL is not transactional on MySQL. Back up first; a partial failure must be inspected.
-        foreach(explode(';',$sql) as $statement)if(trim($statement)!=='')$db->pdo->exec($statement);
-        $db->insert('schema_migrations',['version'=>1,'applied_at'=>now()]);echo "Migration 001 uygulandı.\n";
+        Migration::run($db);echo "Migration 001/002 hazır; mevcut kayıtlar korunur.\n";
     }elseif($cmd==='seed'){
         demand($c['env']==='test','Seed yalnız test ortamında çalışır');demand(str_contains($c['dsn'],'_test')||str_starts_with($c['dsn'],'sqlite:'),'Test DB adı _test içermeli');
         $password=getenv('VAKALAB_SEED_PASSWORD')?:'';demand(strlen($password)>=12,'VAKALAB_SEED_PASSWORD en az 12 karakter olmalı');

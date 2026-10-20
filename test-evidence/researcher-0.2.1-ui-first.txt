@@ -1,0 +1,3 @@
+ReferenceError: Cannot access 'process' before initialization
+    at D:\VakaLab\tests\researcher-ui.cjs:13:62
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)

@@ -1,0 +1,66 @@
+SCENARIO A: B14.2/B15 equivalents, real HTTP; isolated SQLite; mock
+PASS 1 draft unassigned case absent
+PASS 2 B14.2 active unassigned case absent
+PASS 3 unassigned direct start denied
+PASS 4 active assigned unstarted case visible
+PASS 5 first start pins version 2 / first text
+PASS 6 new starter pins version 3 / updated text
+PASS 7 existing version remains unchanged
+PASS 8 B15.1 unassigned third student cannot see case
+PASS 9 third student assigned but not started
+PASS 10 third student has no application
+PASS 11 B15.2 closed case absent for assigned nonstarter
+PASS 12 closed case direct new start denied
+PASS 13 B15.3 closed case visible for existing starter
+PASS 14 closed case resumes same application
+PASS 15 closed case keeps pinned old text
+PASS 16 existing starter can still save when new starts closed
+PASS 17 B15.4 stop ongoing access: case absent
+PASS 18 B15.4 stop ongoing access: resume denied
+PASS 19 B15.4 stop ongoing access: direct view denied
+PASS 20 B15.4 stop ongoing access: save denied
+PASS 21 B15.4 stop ongoing access: initial denied
+PASS 22 B15.4 stop ongoing access: submit denied
+PASS 23 B15.4 stop ongoing access: chat denied
+PASS 24 B15.4 stop ongoing access: events denied
+PASS 25 B15.4 stop ongoing access: researcher retains historical access
+PASS 26 B15.4 stop ongoing access: denied requests preserve all response/analysis/report data
+PASS 27 B15.5 restored access resumes original application
+PASS 28 restored case keeps drafts/snapshots/messages and all prior data
+PASS 29 B15.6 assignment revoked: case absent
+PASS 30 B15.6 assignment revoked: resume denied
+PASS 31 B15.6 assignment revoked: direct view denied
+PASS 32 B15.6 assignment revoked: save denied
+PASS 33 B15.6 assignment revoked: initial denied
+PASS 34 B15.6 assignment revoked: submit denied
+PASS 35 B15.6 assignment revoked: chat denied
+PASS 36 B15.6 assignment revoked: events denied
+PASS 37 B15.6 assignment revoked: researcher retains historical access
+PASS 38 B15.6 assignment revoked: denied requests preserve all response/analysis/report data
+PASS 39 reassignment reuses original assignment
+PASS 40 reassignment resumes same application
+PASS 41 reassignment preserves pinned version and exact draft
+PASS 42 reassignment preserves snapshots/messages/revisions/analysis/reports
+PASS 43 save works after reassignment
+PASS 44 case access scenario never closes global study
+PASS 45 case mutations retain actor/time/reason audit
+PASS 46 assignment creation/revoke/restore audited separately
+SCENARIO B: independent researcher workspaces, bulk operations, deletion, Disco
+PASS 47 new researcher has empty isolated workspace
+PASS 48 researcher cannot list creator students or accounts
+PASS 49 other researcher cannot view application
+PASS 50 other researcher cannot edit case
+PASS 51 other researcher cannot edit participant
+PASS 52 other researcher cannot close case
+PASS 53 other researcher cannot bulk assign
+PASS 54 other researcher cannot change late access
+Traceback (most recent call last):
+  File "D:\VakaLab\tests\access_publication_checks.py", line 344, in <module>
+    main()
+  File "D:\VakaLab\tests\access_publication_checks.py", line 232, in main
+    exported=outsider.ok('download',format='json',all_data=1)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\VakaLab\tests\access_publication_checks.py", line 58, in ok
+    return body['data']
+           ~~~~^^^^^^^^
+KeyError: 'data'

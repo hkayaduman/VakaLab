@@ -1,0 +1,7 @@
+PASS demo fixture student session sees assigned case
+PASS student final-submit tab shows published version1 Word/PDF; no other report
+PASS previously submitted response remains locked
+PASS student report HTTP200 excludes internal appendix
+PASS student pdf download returns actual document
+PASS student docx download returns actual document
+TOTAL DEMO 6 smoke checks passed. Separate DB/session/localhost; login password not tested or changed.

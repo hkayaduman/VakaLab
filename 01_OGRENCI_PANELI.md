@@ -1,5 +1,7 @@
 # Öğrenci Paneli İşlevsel Şartnamesi
 
+Güncel karar 0.2.0: Vaka bazında veri toplama açılır/kapanır; kapalı vakalar salt okunur görüntülenir. Araştırmacı seçili öğrenciye ek süre verebilir veya kaldırabilir. Teslim edilmiş yanıtlar ve başlangıç kilidi açılmaz. Başka vakalar bu işlemden etkilenmez.
+
 Sürüm: 1.0 : konuşmada kabul edilen kararların birleştirilmiş hali.
 Durum: Tasarım belgesi. Uygulama geliştirilmiş veya test edilmiş değildir.
 Dil: Türkçe. Ana hedef: masaüstü laboratuvar kullanımı; mobil uyumluluk zorunlu.
@@ -20,7 +22,7 @@ Sistem yalnızca son ürünleri değil, bölüm geçişlerini, mesajları ve anl
 - Nihai yanıt ve yansıtma birlikte tek teslimle kilitlenir.
 - Kilitli içerik okunabilir kalır. Donuk görünüm düşük kontrast anlamına gelmez.
 - Veri toplama boyunca puan, kullanıcı tipi, prompt kalitesi ve AI değerlendirmesi öğrenciye gösterilmez.
-- Raporlar ancak araştırma genelindeki beş vakanın veri toplaması kapandıktan ve araştırmacı ayrıca yayımladıktan sonra açılır.
+- Raporlar ilgili vakada veri toplama kapandıktan, öğrencinin kişisel ek süresi de kapatıldıktan ve araştırmacı raporu onaylayıp ayrıca yayımladıktan sonra açılır.
 - Her vaka bağımsız sohbettir. Başka vaka konuşması otomatik taşınmaz.
 
 ## 3. Giriş ve ana sayfa
@@ -33,7 +35,7 @@ Sistem yalnızca son ürünleri değil, bölüm geçişlerini, mesajları ve anl
 - Oturum sona ererse kayıtlı çalışma korunur; aynı öğrenci doğrulanmadan yerel kurtarma metni gösterilmez.
 
 ### 3.2. Başlangıç bilgileri
-Araştırma bilgilendirmesi, onam durumu ve program, sınıf, önceki GenAI deneyimi, kullanılan araçlar için alanlar bulunur. Onam metni araştırmacı tarafından sağlanır; uygulama hukuki/etik uygunluğu kendiliğinden ilan etmez. Araştırmadan çekilme talebi ayrı süreçtir; veri sessizce silinmez.
+Öğrenci ana ekranındaki Katılım bilgilerim düğmesi ve buna bağlı form 0.2.2’de kaldırıldı. Program/Sınıf araştırmacının isteğe bağlı kullanıcı bilgileri arasında kalır. Onam durumu, GenAI deneyimi, kullanılan araçlar ve çekilme talebi alanları kaldırılmıştır. Önceden kaydedilmiş metadata silinmez. Kurumun bilgilendirme/onam ve çekilme süreci arayüz alanlarından ayrı olarak kararlaştırılacaktır.
 
 ### 3.3. Vaka kartları
 Öğrenci yalnızca kendisine atanmış ve yayımlanmış vakaları görür. Kart: başlık, sıra, durum, Başla/Devam et/Görüntüle düğmesi. Deneme vakası açıkça araştırma dışı işaretlenir. Devam et en son kaydedilen bölüme döner. Teslim edilmiş vaka salt okunur açılır. Yeni başlangıca kapalı fakat daha önce başlanmış vaka için erişim kuralı sunucudan uygulanır.
@@ -188,7 +190,7 @@ Kopyalama: kaynak bölüm, metin sürümü, seçili aralık, uzunluk, zaman ve s
 
 ## 12. Rapor ve puan erişimi
 
-Öğrenci veri toplama sırasında puan veya rapor görmez. Araştırma genelindeki beş vakanın veri toplaması araştırmacı tarafından kapatıldıktan ve rapor ayrıca onaylanıp yayımlandıktan sonra:
+Öğrenci ilgili vakada veri toplama açıkken veya kendisine ek süre verilmişken puan/rapor görmez. Vaka kapalı, kişisel ek süre kapalı ve rapor ayrıca onaylanıp yayımlanmışsa:
 - Gerekçeli karar.
 - Boyut bazında puanlar.
 - Toplam puan.
@@ -219,3 +221,10 @@ Son teslim kartı her bölümün altında tekrarlanmaz. Gezinmenin en sonunda ay
 
 ### 0.1.3 kullanıcı arayüzü netleştirmesi
 Genel Eksik alanları tamamlayın listesi yalnız Son teslim sekmesinde bulunur. Diğer çalışma bölümlerinin üstünde bu özet gösterilmez. Son teslimdeki bağlantı ilgili alana götürür; genel kutu hedef bölüme taşınmaz. Eksik alanın kendi yan açıklaması/odak vurgusu ve teslim engelleri korunur.
+
+## 0.2.3 — Güncel öğrenci raporu
+
+Öğrenci 7.Son teslim → Yayımlanan raporlar → Raporu görüntüle ile başlangıç/nihai özgün yanıtını, her ölçütün puanı ve geri bildirimini, nihai toplam ve genel geri bildirimini görür; Word/PDF aynı sade içeriktir. Nihai puan × rubrik ağırlıkları toplanır; başlangıç puanı nihai toplama eklenmez. Reddedilmiş/belirsiz puan sıfır değildir. Öğrenci raporunda AI/teknik inceleme/iç notlar gösterilmez; araştırmacı iç kaydı korunur. Araştırmacı Öğrenci raporu hazırla (yeni sürüm) → Öğrenci raporunu önizle → Raporu onayla → Ayrıca öğrenciye yayımla yolunu kullanır. Önizlemede Word indir/PDF indir öğrenci biçimidir; İç inceleme Word/PDF araştırmacıya özeldir. Eski sürümler değiştirilmez; eski raporda yeni feedback yoksa yeni sürüm hazırlanır. Yayın için vaka kapanışı ve kişisel ek sürenin kapalı olması zorunludur. Gerçek AI/kurum rubriği kabulü henüz tamamlanmadı.
+
+## 0.2.5 — Son teslim sonrası izleme
+Sekme ziyaretleri son teslimin sunucuda başarıyla kaydedilmesine kadar ölçülür. Başarısız teslim girişimi takibi bitirmez. Başarılı teslimden sonra öğrenci salt okunur yanıt/raporları dolaşabilir; yeni gezinme/süre kaydı araştırma sürecine eklenmez. Kapanışı alınamayan son ziyaret için süre tahmin edilmez.
