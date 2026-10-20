@@ -1,0 +1,68 @@
+PASS BROWSER 1 only assigned active cases shown
+PASS BROWSER 2 profile starts unselected
+PASS BROWSER 3 AI unlocked after server initial confirmation
+PASS BROWSER 4 initial rendered read only
+PASS BROWSER 5 pinned workspace title preserved after save
+PASS BROWSER 6 initial not automatically shown beside final
+PASS BROWSER 7 mock assistant rendered as text
+PASS BROWSER 8 final draft survives chat navigation
+PASS BROWSER 9 second tab read-only lease
+PASS BROWSER 10 mobile no document horizontal overflow
+PASS BROWSER 11 mobile section navigation present
+PASS BROWSER 12 submission locks final fields
+PASS BROWSER 13 dynamic matrix seven synthetic participants
+PASS BROWSER 14 matrix timestamps formatted as semantic time elements
+PASS BROWSER 15 matrix shows explicit configured time zone
+PASS BROWSER 16 matrix submitted filter
+PASS BROWSER 17 matrix case filter
+PASS BROWSER 18 researcher can add participant through form
+PASS BROWSER 19 single application analysis UI
+PASS BROWSER 20 process summary readable dates with precise raw UTC preserved on hover
+PASS BROWSER 21 raw JSON time convention explained
+PASS BROWSER 22 unreviewed message has no preselected research labels
+PASS BROWSER 23 live label preview uses names
+PASS BROWSER 24 latest saved selection prechecked on reopen
+PASS BROWSER 25 replacement label preview
+PASS BROWSER 26 criticism checkbox toggles by its visible label
+PASS BROWSER 27 missing reason error appears inside modal
+PASS BROWSER 28 failed save retains criticism selection
+PASS BROWSER 29 missing reason receives focus
+PASS BROWSER 30 refresh retains exact latest selection
+PASS BROWSER 31 both review versions retained
+PASS BROWSER 32 history shows removed labels by name
+PASS BROWSER 33 history shows added label by name
+PASS BROWSER 34 each review keeps its reason
+PASS BROWSER 35 review history dates readable
+PASS BROWSER 36 label dialog no horizontal overflow on mobile
+PASS BROWSER 37 explicit empty review overrides previous nonempty selection
+PASS BROWSER 38 empty review appears in history
+PASS BROWSER 39 server save failure visible within modal
+PASS BROWSER 40 server failure preserves selection and reason
+PASS BROWSER 41 successful save names actual current selection
+PASS BROWSER 42 criticism selection saved and persists through reload
+PASS BROWSER 43 only successful saves create review versions
+PASS BROWSER 44 all eight analysis steps visible before starting
+PASS BROWSER 45 only first step initially enabled
+PASS BROWSER 46 future step visibly locked
+PASS BROWSER 47 all run buttons disabled during request
+PASS BROWSER 48 current running state visible
+PASS BROWSER 49 step one completion unlocks step two
+PASS BROWSER 50 step 2 completed with all eight stages retained
+PASS BROWSER 51 step 3 unlocks in order
+PASS BROWSER 52 step 3 completed with all eight stages retained
+PASS BROWSER 53 step 4 unlocks in order
+PASS BROWSER 54 step 4 completed with all eight stages retained
+PASS BROWSER 55 step 5 unlocks in order
+PASS BROWSER 56 analysis steps no horizontal overflow on mobile
+PASS BROWSER 57 reload preserves four completed stages and fifth ready
+PASS BROWSER 58 step 5 completed with all eight stages retained
+PASS BROWSER 59 step 6 unlocks in order
+PASS BROWSER 60 step 6 completed with all eight stages retained
+PASS BROWSER 61 step 7 unlocks in order
+PASS BROWSER 62 step 7 completed with all eight stages retained
+PASS BROWSER 63 report merge waits for missing researcher decisions
+PASS BROWSER 64 all required decisions unlock report merge
+PASS BROWSER 65 all eight complete without rerun controls
+PASS BROWSER 66 report snapshot offered only after all eight stages
+PASS BROWSER 67 no browser JavaScript errors: 
+TOTAL BROWSER 67 checks passed. Chromium desktop/mobile emulation; no physical mobile keyboard test.

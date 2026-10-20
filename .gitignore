@@ -1,0 +1,8 @@
+/config/local.php
+/storage/*
+!/storage/.gitkeep
+/vendor/
+/.tools/
+/tests/tmp/
+*.log
+__pycache__/

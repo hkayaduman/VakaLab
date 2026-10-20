@@ -1,0 +1,51 @@
+PASS VALIDATION 1 missing initial field blocks before confirmation
+PASS VALIDATION 2 first missing profile field focused automatically
+PASS VALIDATION 3 missing field has inline error
+PASS VALIDATION 4 profile tab identifies missing field count
+PASS VALIDATION 5 no global missing-fields box in profile even after validation
+PASS VALIDATION 6 no submit control in profile before initial lock
+PASS VALIDATION 7 last tab is locked before initial confirmation
+PASS VALIDATION 8 focused missing field is below sticky desktop navigation
+PASS VALIDATION 9 initial validation still redirects to the missing profile field without summary box
+PASS VALIDATION 10 zero is valid and clears highlight immediately
+PASS VALIDATION 11 resolved inline field error disappears
+PASS VALIDATION 12 cancel confirmation preserves editable initial response
+PASS VALIDATION 13 no final-submit control under case
+PASS VALIDATION 14 no global missing-fields box under case
+PASS VALIDATION 15 no final-submit control under profile
+PASS VALIDATION 16 no global missing-fields box under profile
+PASS VALIDATION 17 no final-submit control under initial
+PASS VALIDATION 18 no global missing-fields box under initial
+PASS VALIDATION 19 no final-submit control under ai
+PASS VALIDATION 20 no global missing-fields box under ai
+PASS VALIDATION 21 no final-submit control under final
+PASS VALIDATION 22 no global missing-fields box under final
+PASS VALIDATION 23 no final-submit control under reflection
+PASS VALIDATION 24 no global missing-fields box under reflection
+PASS VALIDATION 25 seven tabs with dedicated final-submit tab
+PASS VALIDATION 26 submit stays disabled after initial lock with final fields empty
+PASS VALIDATION 27 only submit tab has a single linked list of four missing requirements
+PASS VALIDATION 28 following validation to final fields does not carry summary along
+PASS VALIDATION 29 forced early submit is blocked before confirmation
+PASS VALIDATION 30 forced early submit directs to first missing final field
+PASS VALIDATION 31 complete final assessment still requires reflection
+PASS VALIDATION 32 submit-only list updates to the remaining reflection
+PASS VALIDATION 33 reflection has no global missing-fields box after following link
+PASS VALIDATION 34 whitespace-only reflection does not enable submission
+PASS VALIDATION 35 unsaved complete draft does not enable submission
+PASS VALIDATION 36 complete saved draft enables submit without requiring an AI message
+PASS VALIDATION 37 clearing required final field disables submit immediately
+PASS VALIDATION 38 server rejects each missing final requirement independently
+PASS VALIDATION 39 rejected submits produce no final snapshot or lock
+PASS VALIDATION 40 starting AI disables ready submit immediately
+PASS VALIDATION 41 submit reopens after AI completion and draft save
+PASS VALIDATION 42 offline state disables ready submit
+PASS VALIDATION 43 reconnection restores saved draft readiness
+PASS VALIDATION 44 error summary and field links fit mobile viewport
+PASS VALIDATION 45 focused missing field is below sticky mobile navigation
+PASS VALIDATION 46 complete submission has no missing-fields box
+PASS VALIDATION 47 server accepts and preserves dedicated submit-section events
+PASS VALIDATION 48 valid final submission locks submit control
+PASS VALIDATION 49 submitted final response remains read only outside submit tab
+PASS VALIDATION 50 no JavaScript page errors
+TOTAL VALIDATION 50 checks passed. Isolated synthetic DB; user working data untouched.

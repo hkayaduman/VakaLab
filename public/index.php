@@ -1,0 +1,6 @@
+<?php
+header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");
+header('X-Content-Type-Options: nosniff');header('Cache-Control: no-store');
+?><!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VakaLab · Pedagojik Vaka Araştırması</title><link rel="stylesheet" href="assets/app.css?v=0.1.9"><script src="assets/analysis.js?v=0.1.9" defer></script><script src="assets/labels.js?v=0.1.9" defer></script><script src="assets/time.js?v=0.1.9" defer></script><script src="assets/validation.js?v=0.1.9" defer></script><script src="assets/app.js?v=0.1.9" defer></script></head>
+<body><header class="masthead"><a href="./" class="brand"><span class="mark">V</span>VakaLab<span class="brand-sub">ARAŞTIRMA ÇALIŞMA ALANI</span></a><div id="identity"></div></header><div id="banner"></div><div id="notice" role="status" aria-live="polite"></div><main id="root"><p>Çalışma alanı yükleniyor…</p></main><footer>VakaLab · Pedagojik muhakeme araştırması <span>Gözlenen etkinlik, düşünme veya okuma kanıtı değildir.</span></footer></body></html>

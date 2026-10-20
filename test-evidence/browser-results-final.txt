@@ -1,0 +1,19 @@
+PASS BROWSER 1 only assigned active cases shown
+PASS BROWSER 2 profile starts unselected
+PASS BROWSER 3 AI unlocked after server initial confirmation
+PASS BROWSER 4 initial rendered read only
+PASS BROWSER 5 pinned workspace title preserved after save
+PASS BROWSER 6 initial not automatically shown beside final
+PASS BROWSER 7 mock assistant rendered as text
+PASS BROWSER 8 final draft survives chat navigation
+PASS BROWSER 9 second tab read-only lease
+PASS BROWSER 10 mobile no document horizontal overflow
+PASS BROWSER 11 mobile section navigation present
+PASS BROWSER 12 submission locks final fields
+PASS BROWSER 13 dynamic matrix seven synthetic participants
+PASS BROWSER 14 matrix submitted filter
+PASS BROWSER 15 matrix case filter
+PASS BROWSER 16 researcher can add participant through form
+PASS BROWSER 17 single application analysis UI
+PASS BROWSER 18 no browser JavaScript errors: 
+TOTAL BROWSER 18 checks passed. Chromium desktop/mobile emulation; no physical mobile keyboard test.

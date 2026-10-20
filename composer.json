@@ -1,0 +1,20 @@
+{
+  "name": "vakalab/research",
+  "description": "Pedagojik vaka araştırma uygulaması",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.3",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-mbstring": "*",
+    "ext-curl": "*",
+    "ext-zip": "*",
+    "ext-gd": "*",
+    "phpoffice/phpword": "^1.4",
+    "phpoffice/phpspreadsheet": "^5.0",
+    "mpdf/mpdf": "^8.2"
+  },
+  "config": {"sort-packages": true, "allow-plugins": false},
+  "scripts": {"test": "php tests/run.php"}
+}

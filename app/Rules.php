@@ -1,0 +1,32 @@
+<?php
+declare(strict_types=1);
+final class Rules {
+    public static function draft(array $d): array {
+        $out=[];
+        foreach(['knowledge','confidence','difficulty','severity','final_confidence'] as $k){$v=$d[$k]??null;demand($v===null||(is_int($v)&&$v>=0&&$v<=10),'Puan 0–10 tam sayı olmalı');$out[$k]=$v;}
+        foreach(['problem','decision','reason','final_decision','final_reason','reflection','question'] as $k){$v=$d[$k]??'';demand(is_string($v)&&strlen($v)<=60000,'Metin sınırı aşıldı');$out[$k]=$v;}
+        return $out;
+    }
+    public static function initial(array $d): void {
+        foreach(['knowledge','confidence','difficulty','severity'] as $k)demand($d[$k]!==null,'Dört profil alanını doldurun');
+        foreach(['problem','decision','reason'] as $k)demand(trim($d[$k])!=='','Başlangıç alanlarını doldurun');
+    }
+    public static function final(array $d): void {
+        foreach(['final_decision','final_reason','reflection'] as $k)demand(trim($d[$k])!=='','Nihai yanıt ve yansıtmayı doldurun');
+        demand($d['final_confidence']!==null,'Nihai güveni seçin');
+    }
+    public static function rubric(array $r): void {
+        demand(isset($r['text'],$r['dimensions'])&&is_string($r['text'])&&is_array($r['dimensions'])&&count($r['dimensions'])>0,'Rubrik metni ve boyutlar gerekli');$ids=[];
+        foreach($r['dimensions'] as $d){demand(isset($d['id'],$d['min'],$d['max'],$d['weight'],$d['levels'])&&is_array($d['levels'])&&$d['levels']!==[],'Boyut/düzey eksik');demand(!in_array($d['id'],$ids,true),'Boyut ID tekrarı');$ids[]=$d['id'];demand(is_numeric($d['min'])&&is_numeric($d['max'])&&is_numeric($d['weight'])&&$d['max']>$d['min']&&$d['weight']>0,'Rubrik aralık/ağırlık geçersiz');}
+    }
+    public static function scores(array $out,array $rubric,array $sources): float {
+        demand(isset($out['scores'])&&count($out['scores'])===count($rubric['dimensions']),'Eksik puan');$sum=0;$weight=0;
+        foreach($rubric['dimensions'] as $d){$s=$out['scores'][$d['id']]??null;demand(is_array($s)&&isset($s['score'],$s['quote'],$s['source'],$s['reason'],$s['level']),'Kanıt/puan eksik');demand(is_numeric($s['score'])&&$s['score']>=$d['min']&&$s['score']<=$d['max'],'Puan aralık dışı');demand(in_array($s['level'],array_column($d['levels'],'name'),true),'Düzey geçersiz');demand(isset($sources[$s['source']])&&is_string($s['quote'])&&trim($s['quote'])!==''&&str_contains($sources[$s['source']],$s['quote']),'Kanıt kaynakta bulunamadı');$sum+=$s['score']*$d['weight'];$weight+=$d['weight'];}
+        return round($sum/$weight,4);
+    }
+    public static function csv(string $s): string { return preg_match('/^[\s]*[=+@\-\t\r]/u',$s)?"'".$s:$s; }
+    public static function unionSeconds(array $spans): int {
+        usort($spans,fn($a,$b)=>$a[0]<=>$b[0]);$total=0;$end=null;
+        foreach($spans as [$a,$b]){if($b<$a)continue;$total+=max(0,$b-max($a,$end??$a));$end=max($b,$end??$b);}return $total;
+    }
+}

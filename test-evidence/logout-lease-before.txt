@@ -1,0 +1,7 @@
+PASS BROWSER 1 only assigned active cases shown
+PASS BROWSER 2 profile starts unselected
+PASS BROWSER 3 AI unlocked after server initial confirmation
+PASS BROWSER 4 initial rendered read only
+Error: immediate logout and relogin does not leave false other-tab lock
+    at check (D:\VakaLab\tests\browser.cjs:9:53)
+    at D:\VakaLab\tests\browser.cjs:16:482
