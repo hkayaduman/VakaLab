@@ -1,0 +1,10 @@
+PASS PRESENCE BROWSER 1 in-page confirmation keeps application focus
+PASS PRESENCE BROWSER 2 cancel leaves final draft editable
+PASS PRESENCE BROWSER 3 Escape cancels without submitting
+page.evaluate: TypeError: Cannot read properties of null (reading 'application')
+    at eval (eval at evaluate (:311:30), <anonymous>:1:10)
+    at UtilityScript.evaluate (<anonymous>:313:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+    at D:\VakaLab\tests\confirmation-browser.cjs:26:194 {
+  log: []
+}

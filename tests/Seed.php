@@ -22,7 +22,7 @@ final class Seed {
             $u=$db->one('SELECT * FROM users WHERE id=?',['test-student-'.$i]);$a=$app->start($u,'test-case-1');$d=Rules::draft(['knowledge'=>5,'confidence'=>8,'difficulty'=>6,'severity'=>7,'problem'=>'SENTETİK: Grup içi katkıları ve koşulları anlamalıyım.','decision'=>'SENTETİK: Öğrencileri ayrı dinlerim.','reason'=>'SENTETİK: Adil karar için farklı bilgileri toplarım.']);
             $a=$app->save($u,$a['id'],['revision'=>0,'draft'=>$d],$i===2?'save':'initial');
             if($i>=4)$app->chat($u,$a['id'],['key'=>'seed-request-test-'.$i,'text'=>'SENTETİK: Durumun olası sonuçları neler olabilir?']);
-            if($i>=5){$d['final_decision']='SENTETİK: Öğrencileri dinleyip bireysel katkıyı ayrı değerlendiririm.';$d['final_reason']='SENTETİK: Ortak ürün ile bireysel koşulları birlikte dikkate alırım.';$d['final_confidence']=10;$d['reflection']='SENTETİK: AI önerisini gözden geçirip kendi kararımı gerekçelendirdim.';$app->save($u,$a['id'],['revision'=>$a['revision'],'draft'=>$d],$i===6?'submit':'save');}
+            if($i>=5){$d['final_decision']='SENTETİK: Öğrencileri dinleyip bireysel katkıyı ayrı değerlendiririm.';$d['final_reason']='SENTETİK: Ortak ürün ile bireysel koşulları birlikte dikkate alırım.';$d['final_confidence']=10;$d['final_severity']=7;$d['reflection']='SENTETİK: AI önerisini gözden geçirip kendi kararımı gerekçelendirdim.';$app->save($u,$a['id'],['revision'=>$a['revision'],'draft'=>$d],$i===6?'submit':'save');}
         }
         $a=$db->one("SELECT * FROM applications WHERE user_id='test-student-6' AND case_id='test-case-1'");$researcher=$db->one("SELECT * FROM users WHERE id='test-researcher'");
         if(!$db->one('SELECT id FROM analysis_runs WHERE app_id=?',[$a['id']])){

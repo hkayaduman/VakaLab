@@ -22,3 +22,11 @@ button.field-link{padding:4px 2px;border:0;border-radius:2px;background:transpar
 .process-answers{margin:1rem 0}.process-answers>div{padding:.8rem 0;border-bottom:1px solid #dce4de}.process-answers dt{font-weight:700}.process-answers dd{margin:.5rem 0 0}.process-entry{border:1px solid #dce4de;border-radius:10px;padding:1rem;margin:1rem 0;overflow-wrap:anywhere}.process-entry h3{font-size:1.05rem}.process-filters{display:grid;gap:.7rem}.process-entry .prose{white-space:pre-wrap}.draft-change summary{line-height:1.8}
 [data-process-panel="navigation"] table{white-space:normal;min-width:900px}
 [data-process-panel="navigation"] td{vertical-align:top}
+
+.snapshot-comparison{table-layout:fixed;min-width:640px}.snapshot-comparison th:first-child{width:20%}.snapshot-comparison td,.snapshot-comparison th{vertical-align:top;overflow-wrap:anywhere}
+
+.snapshot-comparison th,.process-scores th,.process-scores td{white-space:normal;overflow-wrap:anywhere}.snapshot-comparison td{white-space:pre-wrap;word-break:normal}.process-scores{table-layout:fixed}.process-scores th:first-child{width:70%}
+
+.revision-filters{max-width:360px}.revision-table{table-layout:fixed;min-width:860px}.revision-table th,.revision-table td{white-space:normal;overflow-wrap:anywhere;vertical-align:top}.revision-table th:nth-child(1){width:19%}.revision-table th:nth-child(2){width:17%}.revision-table .prose{white-space:pre-wrap}.revision-table .revision-full-text{padding:0;border:0}.revision-full-text summary{font-weight:400;line-height:1.7}
+
+.event-table{table-layout:fixed;min-width:980px}.event-table th,.event-table td{white-space:normal;overflow-wrap:anywhere;vertical-align:top}.event-table th:nth-child(1){width:18%}.event-table th:nth-child(2){width:14%}.event-table th:nth-child(3){width:20%}.event-table th:nth-child(4){width:16%}.event-table td{line-height:1.7}.event-table details{padding:8px 0}.event-table summary{font-weight:500}.event-table .prose{white-space:pre-wrap}

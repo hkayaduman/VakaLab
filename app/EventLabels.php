@@ -6,7 +6,7 @@ final class EventLabels {
         'section_open'=>['Bölüm açıldı','Gezinme','Bir çalışma bölümü açıldı; içeriğin okunduğunu göstermez.'],
         'field_focus'=>['Giriş alanına odaklanıldı','Alan etkileşimi','Bir metin veya seçim alanı odak aldı; veri değişmiş olmayabilir.'],
         'text_changed'=>['Yanıt metni değişti','Alan etkileşimi','Yanıt alanında metin düzenleme gözlendi.'],
-        'profile_changed'=>['Profil veya güven seçimi değişti','Alan etkileşimi','Profil ya da nihai güven alanındaki seçim değişti.'],
+        'profile_changed'=>['Profil veya güven seçimi değişti','Alan etkileşimi','Profil, nihai güven ya da nihai algılanan ciddiyet alanındaki seçim değişti.'],
         'question_changed'=>['Soru taslağı değişti','Alan etkileşimi','AI için yazılan soru taslağı değişti; mesajın gönderildiği anlamına gelmez.'],
         'copy'=>['Kopyalama gözlendi','Alan etkileşimi','Uygulama içinde kopyalama olayı gözlendi.'],
         'paste'=>['Yapıştırma gözlendi','Alan etkileşimi','Uygulama içinde yapıştırma olayı gözlendi.'],
@@ -22,10 +22,14 @@ final class EventLabels {
         'section_leave'=>['Çalışma ekranından ayrıldı','Gezinme','Vakalarım ekranına dönüş veya çıkışla mevcut bölüm ziyareti kapandı.'],
         'workflow_confirmed'=>['Yanıtlar kesinleştirildi','Teslim durumu','Başlangıcın kesinleşmesi veya son teslimin sunucuda başarıyla kaydedilmesi doğrulandı.'],
         'message_send'=>['AI mesajı gönderimi başlatıldı','Mesaj durumu','AI isteğinin gönderilme girişimi kaydedildi; başarı ve soru amacı sunucu isteğiyle eşleştirilerek belirlenir.'],
+        'app_presence'=>['Uygulama durumu değişti','Gezinme','Uygulamadan ayrılma veya uygulamaya dönüş kaydı.'],
     ];
-    public const SECTIONS = ['case'=>'Vaka metni','profile'=>'Vaka profili','initial'=>'Başlangıç değerlendirmesi','ai'=>'AI sohbeti','final'=>'Nihai değerlendirme','reflection'=>'Yansıtma','confirm'=>'Son teslim'];
+    public const SECTIONS = ['case'=>'Vaka metni','profile'=>'Vaka profili','initial'=>'Başlangıç değerlendirmesi','ai'=>'AI sohbeti','final'=>'Nihai değerlendirme','reflection'=>'Yansıtma','confirm'=>'Son teslim','outside'=>'Uygulama dışında','away'=>'Vaka dışında'];
     public static function describe(array $event): array {
         [$name,$category,$description] = self::TYPES[$event['type']] ?? ['Tanımlanmamış olay','Tanımlanmamış','Özgün olay kodunu inceleyin.'];
+        $p=(is_array($event['payload']??null)?$event['payload']:(json_decode($event['payload']??'{}',true)?:[]));
+        if($event['type']==='app_presence'){$name=($p['app_active']??false)?'Uygulamaya döndü':'Uygulamadan ayrıldı';$description=($p['app_active']??false)?'Bölüm süresi yeniden başladı.':'Bölüm süresi durdu; dönüşe kadar Uygulama dışında süresi kaydedilir.';}
+        if($event['type']==='section_open'&&!empty($p['locked'])){$name=$event['section']==='ai'?'Kilitli AI bölümünü görüntüleme':'Kilitli bölüm görüntüleme';$description='İstenen bölüm kilitliydi; erişim denemesi kaydedildi.';}
         return $event + ['type_tr'=>$name,'section_tr'=>self::SECTIONS[$event['section']] ?? 'Tanımlanmamış bölüm','event_category'=>$category,'event_description'=>$description];
     }
     public static function dictionary(): array {

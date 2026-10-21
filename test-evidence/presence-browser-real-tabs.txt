@@ -1,0 +1,10 @@
+PASS PRESENCE BROWSER 1 real tab switch creates one outside interval
+PASS PRESENCE BROWSER 2 time in another tab is measured as outside
+PASS PRESENCE BROWSER 3 locked AI visit resumes separately after return
+PASS PRESENCE BROWSER 4 readable departure and return events persisted by server
+PASS PRESENCE BROWSER 5 locked access event is explicit in researcher log
+PASS PRESENCE BROWSER 6 section durations exclude entire outside interval
+PASS PRESENCE BROWSER 7 actual download includes outside activity
+PASS PRESENCE BROWSER 8 outside total and activity visible in researcher screen
+PASS PRESENCE BROWSER 9 student browser has no JavaScript errors
+TOTAL PRESENCE BROWSER 9 checks passed; isolated synthetic database.

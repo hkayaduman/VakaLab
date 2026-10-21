@@ -1,0 +1,16 @@
+PASS PRESENCE BROWSER 1 in-page confirmation keeps application focus
+PASS PRESENCE BROWSER 2 cancel leaves final draft editable
+PASS PRESENCE BROWSER 3 Escape cancels without submitting
+PASS PRESENCE BROWSER 4 cancel initial confirmation preserves responses
+PASS PRESENCE BROWSER 5 real departure while confirmation is open does not dismiss it
+PASS PRESENCE BROWSER 6 initial confirmation still unlocks AI
+PASS PRESENCE BROWSER 7 cancel, Escape and acceptance create no fake final-confirm departure
+PASS PRESENCE BROWSER 8 final success marker remains exactly once
+PASS PRESENCE BROWSER 9 actual departure during initial dialog remains exactly one outside interval
+PASS PRESENCE BROWSER 10 real dialog-time departure retains its duration
+PASS PRESENCE BROWSER 11 home to reopening is measured as case-away time
+PASS PRESENCE BROWSER 12 case-away time is never charged to application sections
+PASS PRESENCE BROWSER 13 actual CSV distinguishes case absence, app absence and initial success
+PASS PRESENCE BROWSER 14 case-away interval shown in researcher screen
+PASS PRESENCE BROWSER 15 no student JavaScript errors
+TOTAL CONFIRMATION 15 checks passed; isolated synthetic data.

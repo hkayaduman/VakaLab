@@ -1,0 +1,21 @@
+PASS PRESENCE BROWSER 1 real tab switch creates one outside interval
+PASS PRESENCE BROWSER 2 time in another tab is measured as outside
+PASS PRESENCE BROWSER 3 locked AI visit resumes separately after return
+PASS PRESENCE BROWSER 4 readable departure and return events persisted by server
+PASS PRESENCE BROWSER 5 locked access event is explicit in researcher log
+PASS PRESENCE BROWSER 6 section durations exclude entire outside interval
+PASS PRESENCE BROWSER 7 actual download includes outside activity
+PASS PRESENCE BROWSER 8 outside total and activity visible in researcher screen
+PASS PRESENCE BROWSER 9 real delayed response completes during one outside interval
+PASS PRESENCE BROWSER 10 live asynchronous flow preserves one question and one response
+PASS PRESENCE BROWSER 11 actual response timestamp lies inside outside interval
+PASS PRESENCE BROWSER 12 live AI wait never overlaps outside interval
+PASS PRESENCE BROWSER 13 no fake AI viewing during real outside response
+PASS PRESENCE BROWSER 14 hidden reply survives actual CSV download
+PASS PRESENCE BROWSER 15 return before delayed reply leaves the same request pending
+PASS PRESENCE BROWSER 16 real pending wait splits into two positive intervals across absence
+PASS PRESENCE BROWSER 17 two real questions and responses stay exactly two after all returns
+PASS PRESENCE BROWSER 18 return while waiting is not counted as AI viewing
+Error: two tab departures plus one minimize create three outside intervals
+    at check (D:\VakaLab\tests\presence-browser.cjs:14:72)
+    at D:\VakaLab\tests\presence-browser.cjs:92:2

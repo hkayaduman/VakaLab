@@ -1,0 +1,15 @@
+PASS PRESENCE BROWSER 1 cancelling keeps mixed journey open
+PASS PRESENCE BROWSER 2 no telemetry after successful submission despite later tab and section changes
+PASS PRESENCE BROWSER 3 two home/reopen cycles produce exactly two case-away intervals
+PASS PRESENCE BROWSER 4 only real other-tab departure produces app-outside interval
+PASS PRESENCE BROWSER 5 old unclosed history remains unknown
+PASS PRESENCE BROWSER 6 both case-away intervals retain actual elapsed durations
+PASS PRESENCE BROWSER 7 work in case B lies inside case A absence, without being relabeled app-outside
+PASS PRESENCE BROWSER 8 closed case A intervals have no holes and no overlaps
+PASS PRESENCE BROWSER 9 section plus app-outside plus case-away seconds exactly equal observed journey duration
+PASS PRESENCE BROWSER 10 every individual visit duration agrees with raw timestamps
+PASS PRESENCE BROWSER 11 no absence is charged to a section
+PASS PRESENCE BROWSER 12 one real AI question and answer survive multiple case returns exactly once
+Error: response during other-tab absence keeps outside context
+    at check (D:\VakaLab\tests\journey-browser.cjs:14:72)
+    at D:\VakaLab\tests\journey-browser.cjs:49:300

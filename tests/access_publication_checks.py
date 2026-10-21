@@ -151,7 +151,7 @@ def main():
             a = first.ok('initial', {'app_id': aid, 'revision': 0, 'draft': draft})
             first.ok('chat', {'app_id': aid, 'key': uuid.uuid4().hex, 'text': 'SENTETİK soru'})
             draft.update(final_decision='SENTETİK korunacak nihai taslak', final_reason='SENTETİK gerekçe',
-                         final_confidence=9, reflection='SENTETİK yansıtma')
+                         final_confidence=9, final_severity=7, reflection='SENTETİK yansıtma')
             a = first.ok('save', {'app_id': aid, 'revision': a['revision'], 'draft': draft})
             update_case(body='[GÜNCEL METİN]')
             assignment('test-student-2', cid, True)

@@ -1,3 +1,15 @@
+# Güncel model — 0.2.11 yerel
+
+Ana süreç örneği bir öğrenci × vaka çalışmasıdır. Bölüm açılışı/dönüşü aralık başlatır; bölüm değişikliği, uygulamadan ayrılma veya başarıyla kesinleştirme aralığı kapatır. Uygulamadan ayrılma ve dönüş arasında Uygulama dışında etkinliği bulunur. Bölüm süreleri bu aralığı içermez. Başka site/program adı çıkarılmaz. Yeni istemci görünürlük ve odağı birlikte değerlendirir; eski kayıtlar yalnız mevcut görünürlük kanıtıyla hesaplanır. Gözlenmeyen sınırlar tahmin edilmez.
+
+Soru gönderimi ve yanıt gelişi anlık olaylardır. AI beklemesi uygulama dışında sayılmaz; aynı sorunun dönüşten sonraki beklemesi ayrı zaman aralığıdır, yeni soru değildir. Yanıt dışarıda geldiyse gerçek geliş noktası korunur; görüntüleme ancak dönüşte başlar. Başka bölümdeki çalışma ile eşzamanlı AI beklemesi ayrı kulvardadır ve süreler toplanmaz. Kilitli AI bölümünü görüntüleme gerçek sohbetten ayrı etkinliktir. Başlangıcı kesinleştirme ve teslim anlık sınırları korunur; AI öncesi/sonrası ayrı log henüz üretilmez.
+
+Örnek: 10:00 Başlangıç → 10:01 dışarı → 10:04 dönüş → 10:06 Nihai: başlangıç aralıkları 60+120=180 sn, dışarıdaki aralık 180 sn. AI örneği: 10:00 açılış, 10:00:20 soru, 10:00:30 dışarı, 10:01:30 dönüş, 10:01:40 yanıt, 10:02 bölüm değişimi: AI toplamı 60 sn; görüntüleme 20+20 sn, bekleme 10+10 sn; dışarı 60 sn. Bunlar sentetik örneklerdir.
+
+Mevcut ham veriler değiştirilmedi. Yeni gerçek Chrome sekme geçişi ve export fixture kanıtları TEST_RESULTS.md içinde. Gerçek Disco import kabulü bu tur yapılmadı.
+
+---
+
 # Process mining değerlendirmesi — 0.2.4
 
 Bu bölüm 0.2.4 için tarihsel incelemedir. 0.2.5 güncellemesi: kullanıcının click-to-click süre tanımı tüm yedi sekmede uygulandı; navigation_visits ve varsayılan Disco geçiş/süre CSV eklendi, son teslimde izleme durur. Ayrıntılı AI olay CSV ayrı kalır. Yeni çıktı gerçek Disco uygulamasında henüz içe aktarılmadı. Güncel kanıt TEST_RESULTS.md 0.2.5 bölümündedir.

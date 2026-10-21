@@ -1,0 +1,31 @@
+PASS PRESENCE BROWSER 1 real tab switch creates one outside interval
+PASS PRESENCE BROWSER 2 time in another tab is measured as outside
+PASS PRESENCE BROWSER 3 locked AI visit resumes separately after return
+PASS PRESENCE BROWSER 4 readable departure and return events persisted by server
+PASS PRESENCE BROWSER 5 locked access event is explicit in researcher log
+PASS PRESENCE BROWSER 6 section durations exclude entire outside interval
+PASS PRESENCE BROWSER 7 actual download includes outside activity
+PASS PRESENCE BROWSER 8 outside total and activity visible in researcher screen
+PASS PRESENCE BROWSER 9 real delayed response completes during one outside interval
+PASS PRESENCE BROWSER 10 live asynchronous flow preserves one question and one response
+PASS PRESENCE BROWSER 11 actual response timestamp lies inside outside interval
+PASS PRESENCE BROWSER 12 live AI wait never overlaps outside interval
+PASS PRESENCE BROWSER 13 no fake AI viewing during real outside response
+PASS PRESENCE BROWSER 14 hidden reply survives actual CSV download
+PASS PRESENCE BROWSER 15 return before delayed reply leaves the same request pending
+locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('[data-section="ai"]')
+    - locator resolved to <button class="" data-section="ai" aria-current="false">4. AI sohbeti</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+
+    at D:\VakaLab\tests\presence-browser.cjs:83:84 {
+  log: [
+    `  - waiting for locator('[data-section="ai"]')`,
+    '    - locator resolved to <button class="" data-section="ai" aria-current="false">4. AI sohbeti</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}

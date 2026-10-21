@@ -19,7 +19,7 @@ verify(!str_contains(js($coded),'SECRET SYNTHETIC TEXT'),'coded output still rem
 verify(str_contains(js($raw),'SECRET SYNTHETIC TEXT'),'raw output retains synthetic event payload');
 verify($db->all('SELECT * FROM events WHERE app_id=? ORDER BY client_seq',[$a['id']])===$original,'stored event history unchanged');
 verify(count(array_filter($coded['dictionary'],fn($r)=>str_starts_with($r['field'],'events.type.')))===count(Telemetry::TYPES),'dictionary documents all event codes');
-verify(count(array_filter($coded['dictionary'],fn($r)=>str_starts_with($r['field'],'events.section.')))===7,'dictionary documents all sections');
+verify(count(array_filter($coded['dictionary'],fn($r)=>str_starts_with($r['field'],'events.section.')))===count(EventLabels::SECTIONS),'dictionary documents all sections');
 $csv=Export::csv($coded['events']);verify(str_contains($csv,'type_tr')&&str_contains($csv,'event_description')&&str_contains($csv,'Periyodik durum kaydı'),'CSV includes readable Turkish columns');
 $json=obj(js($coded));verify($json['events'][10]['type_tr']==='Periyodik durum kaydı','JSON includes readable descriptions');
 $path=__DIR__.'/tmp/event_labels_'.uid().'.xlsx';

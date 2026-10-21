@@ -1,0 +1,27 @@
+PASS PRESENCE 1 outside is an explicit interval between section visits
+PASS PRESENCE 2 one plus two minutes in section; three minutes outside
+PASS PRESENCE 3 edits belong only to the resumed interval
+PASS PRESENCE 4 outside has a stable activity name and code
+PASS PRESENCE 5 raw observations unchanged
+PASS PRESENCE 6 leaving for another app also starts outside interval
+PASS PRESENCE 7 duplicate outside notifications do not restart interval
+PASS PRESENCE 8 missing return never fabricates outside duration
+PASS PRESENCE 9 locked AI access is distinct from actual chat
+PASS PRESENCE 10 raw event description also identifies locked AI
+PASS PRESENCE 11 submission ends tracking including later section entries
+PASS PRESENCE 12 same request wait pauses outside and resumes for ten seconds
+PASS PRESENCE 13 return while waiting does not create a false viewing interval
+PASS PRESENCE 14 returning does not create a duplicate question
+PASS PRESENCE 15 reply recorded once
+PASS PRESENCE 16 AI section total is sixty seconds excluding outside minute
+PASS PRESENCE 17 presence segments keep unique export identities
+PASS PRESENCE 18 Disco exports two bounded waits
+PASS PRESENCE 19 Disco contains explicit outside duration
+PASS PRESENCE 20 response outside ends pending wait without charging hidden seconds
+PASS PRESENCE 21 actual hidden reply timestamp and context preserved
+PASS PRESENCE 22 viewing resumes only on return after hidden reply
+PASS PRESENCE 23 hidden reply not fabricated again on return
+PASS PRESENCE 24 missing response retains open wait after bounded outside pause
+PASS PRESENCE 25 asynchronous send after departure remains one client-timed question
+PASS PRESENCE 26 request started outside only accumulates visible wait after return
+TOTAL PRESENCE 26 checks passed; isolated in-memory database.

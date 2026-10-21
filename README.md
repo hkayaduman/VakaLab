@@ -1,6 +1,10 @@
 # VakaLab
 
-**0.2.10 — Güncel geliştirme sürümü:** Ayrı araştırmacı çalışma alanları, sadeleştirilmiş yönetim, öğrenci raporu ve okunabilir süreç kayıtları. Etiketli AI soru gönderimi, yanıt hazırlık beklemesi, yanıt gelişi ve görüntüleme ayrı etkinliklerdir; Disco CSV aynı akışı ve ayrı bekleme kulvarını taşır. Eski sorular da korunur. Güncel test kapsamı [TEST_RESULTS.md](TEST_RESULTS.md), devam bilgisi [CONTEXT.md](CONTEXT.md). Gerçek hosting/AI/kurum rubriği kabulü tamamlanmadı.
+**0.2.12 — Yerel geliştirme:** Sayfa içi öğrenci onayları sahte ayrılışı önler. Vakalarım’a dönüş ile aynı vakayı yeniden açma arası Vaka dışında olarak ayrı kaydedilir. Henüz commit/push yapılmadı.
+
+**0.2.11 — Önceki yerel aşama:** Bölümden ayrılma/dönüş süreleri ve Uygulama dışında etkinliği, açık kilitli AI erişimi; AI beklemesi dışarıdaki zamanı içermez. Araştırmacı tabloları ve nihai ciddiyet sorusu güncellendi. Henüz commit/push yapılmadı.
+
+**0.2.10 — Son GitHub sürümü:** Ayrı araştırmacı çalışma alanları, sadeleştirilmiş yönetim, öğrenci raporu ve okunabilir süreç kayıtları. Etiketli AI soru gönderimi, yanıt hazırlık beklemesi, yanıt gelişi ve görüntüleme ayrı etkinliklerdir; Disco CSV aynı akışı ve ayrı bekleme kulvarını taşır. Eski sorular da korunur. Güncel test kapsamı [TEST_RESULTS.md](TEST_RESULTS.md), devam bilgisi [CONTEXT.md](CONTEXT.md). Gerçek hosting/AI/kurum rubriği kabulü tamamlanmadı.
 
 0.2.1: Genel durumda matris yerine vaka/öğrenci listesi, vaka kartında atanan öğrenci diyaloğu; JSON gerektirmeyen rubrik boyut/düzey formu ve okunaklı/aranabilir/JSON indirilebilir işlem geçmişi. Şema değişikliği yok. Güncel koşular TEST_RESULTS.md, kullanım RELEASE_READINESS.md.
 

@@ -11,6 +11,7 @@ const requiredFields = {
     final_decision: {section:'final', label:'Nihai karar'},
     final_reason: {section:'final', label:'Nihai kararın gerekçesi'},
     final_confidence: {section:'final', label:'Nihai güven', score:true},
+    final_severity: {section:'final', label:'Nihai algılanan ciddiyet', score:true},
     reflection: {section:'reflection', label:'Yansıtma'}
 };
 let validationScope = null;

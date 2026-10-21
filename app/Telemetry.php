@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 final class Telemetry {
-    public const TYPES=['section_open','field_focus','text_changed','profile_changed','question_changed','copy','paste','scroll','visibility','focus','heartbeat','offline','online','recovered','response_visible','page_exit','section_leave','workflow_confirmed','message_send'];
+    public const TYPES=['section_open','field_focus','text_changed','profile_changed','question_changed','copy','paste','scroll','visibility','focus','heartbeat','offline','online','recovered','response_visible','page_exit','section_leave','workflow_confirmed','message_send','app_presence'];
     public function __construct(private App $app) {}
     public function ingest(array $u,string $id,array $p,string $session): array {
         $this->app->access($u,$id);demand($u['role']==='student','Öğrenci olayları gerekli',403);$items=$p['events']??[];demand(is_array($items)&&count($items)<=100,'Olay batch sınırı');

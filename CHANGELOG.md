@@ -127,3 +127,13 @@ Eski sürümde gönderim olayı bulunmayan AI soruları güncel etiketleriyle ar
 ## 0.2.10 — Yerel geliştirme
 
 Etiketli soru gönderimi ve AI yanıtı hazırlanıyor beklemesi ayrı etkinliklerdir. Hazırlık aynı isteğin yanıtına kadar, bölüm değiştirilse de ayrı kulvarda sürer. Yanıt/görüntüleme ayrımı ve eski sorular korunur. Disco CSV ayrı kulvarı belirtir; bölüm toplamlarıyla iki kez sayılmaz. Sentetik 40 saniye dahil test kanıtları TEST_RESULTS.md içinde.
+
+## 0.2.11 — Uygulama içi/dışı süreler (2026-10-21, yerel)
+
+Bölüm ziyareti uygulama odağını/görünürlüğünü kaybedince kapanır; geri dönüşte yeni aralık başlar. Aradaki APP_OUTSIDE / Uygulama dışında süresi bölüm toplamına eklenmez. Hangi başka sayfa/programın kullanıldığı çıkarılmaz. Kilitli AI erişimi açıkça adlandırılır. AI beklemesi dışarıdaki zaman çıkarılarak aralıklara bölünür; soru bir kez sayılır, dışarıda gelen yanıt anlık kayıt olarak korunur. Sunucu isteği arka planda sürer. Mevcut ham gözlemler yeniden yazılmaz; geçmişte bulunmayan ayrılma/dönüş sınırları üretilmez. Yeni istemcinin aktiflik gözlemi ile eski görünürlük gözlemi kaynak alanında ayrılır.
+
+Araştırmacı notu ilgili bölüme taşındı; puanlar ve kesinleşmiş başlangıç/son teslim karşılaştırması tabloya alındı. Nihai algılanan ciddiyet 0–10 zorunlu alan olarak eklendi; eski teslimlere değer yazılmaz. Değişiklik geçmişi ilk kayıttan son kayda filtrelenebilir tablo; işlem çizelgesi okunabilir tablo oldu. Kanıt kapsamı TEST_RESULTS.md içinde. Commit/push yok.
+
+## 0.2.12 — Onay odağı ve çalışma arası boşluk
+
+Öğrenci onayları native confirm yerine sayfa içinde açılır; onay/iptal sahte uygulama dışı etkinliği üretmez, gerçek ayrılış korunur. Vakalarım→aynı vakayı yeniden açma arası CASE_AWAY / Vaka dışında ayrı zaman aralığıdır. Dışarıda başka program kullanımı varsayılmaz; bölüm toplamına eklenmez. Eski ham olaylar korunur. Ziyaretsiz bölüm Ziyaret yok olarak gösterilir. Otomatik kanıtlar TEST_RESULTS.md; kullanıcı yeni manuel kontrolü henüz yapmadı.

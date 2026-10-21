@@ -3,7 +3,7 @@ declare(strict_types=1);
 final class Rules {
     public static function draft(array $d): array {
         $out=[];
-        foreach(['knowledge','confidence','difficulty','severity','final_confidence'] as $k){$v=$d[$k]??null;demand($v===null||(is_int($v)&&$v>=0&&$v<=10),'Puan 0–10 tam sayı olmalı');$out[$k]=$v;}
+        foreach(['knowledge','confidence','difficulty','severity','final_confidence','final_severity'] as $k){$v=$d[$k]??null;demand($v===null||(is_int($v)&&$v>=0&&$v<=10),'Puan 0–10 tam sayı olmalı');$out[$k]=$v;}
         foreach(['problem','decision','reason','final_decision','final_reason','reflection','question'] as $k){$v=$d[$k]??'';demand(is_string($v)&&strlen($v)<=60000,'Metin sınırı aşıldı');$out[$k]=$v;}
         return $out;
     }
@@ -14,6 +14,7 @@ final class Rules {
     public static function final(array $d): void {
         foreach(['final_decision','final_reason','reflection'] as $k)demand(trim($d[$k])!=='','Nihai yanıt ve yansıtmayı doldurun');
         demand($d['final_confidence']!==null,'Nihai güveni seçin');
+        demand(($d['final_severity']??null)!==null,'Nihai algılanan ciddiyeti seçin');
     }
     public static function rubric(array $r): void {
         demand(isset($r['text'],$r['dimensions'])&&is_string($r['text'])&&trim($r['text'])!==''&&is_array($r['dimensions'])&&count($r['dimensions'])>0,'Rubrik metni ve boyutlar gerekli');$ids=[];

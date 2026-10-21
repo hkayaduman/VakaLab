@@ -44,13 +44,13 @@ final class App {
             demand((int)($p['revision']??-1)===(int)$a['revision'],'Sürüm çakışması. Metninizi kopyalayın ve yeniden yükleyin.',409);
             $d=Rules::draft($p['draft']??[]);$old=obj($a['draft']);
             if($a['initial_at'])foreach(['knowledge','confidence','difficulty','severity','problem','decision','reason'] as $k)demand($d[$k]===$old[$k],'Başlangıç ve profil kilitli',409);
-            if(!$a['initial_at'])foreach(['final_decision','final_reason','reflection','final_confidence','question'] as $k)demand($d[$k]===$old[$k],'Önce başlangıcı kesinleştirin',409);
+            if(!$a['initial_at'])foreach(['final_decision','final_reason','reflection','final_confidence','final_severity','question'] as $k)demand($d[$k]===($old[$k]??null),'Önce başlangıcı kesinleştirin',409);
             if($action==='initial')Rules::initial($d);
             if($action==='submit'){demand((bool)$a['initial_at'],'Başlangıç kilitlenmeli',409);demand(!$a['active_request'],'AI yanıtı sürerken teslim yapılamaz',409);Rules::final($d);}
             $rev=(int)$a['revision'];if($d!==$old){$rev++;$this->db->insert('draft_revisions',['id'=>uid(),'app_id'=>$id,'revision'=>$rev,'previous_revision'=>$a['revision'],'body'=>js($d),'created_at'=>now()]);}
             $state=$action==='initial'?'working':($action==='submit'?'submitted':$a['state']);
             $this->db->q('UPDATE applications SET draft=?,revision=?,state=?,initial_at=?,submitted_at=?,last_activity=? WHERE id=?',[js($d),$rev,$state,$action==='initial'?now():$a['initial_at'],$action==='submit'?now():$a['submitted_at'],now(),$id]);
-            if($action!=='save'){$body=$action==='initial'?array_intersect_key($d,array_flip(['knowledge','confidence','difficulty','severity','problem','decision','reason'])):array_intersect_key($d,array_flip(['final_decision','final_reason','final_confidence','reflection']));$this->db->insert('snapshots',['id'=>uid(),'app_id'=>$id,'kind'=>$action,'body'=>js($body),'revision'=>$rev,'created_at'=>now()]);}
+            if($action!=='save'){$body=$action==='initial'?array_intersect_key($d,array_flip(['knowledge','confidence','difficulty','severity','problem','decision','reason'])):array_intersect_key($d,array_flip(['final_decision','final_reason','final_confidence','final_severity','reflection']));$this->db->insert('snapshots',['id'=>uid(),'app_id'=>$id,'kind'=>$action,'body'=>js($body),'revision'=>$rev,'created_at'=>now()]);}
             $this->db->audit($u['id'],$action,$id,'',['revision'=>$rev]);return $this->db->one('SELECT * FROM applications WHERE id=?',[$id]);
         });
     }

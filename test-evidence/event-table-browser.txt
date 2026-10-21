@@ -1,0 +1,18 @@
+PASS BROWSER 1 only assigned active cases shown
+PASS BROWSER 2 profile starts unselected
+PASS BROWSER 3 AI unlocked after server initial confirmation
+PASS BROWSER 4 initial rendered read only
+locator.waitFor: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('#login') to be visible
+    - waiting for navigation to finish...
+    - navigated to "http://127.0.0.1:18763/"
+
+    at D:\VakaLab\tests\browser.cjs:16:207 {
+  log: [
+    "  - waiting for locator('#login') to be visible",
+    '    - waiting for navigation to finish...',
+    '    - navigated to "http://127.0.0.1:18763/"'
+  ],
+  name: 'TimeoutError'
+}

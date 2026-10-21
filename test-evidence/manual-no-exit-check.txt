@@ -1,0 +1,18 @@
+{
+  "case": "SENTETİK · Grup çalışmasında adalet",
+  "range_local": "21.10.2026 13:52:19.123 - 13:53:25.015 UTC+03:00",
+  "visits": 8,
+  "outside_visits": 0,
+  "inactive_observations": 0,
+  "section_seconds": {
+    "confirm": 9.99,
+    "case": 6.977,
+    "profile": 6.559,
+    "initial": 6.139,
+    "ai": 18.402,
+    "final": 13.232,
+    "reflection": 4.591
+  },
+  "sum_seconds": 65.89,
+  "note": "Initial confirmation to AI section opening has 0.002s boundary gap; no invented duration. Older Oct 20 history excluded. Read-only DB; no code/data changes."
+}

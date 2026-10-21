@@ -359,3 +359,24 @@ Kullanıcı ekranında yalnız görüntüleme/yanıt satırlarını bildirdi ve 
 ## 0.2.10 — Kullanıcının yeni akış önerisi
 
 Kullanıcı yeni öğrenci ekranındaki Bilgi istedi/Eleştiri istedi ve yanıt/görüntüleme sırasını ekranla gösterip olumlu bildirdi. Bu, gösterilen akış için kullanıcı bildirimi/ekran kanıtıdır; 40 saniye veya tüm cihazlar manuel geçti sayılmaz. Ardından kullanıcı etiketli gönderim → AI hazırlanıyor → yanıt geldi → görüntüleme ayrımını önerip uygulamayı onayladı. Bu değişiklik otomatik sentetik testlerle doğrulandı; yeni manuel batch istenmedi. 40 saniye testi zaman fixture'ıdır, gerçek sağlayıcı çağrısı değildir.
+
+## 0.2.11 — Kullanıcının bölüm/dışarı/dönüş ekranı
+
+2026-10-21 kullanıcı ekranı + salt okunur log kontrolü: TEST-OGR-01 / SENTETİK TEST · Vaka sürümü için 13:13:08.172–13:14:08.481 (UTC+03) aralığı incelendi. Vaka 5 aralık 22.694 sn (ekranda23), Başlangıç 2 aralık6.416sn(6), dışarı5aralık31.199sn(31); toplam60.309sn başlangıç/bitiş farkıyla aynı. Ana dışarı aralığı17.920sn. Beş dışarı aralığının tamamında tarayıcı visible=false gözlemi mevcut; tek görünürlük geçişinin çift sayılması saptanmadı. Kullanıcının ekrandaki kısa ayrılışları hangi amaçla yaptığı çıkarılmadı. Bu kanıt yalnız paylaşılan yolun sürelerinin tutarlılığını doğrular; diğer gerçek kullanıcı senaryoları veya gerçek AI kabulü değildir. Veritabanı salt okunur sorgulandı, değişiklik yapılmadı.
+
+## 0.2.11 — Bölüm/dışarı/dönüş manuel kabulü: GEÇTİ
+
+2026-10-21 kullanıcı onayı: Kullanıcı kısa ayrılışların Codex talimatlarına bakarken yaptığı pencere geçişleri olduğunu doğruladı ve bu manuel senaryonun geçti sayılmasını istedi. TEST-OGR-01 / SENTETİK TEST · Vaka sürümü bölüm→uygulama dışı→dönüş manuel kontrolü GEÇTİ. Önceki salt okunur süre doğrulamasıyla birlikte beş ayrılışın beklenen davranış olduğu kabul edildi. Bu kabul yalnız bu senaryoya aittir; diğer açık kabul maddelerini kapatmaz. Kod/DB değişikliği yok.
+
+## Kullanıcı bildirimi — teslim çevresinde sahte ayrılış ve çalışma arası boşluk
+
+2026-10-21 yeni kullanıcı bildirimi incelemesi (yalnız teşhis): Son teslimden önceki dışarı satırı 13:20:39.882–39.883, yalnız1ms; visible=true ve focused=false→true. Gerçek Chrome’da native confirm kabulü ayrı sentetik DB’de aynı hatayı 2ms olarak yeniden üretti (test-evidence/native-confirm-investigation.txt). Başlangıç kesinleştirmede de 0ms aynı iz var. Bu, gerçek uygulamadan ayrılış değil; native onay penceresinin odak etkisi. HATA AÇIK, uygulama kodu bu incelemede değiştirilmedi. Ayrıca Vakalarım’a dönüş13:14:08.481 ile yeniden vaka açılışı13:19:27.989 arasındaki5dk19.508sn mevcut kapsam gereği izlenmiyor; açık vaka içindeki dışarı toplamına dahil değil. Bu boşluk için nerede zaman geçirildiği çıkarılamaz. Kullanıcıya iki durum ayrı açıklanacak; eski geçti kabulü önceki gerçek pencere geçişi senaryosuyla sınırlıdır. Çalışma DB salt okunur incelendi.
+
+## 0.2.12 — Yeni onay ekranı ve 34.952sn vaka dışı aralığı
+
+2026-10-21 0.2.12 kullanıcı yeni ekran incelemesi: TEST-OGR-01 / Sınıfta dijital araç kullanımı, son onay 13:38:06.747–13:38:17.978 (11.231sn) kesintisiz submit_confirmed ile kapandı; sahte native ayrılış yok. Önceki 13.384 ve8.273sn dışarı aralıklarında visible=false gözlemi var. Vakalarım13:36:49.989→yeniden açılış13:37:24.941 arası34.952sn ilk hesapta görünmüyordu: eski günden kalma end=null trace, sonsuza kadar açık paralel pencere varsayılıp boşluğu engelliyordu. Düzeltildi: sadece bitişi bilinen ve gerçekten çakışan aralık bu boşluğu engeller. Eski açık uçlar bilinmiyor kalır; kapanış uydurulmaz. Salt okunur gerçek DB yeniden hesabı Vaka dışında34.952sn doğruladı. 57 presence,82navigation,16 gerçek Chrome onay/boşluk testi geçti; Chrome fixture eski açık uç kaydını da içerir, CSV/UI doğrulandı. Çalışma DB yazılmadı; yeni manuel tekrar gerekmiyor. Kullanıcının düzeltme sonrası ekran teyidi henüz yok. Commit/push yok.
+
+
+## 0.2.12 — Uygulamadan ayrılmadan bölüm geçişi manuel kontrolü
+
+2026-10-21 kullanıcı ekranları ve salt okunur DB incelemesi: TEST-OGR-01 / Grup çalışmasında adalet, yeni view 13:52:19.123–13:53:25.015. Sekiz bölüm aralığı, sıfır APP_OUTSIDE ve sıfır app_active=false gözlemi. İki AI soru/yanıt akışı ekranda ayrı; son bölüm 13:53:23.002–25.015 (2.013sn) submit_confirmed ile kapandı. Başlangıç kesinleştirme 13:52:46.775, AI açılışı46.777; 2ms ayrı olay sınırı korunur, süre uydurulmaz. Bilinen bölüm toplamı65.890sn. Aynı vaka 20 Ekimden eski geçmiş içeriyor; önceki dışarı/açık uçlar bu yeni teste ait değil ve silinmedi. Yeni manuel senaryoda sahte ayrılış görülmedi. Kanıt test-evidence/manual-no-exit-check.txt. Kod/çalışma DB değişmedi; önceki otomatik testler bu tur yeniden koşulmadı.
