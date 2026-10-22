@@ -25,8 +25,8 @@ try{
         case 'events':$result=(new Telemetry($app))->ingest($u,$id,$p,$session);break;
         case 'dashboard':$result=(new Admin($app))->dashboard($u);break;
         case 'admin':$result=(new Admin($app))->mutate($u,$p['action'],$p);break;
-        case 'new_run':$result=(new Analysis($app))->newRun($u,$id,$p['rubric_id']);break;
-        case 'step':$result=(new Analysis($app))->step($u,$p['run_id'],(int)$p['step']);break;
+        case 'new_run':$result=(new Analysis($app))->newRun($u,$id,$p['rubric_id'],(int)($p['review_version']??1));break;
+        case 'step':$result=(new Analysis($app))->step($u,$p['run_id'],(int)$p['step'],!empty($p['repeat']));break;
         case 'decision':$result=(new Analysis($app))->decide($u,$p['step_id'],$p);break;
         case 'report':$result=(new Analysis($app))->report($u,$p['action'],$p);break;
         case 'message_labels':$result=(new MessageLabels($app))->generate($u,$p['app_id']??'');break;
@@ -44,7 +44,7 @@ try{
             $types=['json'=>'application/json','csv'=>'text/csv','xlsx'=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document','pdf'=>'application/pdf'];demand(isset($types[$format]),'Dosya türü geçersiz');
             $db->audit($u['id'],'download',$report?$rids[0]:'dataset','',['format'=>$format]);
             if($format==='json')$bytes=js($data);elseif($format==='csv'){$table=$_GET['table']??'events';demand(isset($data[$table])&&!$report,'CSV tablo seçimi geçersiz');$bytes=Export::csv($data[$table]);}
-            else{$path=tempnam(__DIR__.'/../storage','export-');try{if($format==='xlsx'){demand(!$report,'XLSX süreç çıktısı içindir');Export::xlsx($data,$path);}else{demand($report,'DOCX/PDF için rapor seçin');Export::reportFile($data,$format,$path);}$bytes=file_get_contents($path);}finally{if(is_file($path))unlink($path);}}
+            else{$path=tempnam(__DIR__.'/../storage','export-');try{if($format==='xlsx'){if($report)Export::reportXlsx($data,$path);else Export::xlsx($data,$path);}else{demand($report,'DOCX/PDF için rapor seçin');Export::reportFile($data,$format,$path);}$bytes=file_get_contents($path);}finally{if(is_file($path))unlink($path);}}
             header('Content-Type: '.$types[$format]);header('Content-Disposition: attachment; filename="vakalab.'.$format.'"');echo $bytes;exit;
         default:throw new Fault('İşlem bulunamadı',404);
         }

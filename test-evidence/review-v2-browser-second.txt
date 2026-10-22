@@ -1,0 +1,29 @@
+PASS V2 BROWSER 1 old analyses preserved and collapsed
+PASS V2 BROWSER 2 invalid profile feedback stops the sequence
+PASS V2 BROWSER 3 sections prepared serially in requested order
+PASS V2 BROWSER 4 exactly five simple sections
+PASS V2 BROWSER 5 profile only has comparison and editable feedback
+PASS V2 BROWSER 6 profile shows missing final fields and real confidence change
+PASS V2 BROWSER 7 chat only displays statistics without score, comment or decisions
+PASS V2 BROWSER 8 section 3 scores each answer separately
+PASS V2 BROWSER 9 section 4 scores each answer separately
+PASS V2 BROWSER 10 section 6 scores each answer separately
+PASS V2 BROWSER 11 report waits for four human reviews
+PASS V2 BROWSER 12 profile comment can be rejected without score
+PASS V2 BROWSER 13 profile edit contains only a comment
+PASS V2 BROWSER 14 four decisions automatically merge without reviewing chat statistics
+PASS V2 BROWSER 15 reflection alone can be recalculated
+PASS V2 BROWSER 16 profile and other question scores unchanged
+PASS V2 BROWSER 17 new reflection result needs another decision
+PASS V2 BROWSER 18 five-section review fits 1440px
+PASS V2 BROWSER 19 five-section review fits 768px
+PASS V2 BROWSER 20 five-section review fits 390px
+PASS V2 BROWSER 21 new report has separately scored reflection
+PASS V2 BROWSER 22 exact reviewed comments and question scores reach report without further AI generation
+PASS V2 BROWSER 23 report has no chat opinion, internal decisions or invented aggregate
+PASS V2 BROWSER 24 student report displays all six question evaluations
+PASS V2 BROWSER 25 student v2 docx downloads
+PASS V2 BROWSER 26 student v2 pdf downloads
+PASS V2 BROWSER 27 internal review export remains available
+PASS V2 BROWSER 28 no browser JavaScript errors: 
+TOTAL V2 BROWSER 28 checks passed. Isolated SQLite/mock; no physical-device or real-provider acceptance.

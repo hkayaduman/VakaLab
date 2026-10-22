@@ -5,6 +5,7 @@ final class Export {
     public function reportData(array $u,string $id,bool $studentPreview=false): array {
         $db=$this->app->db;$r=$db->one('SELECT * FROM reports WHERE id=?',[$id]);demand((bool)$r,'Rapor yok',404);$access=$this->app->access($u,$r['app_id']);
         if($u['role']!=='researcher')demand($r['approved_at']&&$r['published_at']&&Scope::collectionClosed($access),'Rapor henüz yayımlanmadı',403);
+        if($u['role']!=='researcher'){$latest=$db->one('SELECT id,body FROM reports WHERE app_id=? ORDER BY version DESC LIMIT 1',[$r['app_id']]);if($latest&&(obj($latest['body'])['review_version']??1)===2)demand($latest['id']===$r['id'],'Güncel raporu kullanın',403);}
         $body=obj($r['body']);if($u['role']!=='researcher'||$studentPreview){$a=$db->one('SELECT draft FROM applications WHERE id=?',[$r['app_id']]);$body=StudentReport::projection($body,obj($a['draft']));}return ['id'=>$r['id'],'version'=>$r['version'],'created_at'=>$r['created_at'],'approved_at'=>$r['approved_at'],'published_at'=>$r['published_at'],'report'=>$body];
     }
     public function dataset(array $u,array $p): array {
@@ -113,16 +114,58 @@ final class Export {
             foreach($all as $ri=>$row)foreach($row as $ci=>$value)$sheet->setCellValueExplicit([$ci+1,$ri+1],$value,\PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);$sheet->freezePane('A2');$sheet->getDefaultColumnDimension()->setWidth(24);}
         (new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($book))->save($path);$book->disconnectWorksheets();clearstatcache(true,$path);
     }
+    public static function reportXlsx(array $reports,string $path): void {
+        $rows=[];
+        foreach($reports as $r){$d=$r['report'];if(!in_array($d['format']??'',['student-v1','student-v2'],true)){$d=$d['student_report']??StudentReport::build($d,[]);}
+            $base=['Katılımcı'=>$d['participant'],'Vaka'=>$d['case_title'],'Rubrik'=>$d['rubric_name']];
+            $rows[]=$base+['Bölüm'=>'Vaka profilindeki değişim','Soru'=>'','Puan'=>'','En yüksek puan'=>'','Geri bildirim'=>$d['overall_feedback']];
+            foreach($d['sections'] as $section)foreach($section['criteria'] as $q)$rows[]=$base+['Bölüm'=>$section['title'],'Soru'=>$q['name'],'Puan'=>$q['score']??'Puanlanmadı','En yüksek puan'=>$q['max']??'','Geri bildirim'=>$q['feedback']];
+        }
+        self::xlsx(['Öğrenci raporu'=>$rows],$path);
+    }
     public static function reportFile(array $reports,string $format,string $path): void {
         if($format==='docx'){
-            demand(class_exists('PhpOffice\\PhpWord\\PhpWord'),'Vendor kurulmadı',503);\PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(true);$w=new \PhpOffice\PhpWord\PhpWord();$w->setDefaultFontName('DejaVu Sans');$w->setDefaultFontSize(11);
-            foreach($reports as $r){$s=$w->addSection(['pageSizeW'=>11906,'pageSizeH'=>16838]);$s->addText('VakaLab — Vaka Raporu',['bold'=>true,'size'=>18]);foreach(self::blocks($r) as $block){if($block['type']==='table'){$t=$s->addTable(['borderSize'=>4,'borderColor'=>'DCE4DE','cellMargin'=>90]);foreach($block['rows'] as $row){$t->addRow();foreach($row as $cell)$t->addCell(2400)->addText((string)$cell);}}else $s->addText($block['text'],in_array($block['type'],['heading','section','label'],true)?['bold'=>true,'size'=>$block['type']==='label'?11:13,'color'=>'000000']:[],['keepNext'=>in_array($block['type'],['heading','section','label'],true),'pageBreakBefore'=>$block['type']==='section']);}}(new \PhpOffice\PhpWord\Writer\Word2007($w))->save($path);
+            demand(class_exists('PhpOffice\\PhpWord\\PhpWord'),'Vendor kurulmadı',503);
+            \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(true);
+            $w=new \PhpOffice\PhpWord\PhpWord();$w->setDefaultFontName('Calibri');$w->setDefaultFontSize(11);
+            $w->setDefaultParagraphStyle(['spaceAfter'=>100,'lineHeight'=>1.12,'widowControl'=>true]);
+            $w->addTitleStyle(0,['name'=>'Calibri','bold'=>true,'size'=>23,'color'=>'000000'],['spaceAfter'=>180,'keepNext'=>true]);
+            $w->addTitleStyle(1,['name'=>'Calibri','bold'=>true,'size'=>14,'color'=>'000000'],['spaceBefore'=>220,'spaceAfter'=>110,'keepNext'=>true]);
+            foreach($reports as $r){
+                $s=$w->addSection(['pageSizeW'=>11906,'pageSizeH'=>16838,'marginTop'=>1000,'marginBottom'=>1000,'marginLeft'=>1100,'marginRight'=>1100]);
+                $s->addTitle('VakaLab öğrenci değerlendirme raporu',0);
+                $blocks=self::blocks($r);
+                foreach($blocks as $blockIndex=>$block){
+                    $type=$block['type'];
+                    if($type==='table'){
+                        $t=$s->addTable(['borderSize'=>4,'borderColor'=>'DCE4DE','cellMargin'=>130,'layout'=>'fixed','width'=>9706,'unit'=>'dxa']);
+                        $width=(int)floor(9706/count($block['rows'][0]));
+                        foreach($block['rows'] as $index=>$row){
+                            $t->addRow(null,['tblHeader'=>$index===0,'cantSplit'=>true]);
+                            foreach($row as $cell)$t->addCell($width,['bgColor'=>$index===0?'E6F0E9':'FFFFFF','valign'=>'center'])->addText((string)$cell,['bold'=>$index===0,'color'=>'183B40'],['spaceAfter'=>30,'spaceBefore'=>30]);
+                        }
+                        $s->addTextBreak(1,null,['spaceAfter'=>0,'spaceBefore'=>0,'lineHeight'=>0.4]);
+                    }elseif(in_array($type,['heading','section'],true)){
+                        $s->addTitle($block['text'],1);
+                    }else{
+                        $font=match($type){'score'=>['bold'=>true,'size'=>24,'color'=>'246852'],'label'=>['bold'=>true,'size'=>11,'color'=>'000000'],'question-score','subtotal'=>['bold'=>true,'size'=>11,'color'=>'246852'],default=>['color'=>'283E42']};
+                        $paragraph=['spaceAfter'=>120,'keepNext'=>in_array($type,['score','label','answer','question-score'],true)||($blocks[$blockIndex+1]['type']??'')==='subtotal'];
+                        if($type==='score')$paragraph+=['spaceBefore'=>180,'shading'=>['fill'=>'E6F0E9']];
+                        if($type==='label')$paragraph+=['spaceBefore'=>100];
+                        if($type==='answer')$paragraph+=['shading'=>['fill'=>'F3F5F7'],'indentation'=>['left'=>140,'right'=>140]];
+                        if($type==='feedback')$paragraph+=['shading'=>['fill'=>'FFF8E9'],'indentation'=>['left'=>140,'right'=>140]];
+                        if(in_array($type,['question-score','subtotal'],true))$paragraph+=['shading'=>['fill'=>'E6F0E9']];
+                        $s->addText($block['text'],$font,$paragraph);
+                    }
+                }
+            }
+            (new \PhpOffice\PhpWord\Writer\Word2007($w))->save($path);
         }elseif($format==='pdf'){
             demand(class_exists('Mpdf\\Mpdf'),'Vendor kurulmadı',503);$m=new \Mpdf\Mpdf(['tempDir'=>__DIR__.'/../storage','default_font'=>'dejavusans','default_font_size'=>10]);$escape=fn($x)=>htmlspecialchars((string)$x,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');$html='<style>h1{color:#183b40;font-size:22pt}h2{color:#246852;font-size:13pt;margin-top:22px}h2,h3{page-break-after:avoid}h3{font-size:10pt;color:#000;margin-bottom:5px}p{line-height:1.6}table{border-collapse:collapse;width:100%;margin:12px 0}td{border:1px solid #dce4de;padding:9px}tr:first-child{background:#edf3ef;font-weight:bold}</style>';foreach($reports as $i=>$r){if($i)$html.='<pagebreak />';$html.='<h1>VakaLab — Vaka Raporu</h1>';foreach(self::blocks($r) as $b){if($b['type']==='table'){$html.='<table>';foreach($b['rows'] as $row){$html.='<tr>';foreach($row as $cell)$html.='<td>'.$escape($cell).'</td>';$html.='</tr>';}$html.='</table>';}else{$tag=in_array($b['type'],['heading','section'],true)?'h2':($b['type']==='label'?'h3':'p');$style=$b['type']==='section'?' style="page-break-before:always"':'';$html.="<$tag$style>".nl2br($escape($b['text']))."</$tag>";}}}$m->WriteHTML($html);$m->Output($path,\Mpdf\Output\Destination::FILE);
         }else throw new Fault('Dosya biçimi geçersiz');
     }
     private static function blocks(array $r): array {
-        $d=$r['report'];if(($d['format']??'')==='student-v1')return StudentReport::blocks($r);$b=[];$p=function(string $s)use(&$b){$b[]=['type'=>'paragraph','text'=>$s];};$h=function(string $s)use(&$b){$b[]=['type'=>'heading','text'=>$s];};$score=fn($x)=>$x===null?'Karar verilemedi':(string)$x;
+        $d=$r['report'];if(in_array($d['format']??'',['student-v1','student-v2'],true))return StudentReport::blocks($r);if(($d['review_version']??1)===2){$copy=$r;$copy['report']=StudentReport::projection($d,[]);$blocks=StudentReport::blocks($copy);$blocks[]=['type'=>'heading','text'=>'Araştırmacı iç inceleme eki'];foreach($d['parts'] as $part)$blocks[]=['type'=>'paragraph','text'=>'Bölüm '.$part['step'].' · Karar: '.$part['action']];foreach($d['internal']['notes']??[] as $note)$blocks[]=['type'=>'paragraph','text'=>$note['body']];return $blocks;}$b=[];$p=function(string $s)use(&$b){$b[]=['type'=>'paragraph','text'=>$s];};$h=function(string $s)use(&$b){$b[]=['type'=>'heading','text'=>$s];};$score=fn($x)=>$x===null?'Karar verilemedi':(string)$x;
         $p('Rapor sürümü: '.$r['version'].' · Oluşturma (UTC): '.$r['created_at']);$h('Katılımcı ve vaka');$p('Katılımcı: '.($d['participant']??'—').' · '.($d['case_title']??'Vaka').' · Vaka sürümü: '.($d['case_version']??'—'));$p('Rubrik: '.($d['rubric_name']??'—').' · Sürüm: '.($d['rubric_number']??'—'));$p($d['notice']);
         $h('Veri bütünlüğü ve teknik sınırlar');$p($d['limitations']??'Teknik ölçümler sınırlıdır.');$h('Başlangıç profili');$labels=['knowledge'=>'Ön bilgi','confidence'=>'Başlangıç güveni','difficulty'=>'Algılanan zorluk','severity'=>'Algılanan ciddiyet'];foreach($d['profile']??[] as $k=>$v)$p(($labels[$k]??$k).': '.$v.' / 10');
         $h('Başlangıç ve nihai güven');$c=$d['confidence'];$b[]=['type'=>'table','rows'=>[['Başlangıç','Nihai','Fark'],[$c['initial_confidence'],$c['final_confidence'],sprintf('%+d',$c['difference'])]]];

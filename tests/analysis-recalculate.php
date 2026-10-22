@@ -1,0 +1,40 @@
+<?php
+declare(strict_types=1);
+require __DIR__.'/../app/bootstrap.php';require __DIR__.'/Seed.php';
+$c=require __DIR__.'/../config/example.php';$c['dsn']='sqlite::memory:';$c['db_user']='';$c['db_password']='';$c['https']=false;
+$db=new Db($c);Migration::run($db);Seed::run($db,$c,uid());$app=new App($db,$c);$analysis=new Analysis($app);$n=0;
+function yes(bool $ok,string $label): void {global $n;demand($ok,$label);echo 'PASS '.(++$n).' '.$label.PHP_EOL;}
+function denied(callable $fn,string $label): void {try{$fn();}catch(Fault){yes(true,$label);return;}throw new RuntimeException($label);}
+$r=$db->one("SELECT * FROM users WHERE id='test-researcher'");$u=$db->one("SELECT * FROM users WHERE id='test-student-6'");
+$a=$db->one('SELECT * FROM applications WHERE user_id=?',[$u['id']]);$run=$db->one('SELECT * FROM analysis_runs WHERE app_id=?',[$a['id']]);$rid=$run['id'];
+$old=$analysis->currentStep($rid,3);$oldMerge=$analysis->currentStep($rid,8);$history=$db->all('SELECT * FROM reports WHERE app_id=?',[$a['id']]);$decisions=$db->all('SELECT * FROM decisions');
+$unchanged=$db->all('SELECT * FROM analysis_steps WHERE run_id=? AND step IN (1,2,4,5,6,7)',[$rid]);
+denied(fn()=>$analysis->step($u,$rid,3,true),'student cannot recalculate');
+denied(fn()=>$analysis->step($r,$rid,3),'completed step needs explicit recalculate');
+denied(fn()=>$analysis->step($r,$rid,1,true),'technical checks cannot be repeated as AI review');
+$bad=$c;$bad['ai']['mode']='invalid_json';$failed=(new Analysis(new App($db,$bad)))->step($r,$rid,3,true);
+yes($failed['status']==='failed','invalid repeat is recorded as failed');
+yes($analysis->currentStep($rid,3)['id']===$old['id'],'failed repeat retains previous successful result');
+$fresh=$analysis->step($r,$rid,3,true);
+yes($fresh['status']==='completed'&&$fresh['id']!==$old['id']&&(int)$fresh['attempt']===3,'only selected step gets a new successful attempt');
+yes($db->all('SELECT * FROM analysis_steps WHERE run_id=? AND step IN (1,2,4,5,6,7)',[$rid])===$unchanged,'all other calculation and AI steps unchanged');
+yes($db->all('SELECT * FROM decisions')===$decisions,'previous human decisions preserved without auto acceptance');
+denied(fn()=>$analysis->assemble($run),'new result requires its own human decision');
+denied(fn()=>$analysis->decide($r,$old['id'],['action'=>'accept','reason'=>'old']),'cannot approve superseded AI result');
+$edited=obj($fresh['output']);$edited['scores']['reasoning']['score']=2;$edited['scores']['reasoning']['level']='Gelişiyor';$feedback='Kararınızı destekleyen vaka bilgilerini daha açık ilişkilendirin.';$edited['scores']['reasoning']['feedback']=$feedback;
+$decision=$analysis->decide($r,$fresh['id'],['action'=>'edit','body'=>$edited,'reason'=>'Human reviewed score and feedback']);
+$merge=$analysis->step($r,$rid,8);
+yes($merge['status']==='completed'&&$merge['id']!==$oldMerge['id'],'merge is rebuilt after new human decision');
+yes(in_array($decision['id'],array_column(obj($merge['output'])['parts'],'decision_id'),true),'merge uses new decision');
+denied(fn()=>$analysis->step($r,$rid,8),'same decisions cannot produce duplicate merge');
+$report=$analysis->report($r,'create',['run_id'=>$rid]);$student=(new Export($app))->reportData($r,$report['id'],true)['report'];
+yes($student['sections']['initial']['criteria'][0]['score']===2,'reviewed score reaches student report');
+yes($student['sections']['initial']['criteria'][0]['feedback']===$feedback,'exact card feedback reaches student report without regeneration');
+yes(!isset($student['parts'],$student['internal'])&&!str_contains(js($student),'score_sources'),'student report has no internal authorship metadata');
+yes($db->all('SELECT * FROM reports WHERE app_id=? AND id<>?',[$a['id'],$report['id']])===$history,'all previous report snapshots unchanged');
+yes($db->one('SELECT output FROM analysis_steps WHERE id=?',[$old['id']])['output']===$old['output'],'original AI output unchanged');
+$db->insert('analysis_steps',['id'=>uid(),'run_id'=>$rid,'step'=>4,'attempt'=>2,'status'=>'running','input'=>'{}','output'=>'{}','model'=>'synthetic-v1','directive'=>'analysis-v1','created_at'=>now()]);
+denied(fn()=>$analysis->report($r,'create',['run_id'=>$rid]),'report creation waits for running recalculation');
+denied(fn()=>$analysis->decide($r,$fresh['id'],['action'=>'accept','reason'=>'concurrent']),'decision waits for running calculation');
+denied(fn()=>$analysis->step($r,$rid,3,true),'parallel recalculation is rejected');
+echo "TOTAL RECALCULATE $n checks passed. Isolated SQLite/mock; no working database used.\n";

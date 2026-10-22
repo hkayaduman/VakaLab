@@ -1,5 +1,11 @@
 # Hatalar, düzeltmeler ve açık doğrulamalar
 
+## 2026-10-21 durum incelemesi — yeni açık bulgular
+
+- **AUDIT-01 · P1 · AÇIK:** final_severity eklenmeden teslim edilmiş kayıt, Analysis::step(1) → Rules::final nedeniyle failed olur; sonraki analiz engellenir. Yalnız bellek içi sentetik DB'de yeniden üretildi. Eski ham yanıtları değiştirmeden geçmiş kayıt doğrulaması ayrılmalı.
+- **AUDIT-02 · P2 · AÇIK:** Rules::scores puan-düzey eşleşmesini ve dolu puan açıklamasını doğrulamıyor. Sentetik rubrikte Yetersiz=0 iken score=4/level=Yetersiz/reason=boş kabul edildi. AI ve araştırmacı düzenleme aynı kontrolü kullanıyor.
+- Ayrıntı ve öncelikler STATUS_REVIEW.md; çıktı test-evidence/review-2026-10-21-probes.txt. Mevcut genel testler geçti; bu iki negatif senaryo mevcut testlerin dışında kaldı. Bu incelemede düzeltme yapılmadı.
+
 2026-10-20 · Yerel test sürümü 0.1.0. Kullanıcı kabulü yapılmadı; üretime hazır beyanı yok.
 
 | ID | Sorun / etki | Durum / kanıt |

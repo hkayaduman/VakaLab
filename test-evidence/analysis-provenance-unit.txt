@@ -1,0 +1,22 @@
+PASS 1 initial weighted sum
+PASS 2 final weighted total, not initial plus final
+PASS 3 original final answer
+PASS 4 original initial answer
+PASS 5 feedback cannot change calculated scores
+PASS 6 feedback mapped to correct criterion
+PASS 7 missing feedback rejected
+PASS 8 unknown criterion rejected
+PASS 9 technical production wording rejected
+PASS 10 empty overall feedback rejected
+PASS 11 uncertain is not zero
+PASS 12 rejected is not approved total
+PASS 13 clean projection excludes research internals
+PASS 14 new snapshot independent of later draft
+PASS 15 legacy missing feedback explicit
+TOTAL 15 student report checks passed.
+PASS 16 accepted AI score identifies its source
+PASS 17 feedback provenance is distinct from score provenance
+PASS 18 overall feedback identifies AI source
+PASS 19 mixed score origins preserved per criterion
+PASS 20 document blocks disclose separate origins
+TOTAL PROVENANCE 5 checks passed.

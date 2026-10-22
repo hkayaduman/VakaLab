@@ -1,0 +1,18 @@
+<?php
+declare(strict_types=1);
+require __DIR__.'/../../app/bootstrap.php';
+require __DIR__.'/../Seed.php';
+$c=require __DIR__.'/../../config/example.php';
+$c['dsn']='sqlite::memory:';$c['db_user']='';$c['db_password']='';$c['https']=false;
+$db=new Db($c);Migration::run($db);Seed::run($db,$c,uid());
+$app=new App($db,$c);$analysis=new Analysis($app);
+$u=$db->one("SELECT * FROM users WHERE id='test-researcher'");
+$a=$db->one("SELECT * FROM applications WHERE user_id='test-student-6' AND case_id='test-case-1'");
+$d=obj($a['draft']);unset($d['final_severity']);
+$db->q('UPDATE applications SET draft=? WHERE id=?',[js($d),$a['id']]);
+$run=$analysis->newRun($u,$a['id'],'test-rubric-v1');
+$step=$analysis->step($u,$run['id'],1);
+echo 'LEGACY_SUBMISSION '.js(['state'=>$a['state'],'step1'=>$step['status'],'error'=>$step['error']]).PHP_EOL;
+$rubric=obj($db->one("SELECT body FROM definitions WHERE id='test-rubric-v1'")['body']);
+$scores=[];foreach($rubric['dimensions'] as $dim)$scores[$dim['id']]=['score'=>4,'level'=>'Yetersiz','source'=>'source','quote'=>'evidence','reason'=>''];
+try{$mean=Rules::scores(['scores'=>$scores],$rubric,['source'=>'evidence']);echo 'SCORE_LEVEL_MISMATCH_ACCEPTED '.js(['weighted_mean'=>$mean,'score'=>4,'level'=>'Yetersiz','defined_level_score'=>0,'reason'=>'']).PHP_EOL;}catch(Throwable $e){echo 'SCORE_REJECTED '.get_class($e).PHP_EOL;}

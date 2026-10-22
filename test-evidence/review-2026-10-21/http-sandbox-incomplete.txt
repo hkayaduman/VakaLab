@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "D:\VakaLab\tests\http_checks.py", line 47, in <module>
+    else:raise RuntimeError('server did not start')
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: server did not start

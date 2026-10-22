@@ -1,0 +1,4 @@
+PASS TIME 10 checks: Istanbul, rollover, UTC, DST, missing/invalid values, raw data preserved.
+PASS LABELS 11 checks: latest review, separate AI, added/removed, immutable input, empty review, message isolation, legacy rows.
+TOTAL PROCESS UI 11 checks passed: field differences, zero/null, durations, interval union, unknown measurements.
+PASS ANALYSIS 12 checks: all steps, sequencing, running lock, failed retry, successful retry, decision gate, complete run, run isolation.

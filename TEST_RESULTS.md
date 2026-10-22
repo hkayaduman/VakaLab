@@ -1,5 +1,35 @@
 # Gerçek test sonuçları — 2026-10-20
 
+## Genel tarayıcı testi yeniden doğrulaması — 2026-10-22
+
+`tests/browser.cjs` içindeki eski v1 akışını zorlayan istek müdahalesi ve artık görünmeyen `data-analysis-step` beklentileri kaldırıldı. Genel test güncel beş bölümlü v2 ekranını ve tek güncel rapor akışını kullanır. Uygulama kodu, event/süre hesapları ve dışa aktarım davranışı değiştirilmedi.
+
+- Genel Chrome testi: **131/131**. Önceki 93 kontrolün ardından analiz hatasında durma/devam, sıralı hazırlama, dört araştırmacı kararı, bağımsız yeniden hesaplama, başarısız yeniden hesaplamada önceki sonuç ve kararların aynen korunması, rapor güncelleme, Word/Excel indirme ve yayın doğrulandı.
+- V2 alan testi: **56/56**; V2 JavaScript durum/sıra testleri: **13/13**.
+- İzole geçici SQLite, sentetik hesaplar ve mock AI kullanıldı. Gerçek çalışma veritabanı kullanılmadı. Fiziksel cihaz, gerçek AI/hosting ve Disco içe aktarımı bu koşunun kapsamında değil.
+
+Kanıt: `test-evidence/analysis-browser-2026-10-22.txt`. Önceki genel tarayıcı testindeki zaman aşımı bu koşuyla giderildi; aşağıdaki eski v1 genel test açıklamaları tarihsel sonuçlardır.
+
+## Güncel kullanıcı kararı — 0.2.18 · 2026-10-21
+
+Araştırmacı ekranından önceki yorum/kararlar, önceki değerlendirmeler ve Rapor geçmişi · Onay ve yayın listeleri kaldırıldı. Tek güncel rapor alanında yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster var. Word ve Excel doğrudan öğrenci projeksiyonunu indirir. Excel gerçek XLSX dosyasıdır; profil yorumu ve altı soru puanı/feedbacki içerir, iç karar veya geçmiş içermez. PDF backend desteği korunur fakat bu alanda PDF/önizleme düğmesi yoktur (kullanıcının son tercihi).
+
+V2 raporu yeniden hazırlamak aynı reports.id satırını günceller; yeni rapor listesi/snapshot satırı oluşturmaz. Yeniden hesaplanan başarılı sonuç veya yeni karar önceki öğrenci görünürlüğünü kapatır; dört insan kararı yeniden tamamlandığında birleştirme mevcut raporu otomatik günceller. Güncellenen rapor yeniden Öğrenciye göster gerektirir. Tek düğme onay ve yayını birlikte yapar; mevcut vaka veri toplama kapanış/kişisel ek erişim kapısı korunur. Yeni v2 analiz başlatmak da önceki yayını kapatır. Öğrenci güncel v2 rapor dışında eski rapor kimliklerine erişemez. Araştırmacı ekranında tarihi satırlar gösterilmez; eski analiz/karar kayıtları silinmez. Eski v1 rapor üretim sözleşmesi korunur. Yeni v2 feedback API düzenlemesi de aynı raporu günceller. Sürüm etiketi v2 öğrenci ekranı/Word dosyasından kaldırıldı.
+
+Şema/migration ve çalışma verisine doğrudan yazma yok; yalnız uygulama davranışı değişti. Testler ayrı sentetik SQLite/mock ortamında. 53 PHP ve 36 Chrome kontrolü; mobil/masaüstü yerleşim, aynı rapora yazma, otomatik güncelleme, Word/XLSX ve tek tık gösterme doğrulandı. Gerçek AI/hosting veya kullanıcı manuel kabulü sayılmaz. Kanıtlar test-evidence/current-report-*. Commit/push/dağıtım yok. Önceki 0.2.17 snapshot koruma açıklaması yeni v2 raporların üzerine yazılması için artık geçerli değildir.
+
+## Güncel ek sonuç — 0.2.17 · 2026-10-21
+
+Yeni beş bölüm sözleşmesi, izole SQLite ve mock AI ile doğrulandı. Çalışma DB'sine yazılmadı. Gerçek sağlayıcı/hosting ve manuel kullanıcı kabulü bu sonuçların kapsamında değildir.
+
+- tests/review-v2.php: 48 kontrol; altı ayrı soru payload/puanı, puansız profil, yorumsuz sohbet, düzenleme/ret/yenile, eski snapshotlar, rapor feedback sürümü ve onay/yayın/erişim kapıları.
+- tests/review-v2.cjs: 13 kontrol; sıra, dört karar kapısı, bağımsız yenileme ve güncel birleştirme.
+- tests/review-v2-browser.cjs: 28 kontrol; tek başlatma, hatada dur/devam, beş kart, puan/yorum düzenleme, öğrenci raporu ve Word/PDF, 1440/768/390 taşmama. İlk koşu asenkron rapor oluşturmayı beklemeyen test seçicisinde durdu; kesin oluşturma yanıtı beklendikten sonra tam koşu geçti.
+- Genel/tarihsel tests/browser.cjs: 130 kontrol; fixture açıkça v1 başlatır. Yeni UI yukarıdaki ayrı testle doğrulandı.
+- Genel PHP 81, eski analiz JS 27, tekrar PHP 21, inceleme PHP 17, eski öğrenci raporu PHP 15 geçti.
+
+Kanıtlar test-evidence/review-v2-*. Yeni kaynaklar PHP/JS sözdizimi ve diff kontrolünden geçirildi. Önceki kayıtlar aşağıda tarihçe olarak korunur.
+
 Güncel sürüm **0.2.2**. Son gerçek koşu ve sınırları dosya sonundaki 0.2.2 kaydındadır. Eski sürüm tabloları tarihçedir; yeniden çalıştırılmamış sonuçları güncel saymayın.
 
 Sürüm 0.1.0, Windows, PHP CLI 8.3.35, MariaDB 11.4.12 (PDO mysql), SQLite (PDO sqlite), Google Chrome headless + Playwright. AI **mock**. Tüm hesap/metin/zaman fixtureları sentetik. Kullanıcı manuel kabulü **yapılmadı**.
@@ -316,3 +346,40 @@ Kanıtlar: test-evidence/stale-gap-domain.txt (57), stale-gap-navigation.txt (82
 ## 0.2.12 — Uygulamadan ayrılmadan bölüm geçişi manuel kontrolü
 
 2026-10-21 kullanıcı ekranları ve salt okunur DB incelemesi: TEST-OGR-01 / Grup çalışmasında adalet, yeni view 13:52:19.123–13:53:25.015. Sekiz bölüm aralığı, sıfır APP_OUTSIDE ve sıfır app_active=false gözlemi. İki AI soru/yanıt akışı ekranda ayrı; son bölüm 13:53:23.002–25.015 (2.013sn) submit_confirmed ile kapandı. Başlangıç kesinleştirme 13:52:46.775, AI açılışı46.777; 2ms ayrı olay sınırı korunur, süre uydurulmaz. Bilinen bölüm toplamı65.890sn. Aynı vaka 20 Ekimden eski geçmiş içeriyor; önceki dışarı/açık uçlar bu yeni teste ait değil ve silinmedi. Yeni manuel senaryoda sahte ayrılış görülmedi. Kanıt test-evidence/manual-no-exit-check.txt. Kod/çalışma DB değişmedi; önceki otomatik testler bu tur yeniden koşulmadı.
+
+
+## 0.2.13 — Makale yöntemi ve uygulama içi ölçüm özeti
+
+2026-10-21 · 0.2.13 yerel: Kullanıcı için METHODS_EVENTS_DURATIONS_TR.md yöntem taslağı/etkinlik sözlüğü/örnekler hazırlandı. Araştırmacı bölüm geçişleri altında açılır Etkinlikler ve süreler nasıl yorumlanır? özeti eklendi; olay/mesaj etiketi, görüntüleme/güncelleme/kilit, görünür+odak koşulu, hareketsizliğin dahil olması, uygulama/vaka dışı ayrımı, AI beklemesinde çift saymama, teslim ve eksik süre kuralları açıklanır. Ölçüm mantığı/DB/etiketler değişmedi. Yerel sekiz etiketin açıklamaları sentetik başlangıç tanımı olduğundan bilimsel kodlama yönergesinin tamamlanması gerektiği belgede açıklandı; güvenirlik çalışması yapılmış gibi sunulmadı. Chrome 1440/768/390 genişlikte kılavuz taşmıyor; mevcut sentetik yol verisiyle render, DB erişimi yok. JS/PHP syntax ve diff kontrolü geçti. Önceki fonksiyonel testler bu tur yeniden koşulmadı. Bu yeni düzenleme henüz commit/push edilmedi.
+
+Kanıt: test-evidence/measurement-guide-layout.txt.
+
+## 2026-10-21 — Güncel durum incelemesi
+
+Ayrıntılar STATUS_REVIEW.md; kalıcı loglar test-evidence/review-2026-10-21/ altında. Bu tur yeniden çalışan sonuçlar: SQLite genel81, navigation82, presence57, süreç28, export39, öğrenci raporu15, rubrik14, JS zaman10/etiket11/süreç11/analiz12, genel Chromium127, iki-worker HTTP42, erişim/yayın119, MariaDB81. Ayrı restore DB'de8tablo kayıt sayısı eşit; içerik hash eşitliği iddiası yok. PHP28dosya ve ürün JS7dosya syntax/diff kontrolü geçti. Gruplar örtüşür.
+
+İlk sandbox dosya okunabilirliği ve localhost bağlantı koşuları tamamlanmadı; normal izinli yerel tekrarlar geçti. Mevcut çalışma DB'si/ürün kodu değişmedi. Yeni iki bellek içi sentetik probe mevcut testlerin kapsamadığı açıkları doğruladı: AUDIT-01 eski final_severity bulunmayan teslim analiz1'de failed; AUDIT-02 Yetersiz=0 tanımına karşı score4/levelYetersiz/boş reason kabul ediliyor. Bunlar geçti sayılmadı; BUGS.md içinde açık. Probe çıktısı test-evidence/review-2026-10-21-probes.txt; kaynak betik kanıt klasöründe probes.php.txt olarak saklandı.
+
+Özel confirmation/presence/journey browser, validation/researcher-ui ve uzun metin yerleşim grupları bu tur tekrar çalıştırılmadı. Gerçek AI/hosting/fiziksel cihaz-kesinti/Disco import kabulü yapılmadı. Commit/push/dağıtım yok.
+
+## 0.2.14 — Araştırmacı süre özeti ve AI yanıt durumu
+
+İki bölüm kullanıcı isteğiyle sadeleştirildi. 130genelChrome ve11süreçJS geçti. Üç genişlikte (1440/768/390) taşma yok; üç süre grubu, eksik kayıt uyarısı, sorunlu istek, boş kayıt ve tüm istekler başarılıyken kapalı teknik ayrıntılar sentetik DOM ile doğrulandı. Masaüstü ve mobil ekranlar görsel incelendi. İlk Chrome koşusu68kontrolden sonra değişen eksik-süre metni beklentisinde durdu; sıfır eksik kaydın da açık gösterilmesiyle tam tekrar130geçti. Kanıtlar test-evidence/readable-panels-browser-first.txt, readable-panels-browser.txt, readable-panels-layout.txt. Ölçüm/backend/çalışma DB değişmedi; mevcut AUDIT-01/02 açık. Gerçek AI/hosting ve fiziksel cihaz testi bu tur yapılmadı. Commit/push/dağıtım yok.
+
+## 0.2.15 — Tek başlatmayla sıralı analiz, insan incelemesi ve sade öğrenci raporu
+
+Kullanıcı onayıyla1–7adımları tek başlatma sonrası ayrı isteklerle sırayla ilerler; hata/ağ belirsizliğinde durur, tamamlanan adımları yeniden çalıştırmaz.3–7kararları kullanıcıya aittir; son karar sonrası8birleştirme otomatik başlar. Rapor hazırlama/onay/yayın ayrı. Ekrandan ayrılınca sonraki adım başlatılmaz; çalışan istek tamamlanabilir. Tek-adım kontrolleri isteğe bağlı açılır alanda korunur.
+
+Kullanıcının son düzeltmesiyle öğrenci raporuna AI/araştırmacı kaynak etiketi EKLENMEZ. Bu tur ilk yorumda eklenen kaynak alanları/gösterimleri kaldırıldı; iç karar/AI geçmişi araştırmacıda korunur. Öğrenci ekranı ve Word/PDF puan/feedback odaklıdır, yanıt metinlerini tekrarlamaz. Araştırmacı dosyasında öğrenci cevapları ve AI önerileri korunur. Onaysız raporda genel/ölçüt feedback düzenlemesi ayrı yeni onaysız rapor sürümü üretir; puanlar ve önceki rapor değişmez. Onaylı rapor üzerine yazma ve öğrenci hesabından düzenleme reddedilir.
+
+Son sonuçlar:119Chrome,81genelSQLite,15öğrenciraporunit,17inceleme/feedbackintegration,12analizilerleme+10sıralamaJS geçti.119erişim/yayın kontrolü bu tur sıralı analiz/source ilk düzenlemesinden sonra geçti; son feedback düzenleme endpointi için sahiplik/rol/onaylı snapshot korumaları17integration içinde test edildi. PHP/JS syntax ve diff whitespace geçti. Chrome gerçek UI: geçersiz mock çıktıda3.adımda durma,1/2tekrar etmeden3–7devam,aynı andaençok1adımisteği,otomatikkararverilmemesi,yenilemede7sonucun korunması,manuel3–7kararısonrasıotomatik8,feedbackdüzenleme/yeni sürüm/onay/yayın,öğrencidekaynaketiketiyokluğu,mobilrapor,PDF/DOCXindirme. DOCX XML ayrıca incelendi: düzenlenen feedback var, kaynak etiketleri ve yinelenen öğrenci yanıtları yok. Mobil analiz/öğrenci raporu ekranı görsel incelendi.
+
+Kanıtlar test-evidence/analysis-reviewed-report-{final,domain,unit,integration}.txt ve analysis-reviewed-sequence-unit.txt. Erken denemeler analysis-sequence-browser-first.txt (kapalı details içindeki hatayı görünür bekleyen test seçicisi) ve analysis-sequence-browser-label-first.txt (değişen düğme adını bekleyen eski test) başarılı sayılmadı; son tam koşu geçti.118kontrollü önceki sıralı/provenance koşuları tarihçedir; final119kontrollü sade rapor koşusu günceldir. Gerçek AI/hosting/Disco veya fiziksel cihaz doğrulaması yok. Çalışma DB'si/seed/migration/commit/push/dağıtım yok; AUDIT-01/02açık.
+
+## 0.2.16 — Açık inceleme kartları ve yalnız seçili değerlendirmeyi yenileme
+
+Kullanıcının eski ekranın karışık olduğu bildirimiyle ana alan5açık karta dönüştü.3/4ölçütpuanları/ağırlıklıtoplam/feedbackaçık;5–7niteldeğerlendirmesayısalpuanüretilmedengösterilir. Teknik1/2/8,girdi/kanıt,eskiAIsonuçları/kararlarkapalıayrıntılardakorunur. DoğrudanKabul et,Düzenle,Yalnız bunu yeniden hesaplat;editpuanveöğrencifeedbackiilebaşlar. Kabul ettıklamasıaraştırmacıkararıdır,otomatikinsanonayıyoktur. YeniAIrubriksonucundafeedbackayrıalandır;eskikayıttayoksaaçıkaçıklanır,hamverideğiştirilmez. Onaylıfeedbackraporaaynımetinleaktarılır;öğrenciyekaynakbilgisigösterilmez.
+
+Sonuçlar:130Chrome,81genelSQLite,21seçiliadımtekrar,17inceleme/feedback,15öğrencirapor,27analizJS(12ilerleme+5yenisonuç/birleştirme+10sıralama),28süreçPHP/11süreçJSgeçti.5PHPve3ürünJSsyntaxkontrolü/diffwhitespacegeçti. Chrome:doğrudangörünürpuan/feedback/3düğme,kabul/edit,yalnız3adımıyenileme,hatalıyenilemedeeskisonucukoruma,diğer4adımındeğişmemesi,yenisonucunyenionayistemesi,8birleştirmeyiyenileme,öğrenciyanıtınıkarttanaçma,mobiltaşmama,karttadüzenlenenfeedbackinrapordaaynıkalması,rapordüzenleme/onay/yayın/DOCX/PDF. PHPayrıcaeskiadımkimliğinekararverilememesi,aynırundaparalelistek/karar/raporkoruması,eskiraporlarınsabitkalmasıveaynıkararlarıtekrarbirlestirmemereddinidoğruladı.
+
+Kanıt:test-evidence/review-cards-*.txt;review-card-desktop.png/review-card-mobile.pnggörselincelendi. İlk Chrome koşusu 107 kontrolden sonra kapalıteknik8satırınıgörünürbekleyentestseçicisindedurdu;attachedbeklemesinegeçilince130tamgeçti. İlkstandartPHPkoşusuXLSXis_readablesandboxsınırındadurdu;normalizinlison81koşugeçti. İlkkoşulargeçtisayılmadı. ÇalışmaDB/seed/migrationyok;gerçekAI/hosting/Discoimport/fizikselcihazdoğrulamasıyapılmadı. Kullanıcıyenikartdüzeninikabul etmişsayılmadı;yenimanuelbatchçıkarılmadı. Commit/push/dağıtımyok. AUDIT-01/02buçalışmadakapatılmadı.

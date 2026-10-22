@@ -1,5 +1,7 @@
 # VakaLab
 
+0.2.18 yerel güncelleme: Beş bölümlü değerlendirme ve tek güncel öğrenci raporu. Rapor alanı yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster düğmeleridir; geçmiş listeleri gösterilmez. Yeniden inceleme tamamlanınca aynı rapor güncellenir, öğrenciye tekrar açılması gerekir. Vaka veri toplama kapanış kuralı korunur. Yeni akış için Ctrl+F5; ayrıntılar CONTEXT.md.
+
 **0.2.12 — Yerel geliştirme:** Sayfa içi öğrenci onayları sahte ayrılışı önler. Vakalarım’a dönüş ile aynı vakayı yeniden açma arası Vaka dışında olarak ayrı kaydedilir. Henüz commit/push yapılmadı.
 
 **0.2.11 — Önceki yerel aşama:** Bölümden ayrılma/dönüş süreleri ve Uygulama dışında etkinliği, açık kilitli AI erişimi; AI beklemesi dışarıdaki zamanı içermez. Araştırmacı tabloları ve nihai ciddiyet sorusu güncellendi. Henüz commit/push yapılmadı.
@@ -72,3 +74,6 @@ HTTP testleri PHP_BIN ortam değişkenini veya Windows `.tools/php/php.exe` yolu
 [Shared hosting kurulumu](INSTALL_SHARED_HOSTING.md) · [Sentetik veri](TEST_DATA.md) · [Manuel test](MANUAL_TESTS.md) · [Test sonuçları](TEST_RESULTS.md) · [Mimari](ARCHITECTURE.md) · [Veri sözlüğü](DATA_DICTIONARY.md) · [Olaylar](EVENT_CATALOG.md) · [AI girdileri](AI_INPUT_CONTRACTS.md) · [Hatalar](BUGS.md).
 
 Kabul edilmiş özgün şartnameler 01_OGRENCI_PANELI.md ve 02_ARASTIRMACI_PANELI.md; 03_CODEX_GELISTIRME_PROMPTU.md görev kaynağıdır. Kalıcı silme yoktur. İlgili vaka ve kişisel ek süre kapanışı + rapor onayı + ayrı yayın olmadan öğrenciye puan/rapor erişimi verilmez.
+
+
+Makale için ölçüm tanımları, etkinlik sözlüğü ve süre örnekleri: [Olaylar, etiketler ve süreler](METHODS_EVENTS_DURATIONS_TR.md). Uygulama içi özet araştırmacının Bölüm geçişleri ve ziyaret süreleri alanındadır.

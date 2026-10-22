@@ -1,0 +1,5 @@
+PASS 1440px: page fits, three duration groups, unknown warning and failed request visible
+PASS 768px: page fits, three duration groups, unknown warning and failed request visible
+PASS 390px: page fits, three duration groups, unknown warning and failed request visible
+PASS empty state explicitly says no records
+PASS healthy requests hide technical detail and show successful status

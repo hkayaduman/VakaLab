@@ -1,5 +1,33 @@
 # Geliştirme Planı ve Durum Takibi
 
+## Güncel kullanıcı kararı — 0.2.18 · 2026-10-21
+
+Araştırmacı ekranından önceki yorum/kararlar, önceki değerlendirmeler ve Rapor geçmişi · Onay ve yayın listeleri kaldırıldı. Tek güncel rapor alanında yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster var. Word ve Excel doğrudan öğrenci projeksiyonunu indirir. Excel gerçek XLSX dosyasıdır; profil yorumu ve altı soru puanı/feedbacki içerir, iç karar veya geçmiş içermez. PDF backend desteği korunur fakat bu alanda PDF/önizleme düğmesi yoktur (kullanıcının son tercihi).
+
+V2 raporu yeniden hazırlamak aynı reports.id satırını günceller; yeni rapor listesi/snapshot satırı oluşturmaz. Yeniden hesaplanan başarılı sonuç veya yeni karar önceki öğrenci görünürlüğünü kapatır; dört insan kararı yeniden tamamlandığında birleştirme mevcut raporu otomatik günceller. Güncellenen rapor yeniden Öğrenciye göster gerektirir. Tek düğme onay ve yayını birlikte yapar; mevcut vaka veri toplama kapanış/kişisel ek erişim kapısı korunur. Yeni v2 analiz başlatmak da önceki yayını kapatır. Öğrenci güncel v2 rapor dışında eski rapor kimliklerine erişemez. Araştırmacı ekranında tarihi satırlar gösterilmez; eski analiz/karar kayıtları silinmez. Eski v1 rapor üretim sözleşmesi korunur. Yeni v2 feedback API düzenlemesi de aynı raporu günceller. Sürüm etiketi v2 öğrenci ekranı/Word dosyasından kaldırıldı.
+
+Şema/migration ve çalışma verisine doğrudan yazma yok; yalnız uygulama davranışı değişti. Testler ayrı sentetik SQLite/mock ortamında. 53 PHP ve 36 Chrome kontrolü; mobil/masaüstü yerleşim, aynı rapora yazma, otomatik güncelleme, Word/XLSX ve tek tık gösterme doğrulandı. Gerçek AI/hosting veya kullanıcı manuel kabulü sayılmaz. Kanıtlar test-evidence/current-report-*. Commit/push/dağıtım yok. Önceki 0.2.17 snapshot koruma açıklaması yeni v2 raporların üzerine yazılması için artık geçerli değildir.
+
+## 0.2.17 — Güncel kullanıcı önceliği: yalnız beş basit bölüm
+
+Uygulandı: puansız profil yorumu; üç ayrı başlangıç soru puanı; yalnız sohbet istatistiği; iki ayrı nihai soru puanı; yansıtma puanı. Dört bölümde insanın kabul/düzenle/ret/yenile kararı gerekir. Rapor onaylı puan ve feedbacki aynen taşır. Yeni review_version=2, eski analizleri değiştirmez. 48 PHP / 13 JS / 28 yeni Chrome ve 130 tarihsel/genel Chrome kontrolü geçti. Yeni UI ve gerçek sağlayıcı kullanıcı kabulü bekliyor. Çalışma DB/migration/dağıtım yok; eski v1 AUDIT-01/02 açık.
+
+## 0.2.16 — Kullanıcı önceliği: doğrudan puan/feedback inceleme kartları
+
+Uygulandı:5açık kart,3/4puan ve öğrenci feedbacki,doğrudan Kabul et/Düzenle/yalnız bunu yeniden hesaplat. Teknik1/2/8vegeçmişkapalı;öncekiverisilmez. Yenitekrarsonucuyeniinsankararına bağlı;diğeradımlarkorunur,eski8güncelkararlarla yenilenir. Onaylıfeedbackaynımetinleraporageçer.130Chrome,81SQLite,21repeat/17review/15report/27analysisJSveilgilisüreçkontrollerigeçti. MevcutçalışmaDB/migration/dağıtımyok. YeniUIkullanıcıkabulühenüzyok;AUDIT-01/02açık.
+
+## 0.2.15 — Tek başlatmayla sıralı analiz ve kaynak açıklığı
+
+Kullanıcı onayıyla uygulandı: Yeni analiz başlat1–7ayrıistek, hata sonrası kaldığı yerden devam, manuel3–7karar kapısı ve son karar sonrası otomatik8. İsteğe bağlı tek adım işlemleri korunur. AI orijinali/araştırmacı düzenlemesi geçmişi ayrıdır; öğrenci raporu puan/feedback gösterir, kaynak etiketi içermez. Onaysız rapor feedback metni yeni sürüm olarak düzenlenebilir; önceki rapor korunur. Rapor hazırlama/onay/yayın ayrı kalır. Tarayıcı ekranından ayrılınca yeni adım başlatılmaz; arka plan worker eklenmedi. Çalışma DB/migration/dağıtım yok. Ayrıntı/testler CONTEXT.md ve TEST_RESULTS.md; AUDIT-01/02 bu istek kapsamında kapatılmadı.
+
+## 0.2.14 — Kullanıcı önceliği: süre ve AI durumunu anlaşılırlaştırma
+
+Tamamlandı: Süre özeti üç açıklamalı kutu; AI yanıt durumu dört sayaç ve sorunlu/bekleyen istekler. Gerektiğinde açılan geçmiş/teknik ayrıntı/müdahale; veri veya özellik silinmedi. 130Chrome,11JS ve1440/768/390yerleşim/boş/sağlıklı/sorunlu sentetik durum kontrolleri geçti. DB/backend değişikliği yok. Önceki AUDIT-01/02 hâlâ açık; bu kullanıcı önceliği onları kapatmaz. Commit/push yok.
+
+## 2026-10-21 son denetim ve yeni öncelik
+
+Güncel durum STATUS_REVIEW.md içinde. Mevcut yerel regresyon grupları yeniden geçti; ancak sentetik olumsuz kontrollerde AUDIT-01 (eski teslimin analizde yeni final_severity zorunluluğuna takılması) ve AUDIT-02 (puan-düzey/boş açıklama doğrulama açığı) bulundu. Sonraki ilk iş bu iki hatayı ham veriyi koruyarak düzeltmek ve kalıcı negatif testlerini eklemek; ardından sürüm/kurulum/bağlam belgelerini eşitlemek. Gerçek AI/hosting/kurum-kod kitabı/Disco ve hedef cihaz-kesinti kabulü açık. Bu incelemede ürün kodu ve çalışma DB değişmedi; yeni manuel batch yok, commit/push yok.
+
 ## Mevcut durum
 
 2026-10-21 0.2.12 kullanıcı yeni ekran incelemesi: TEST-OGR-01 / Sınıfta dijital araç kullanımı, son onay 13:38:06.747–13:38:17.978 (11.231sn) kesintisiz submit_confirmed ile kapandı; sahte native ayrılış yok. Önceki 13.384 ve8.273sn dışarı aralıklarında visible=false gözlemi var. Vakalarım13:36:49.989→yeniden açılış13:37:24.941 arası34.952sn ilk hesapta görünmüyordu: eski günden kalma end=null trace, sonsuza kadar açık paralel pencere varsayılıp boşluğu engelliyordu. Düzeltildi: sadece bitişi bilinen ve gerçekten çakışan aralık bu boşluğu engeller. Eski açık uçlar bilinmiyor kalır; kapanış uydurulmaz. Salt okunur gerçek DB yeniden hesabı Vaka dışında34.952sn doğruladı. 57 presence,82navigation,16 gerçek Chrome onay/boşluk testi geçti; Chrome fixture eski açık uç kaydını da içerir, CSV/UI doğrulandı. Çalışma DB yazılmadı; yeni manuel tekrar gerekmiyor. Kullanıcının düzeltme sonrası ekran teyidi henüz yok. Commit/push yok.
@@ -356,3 +384,10 @@ Kullanıcı tüm biriken düzenlemelerin GitHub'a gönderilmesini istedi. Hedef 
 ## Ek karma yol testi — 0.2.12
 
 2026-10-21: Kullanıcının ek test isteği için tests/journey-browser.cjs ile ayrı SQLite ve gerçek Chrome profilinde farklı karma yol denendi. Vaka A → Vakalarım → Vaka B'de iki bölüm → A'ya dönüş → gecikmeli AI sorusu → nihai bölüme geçiş → başka Chrome sekmesindeyken yanıt gelişi → uygulamaya dönüş → AI/yansıtma → Vakalarım → A'ya dönüş → teslim onayını iptal → yeniden onay/teslim → teslim sonrası gezinme. Eski kapanmamış trace fixture'ı da vardı. 27 kontrol geçti: bilinen aralıklarda sıfır boşluk/çakışma, her sürenin ham zaman farkına eşitliği, bölüm/uygulama dışı/vaka dışı ayrımı, tek yeni soru/yanıt, onayda sahte ayrılış olmaması ve teslim sonrası takibin durması. Gerçek indirilen CSV'de süreler, sıra, önceki/sonraki etkinlik ve benzersiz kimlikler; araştırmacı UI/API toplamları karşılaştırıldı. Gözlenen A yolunda 5.394sn bölüm + 6.266sn uygulama dışında + 2.853sn vaka dışında = 14.513sn; AI bekleme kulvarı bu toplama yeniden eklenmedi. Eski açık uç null kaldı. Kanıt: test-evidence/journey-mixed-final.txt; sentetik ekran tests/tmp/journey-mixed.png görsel incelendi. Çalışma DB'si ve ürün kodu bu tur değiştirilmedi; yeni manuel test istenmiyor. Gerçek AI yerine 6sn gecikmeli mock kullanıldı; gerçek hosting/sağlayıcı/Disco import kabulü sayılmaz. Commit/push yok.
+
+
+## 0.2.13 — Makale yöntemi ve uygulama içi ölçüm özeti
+
+2026-10-21 · 0.2.13 yerel: Kullanıcı için METHODS_EVENTS_DURATIONS_TR.md yöntem taslağı/etkinlik sözlüğü/örnekler hazırlandı. Araştırmacı bölüm geçişleri altında açılır Etkinlikler ve süreler nasıl yorumlanır? özeti eklendi; olay/mesaj etiketi, görüntüleme/güncelleme/kilit, görünür+odak koşulu, hareketsizliğin dahil olması, uygulama/vaka dışı ayrımı, AI beklemesinde çift saymama, teslim ve eksik süre kuralları açıklanır. Ölçüm mantığı/DB/etiketler değişmedi. Yerel sekiz etiketin açıklamaları sentetik başlangıç tanımı olduğundan bilimsel kodlama yönergesinin tamamlanması gerektiği belgede açıklandı; güvenirlik çalışması yapılmış gibi sunulmadı. Chrome 1440/768/390 genişlikte kılavuz taşmıyor; mevcut sentetik yol verisiyle render, DB erişimi yok. JS/PHP syntax ve diff kontrolü geçti. Önceki fonksiyonel testler bu tur yeniden koşulmadı. Bu yeni düzenleme henüz commit/push edilmedi.
+
+Kanıt: test-evidence/measurement-guide-layout.txt.

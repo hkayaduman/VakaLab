@@ -1,5 +1,15 @@
 # Veri sözlüğü · schema 001
 
+0.2.18 güncellemesi: V2 için tek güncel reports.id vardır; tekrar hazırlama ve tamamlanan insan incelemesi sonrası birleştirme aynı raporu günceller. Güncelleme önceki onay/yayını kaldırır; show işlemi vaka kapanış kapısıyla onay ve yayını birlikte yapar. Öğrenciye yalnız güncel rapor açılır. Araştırmacı geçmiş listeleri kaldırıldı; iç analiz/karar kayıtları silinmez. Öğrenci Word/XLSX çıktısı yalnız güncel puan ve feedbacktir. V1 tarihsel sözleşmesi korunur; şema değişmedi.
+
+## 0.2.17 ek sözleşme — şema değişikliği yok
+
+Yeni değerlendirme sürümü audit tablosundaki action=analysis_run, target=run_id, detail.review_version=2 ile kayıtlıdır; alan yoksa v1. analysis_steps.step=2 çıktısı profile satırları+feedback, step=3 üç başlangıç questions girdisi, step=4 iki nihai questions girdisi, step=6 bir reflection girdisi taşır. Her questions[id] score/min/max/feedback/criteria/input içerir; puan rubrik ağırlıklı ortalamasıdır. step=5 statistics ve model=system; puan/feedback/karar yok. Çalışma sırası [1,2,3,5,4,6,8], insan kararları [2,3,4,6]. Yeni denemeler önceki sonuç/kararları silmez.
+
+reports.body.review_version=2 ve student_report.format=student-v2. Öğrenci projeksiyonu başlangıç/nihai/yansıtma soru puanları ile feedbackleri, bölüm toplamları ve overall_feedback alanındaki profil yorumunu içerir; kök total/max null, evreler arası genel puan yoktur. İç student_feedback.model=system ve directive=approved-review-v2; rapora yeni AI üretimi yapılmaz. Eski v1 snapshotları değişmez.
+
+0.2.16: analysis_steps aynı run/step için explicit tekrar ile yeni attempt satırı alabilir; güncel sonuç attempt sırasındaki en son completed kayıttır. Failed/running tekrar geçmişi başarılı eski çıktıyı silmez. Her yeni başarılı sonucun kendi step_id'sine bağlı araştırmacı kararı gerekir; superseded step'e yeni karar verilmez. Birleştirme çıktısı güncel karar kimlikleriyle eşleştirilir ve değişmiş kararlarda yeni8attemptüretilir. Eski rapor snapshotları değişmez. Rubrik scores[dimension].feedback öğrenciye gidecek, araştırmacı tarafından düzenlenebilir metindir; reason iç puanlama gerekçesidir. Onaylı feedback rapora aynen aktarılır. Şema migrationı yoktur.
+
 0.2.0 ek alanlar: users/cases/definitions.owner_id = sahip araştırmacının değişmez kimliği; cases.collection_closed_at = vaka veri toplama kapanış UTC zamanı (NULL açık); assignments.allow_late = kapalı vakada kişisel ek erişim; definitions.deleted_at = yeni seçimlerden kaldırılma UTC zamanı. study.closed_at yalnız tarihsel global kayıttır, güncel kapılarda kullanılmaz. Tam export cases/case_versions/participants/assignments/reports/research_notes tablolarını da içerir; parola/hash/anahtar içermez.
 
 Tüm iç kimlikler değişmeyen 32 hex karakterdir; test fixture kimlikleri `test-` öneklidir. İlişkiler FK ile korunur; tablo silme API'si yok. LONGTEXT alanlar JSON ya da UTF-8 metindir. UTC zamanlar ISO 8601 (`…Z`, mikrosaniye); tarayıcı saat dilimi `config.timezone`. Kimlikli dışa aktarmadaki serbest metin kişisel veri içerebilir.

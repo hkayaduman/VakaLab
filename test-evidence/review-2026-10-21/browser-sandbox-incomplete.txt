@@ -1,0 +1,10 @@
+page.goto: net::ERR_NETWORK_ACCESS_DENIED at http://127.0.0.1:18763/
+Call log:
+  - navigating to "http://127.0.0.1:18763/", waiting until "load"
+
+    at D:\VakaLab\tests\browser.cjs:13:16 {
+  log: [
+    '  - navigating to "http://127.0.0.1:18763/", waiting until "load"'
+  ],
+  name: 'Error'
+}

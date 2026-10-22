@@ -1,0 +1,2 @@
+LEGACY_SUBMISSION {"state":"submitted","step1":"failed","error":"invalid_or_failed_output"}
+SCORE_LEVEL_MISMATCH_ACCEPTED {"weighted_mean":4,"score":4,"level":"Yetersiz","defined_level_score":0,"reason":""}

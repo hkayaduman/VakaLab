@@ -1,5 +1,44 @@
 # Değişiklik günlüğü
 
+## Güncel kullanıcı kararı — 0.2.18 · 2026-10-21
+
+Araştırmacı ekranından önceki yorum/kararlar, önceki değerlendirmeler ve Rapor geçmişi · Onay ve yayın listeleri kaldırıldı. Tek güncel rapor alanında yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster var. Word ve Excel doğrudan öğrenci projeksiyonunu indirir. Excel gerçek XLSX dosyasıdır; profil yorumu ve altı soru puanı/feedbacki içerir, iç karar veya geçmiş içermez. PDF backend desteği korunur fakat bu alanda PDF/önizleme düğmesi yoktur (kullanıcının son tercihi).
+
+V2 raporu yeniden hazırlamak aynı reports.id satırını günceller; yeni rapor listesi/snapshot satırı oluşturmaz. Yeniden hesaplanan başarılı sonuç veya yeni karar önceki öğrenci görünürlüğünü kapatır; dört insan kararı yeniden tamamlandığında birleştirme mevcut raporu otomatik günceller. Güncellenen rapor yeniden Öğrenciye göster gerektirir. Tek düğme onay ve yayını birlikte yapar; mevcut vaka veri toplama kapanış/kişisel ek erişim kapısı korunur. Yeni v2 analiz başlatmak da önceki yayını kapatır. Öğrenci güncel v2 rapor dışında eski rapor kimliklerine erişemez. Araştırmacı ekranında tarihi satırlar gösterilmez; eski analiz/karar kayıtları silinmez. Eski v1 rapor üretim sözleşmesi korunur. Yeni v2 feedback API düzenlemesi de aynı raporu günceller. Sürüm etiketi v2 öğrenci ekranı/Word dosyasından kaldırıldı.
+
+Şema/migration ve çalışma verisine doğrudan yazma yok; yalnız uygulama davranışı değişti. Testler ayrı sentetik SQLite/mock ortamında. 53 PHP ve 36 Chrome kontrolü; mobil/masaüstü yerleşim, aynı rapora yazma, otomatik güncelleme, Word/XLSX ve tek tık gösterme doğrulandı. Gerçek AI/hosting veya kullanıcı manuel kabulü sayılmaz. Kanıtlar test-evidence/current-report-*. Commit/push/dağıtım yok. Önceki 0.2.17 snapshot koruma açıklaması yeni v2 raporların üzerine yazılması için artık geçerli değildir.
+
+## 0.2.17 — 2026-10-21 — Beş bölümlü değerlendirme inceleme ve onay
+
+- Vaka profili karşılaştırması yalnız yorum; sohbet yalnız mesaj/süre istatistiği.
+- Başlangıçtaki üç soru, nihai iki soru ve yansıtma ayrı rubrik puanı ve geliştirme feedbacki alır; her soru ayrı AI çağrısıdır.
+- Dört inceleme bölümünde kabul, puan/yorum düzenleme, ret ve yalnız ilgili bölümü yenileme. İstatistiklerde karar düğmesi yok.
+- Öğrenci raporuna incelenmiş metin ve puanlar aynen geçer; rapor için ek AI üretimi veya kaynak etiketi yok. Yansıtma raporda yer alır.
+- Yeni sürüm yalnız yeni değerlendirmelerde kullanılır; eski analiz/raporlar geçmişte korunur. Şema ve çalışma verisi değişmedi.
+
+## 0.2.16 — 2026-10-21 — Kullanılabilir değerlendirme kartları
+
+- Beş açık inceleme kartı; başlangıç/nihai ölçüt puanları ve feedback doğrudan görünür. Teknik kontroller ve geçmiş kapalı ayrıntılara taşındı.
+- Kartta Kabul et, Düzenle ve Yalnız bunu yeniden hesaplat düğmeleri. Düzenleme puan ve feedback ile başlar; iç dayanaklar ayrıntıdadır.
+- Yalnız seçili AI adımı yeni deneme olarak çalışır; diğer adımlar, eski sonuçlar/kararlar/raporlar korunur. Yeni başarılı sonuç yeni onay ister; başarısız tekrarda eski sonuç korunur.
+- Birleştirme güncel kararlarla yenilenir. Onaylanmış ölçüt feedbacki rapora aynı metinle geçer; öğrenciye iç kaynak bilgisi gösterilmez.
+- Şema veya çalışma verisi değişmedi; gerçek sağlayıcı kabulü yapılmadı.
+
+## 0.2.15 — 2026-10-21 — Sıralı otomatik analiz ve rapor kaynağı
+
+- Bir başlatma ile1–7adımı ayrı istekler halinde sırayla çalıştırma; başarısızlıkta durma ve eksik adımdan devam.
+- 3–7sonuçları için insan kararları korunur; son karar sonrası8birleştirme otomatik, rapor onayı/yayın ayrı.
+- Önceki araştırmacı düzenlemesi tekrar açıldığında korunur; orijinal AI önerileri ve eski raporlar değiştirilmez.
+- Öğrenci raporu puan ve geri bildirim odaklı; AI/araştırmacı kaynak etiketleri gösterilmez. Onaysız rapor feedback düzenlemesi yeni sürüm oluşturur, puanlar ve eski rapor korunur. Ekran/DOCX/PDF uyumlu.
+- Bu ekran açıkken sırayla ilerler; yeni arka plan worker/şema/çalışma DB değişikliği yok.
+
+## 0.2.14 — 2026-10-21 — Araştırmacı süre ve AI durum bölümleri
+
+- “Çalışma süreleri ve eksik ölçümler” yerine açıklamalı üç kutuyla “Süre özeti”; eksik kayıt ve yorum sınırı açıklandı.
+- “AI yanıtları ve bağlantı sorunları” yerine sayaçlarla “AI yanıt durumu”; kontrol gerektiren istekler öne alındı.
+- Tüm istek geçmişi, sunucu süresi, gönderilen bağlam, denemeler ve takılı isteğe müdahale kapalı açılır alanlarda korunur. Veri/özellik silinmedi; backend ölçümü değişmedi.
+- 130 Chrome,11 süreç JS ve üç ekran genişliği/boş/sağlıklı/sorunlu durum doğrulaması geçti. DB değişikliği ve dağıtım yok.
+
 ## 0.2.2 — 2026-10-20 — Öğrenci ana ekranı
 
 - Katılım bilgilerim düğmesi ve istemci formu kaldırıldı; mevcut bilgiler korundu.69Chrome kontrolü ve syntax/lint geçti.
@@ -137,3 +176,10 @@ Araştırmacı notu ilgili bölüme taşındı; puanlar ve kesinleşmiş başlan
 ## 0.2.12 — Onay odağı ve çalışma arası boşluk
 
 Öğrenci onayları native confirm yerine sayfa içinde açılır; onay/iptal sahte uygulama dışı etkinliği üretmez, gerçek ayrılış korunur. Vakalarım→aynı vakayı yeniden açma arası CASE_AWAY / Vaka dışında ayrı zaman aralığıdır. Dışarıda başka program kullanımı varsayılmaz; bölüm toplamına eklenmez. Eski ham olaylar korunur. Ziyaretsiz bölüm Ziyaret yok olarak gösterilir. Otomatik kanıtlar TEST_RESULTS.md; kullanıcı yeni manuel kontrolü henüz yapmadı.
+
+
+## 0.2.13 — Makale yöntemi ve uygulama içi ölçüm özeti
+
+2026-10-21 · 0.2.13 yerel: Kullanıcı için METHODS_EVENTS_DURATIONS_TR.md yöntem taslağı/etkinlik sözlüğü/örnekler hazırlandı. Araştırmacı bölüm geçişleri altında açılır Etkinlikler ve süreler nasıl yorumlanır? özeti eklendi; olay/mesaj etiketi, görüntüleme/güncelleme/kilit, görünür+odak koşulu, hareketsizliğin dahil olması, uygulama/vaka dışı ayrımı, AI beklemesinde çift saymama, teslim ve eksik süre kuralları açıklanır. Ölçüm mantığı/DB/etiketler değişmedi. Yerel sekiz etiketin açıklamaları sentetik başlangıç tanımı olduğundan bilimsel kodlama yönergesinin tamamlanması gerektiği belgede açıklandı; güvenirlik çalışması yapılmış gibi sunulmadı. Chrome 1440/768/390 genişlikte kılavuz taşmıyor; mevcut sentetik yol verisiyle render, DB erişimi yok. JS/PHP syntax ve diff kontrolü geçti. Önceki fonksiyonel testler bu tur yeniden koşulmadı. Bu yeni düzenleme henüz commit/push edilmedi.
+
+Kanıt: test-evidence/measurement-guide-layout.txt.

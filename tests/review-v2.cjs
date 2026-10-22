@@ -1,0 +1,25 @@
+const assert=require('node:assert/strict');
+const {analysisProgress,runSequentialAnalysis}=require('../public/assets/analysis.js');
+const v={analysis_runs:[{id:'v2',review_version:2}],steps:[],decisions:[]};
+const state=()=>analysisProgress('v2',v);
+assert.deepEqual(state().map(p=>p.n),[1,2,3,5,4,6,8]);
+assert.equal(state()[0].status,'ready');
+for(const n of [1,2,3,5,4,6])v.steps.push({id:'s'+n,run_id:'v2',step:n,status:'completed',attempt:1});
+assert.deepEqual(state().find(p=>p.n===8).missingDecisions,[2,3,4,6]);
+assert.equal(state().find(p=>p.n===8).status,'locked');
+for(const n of [2,3,4,6])v.decisions.push({id:'d'+n,step_id:'s'+n,action:'accept'});
+assert.equal(state().find(p=>p.n===8).status,'ready');
+v.steps.push({id:'s8',run_id:'v2',step:8,status:'completed',attempt:1,output:{parts:[2,3,4,6].map(step=>({step,decision_id:'d'+step}))}});
+assert.equal(state().find(p=>p.n===8).done.id,'s8');
+v.steps.push({id:'s2new',run_id:'v2',step:2,status:'completed',attempt:2});
+assert.deepEqual(state().find(p=>p.n===8).missingDecisions,[2]);
+assert.equal(state().find(p=>p.n===8).done,undefined);
+assert.equal(state().find(p=>p.n===3).done.id,'s3');
+assert.equal(state().find(p=>p.n===5).done.id,'s5');
+console.log('PASS V2 STATE 10 checks: exact order, four reviews, no chat decision, independent rewrite and merge.');
+(async()=>{
+ const x={analysis_runs:[{id:'x',review_version:2}],steps:[],decisions:[]},calls=[];
+ const result=await runSequentialAnalysis('x',{load:async()=>x,execute:async n=>{calls.push(n);x.steps.push({id:'x'+n,run_id:'x',step:n,status:'completed',attempt:1});return {status:'completed'};}});
+ assert.deepEqual(calls,[1,2,3,5,4,6]);assert.equal(result.status,'review');assert.deepEqual(result.missing,[2,3,4,6]);
+ console.log('PASS V2 SEQUENCE 3 checks: automatic preparation stops for four human decisions.');
+})().catch(e=>{console.error(e);process.exitCode=1;});

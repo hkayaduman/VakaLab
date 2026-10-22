@@ -1,0 +1,18 @@
+PASS 1 edited score marked researcher origin
+PASS 2 unchanged criterion still marked AI origin
+PASS 3 original AI suggestion remains unchanged
+PASS 4 student preview does not disclose score origin
+PASS 5 student preview has no feedback origin fields
+PASS 6 student receives researcher reviewed score
+PASS 7 origin disclosure does not reveal private reasons or internals
+PASS 8 previous report snapshot unchanged
+PASS 9 explicit acceptance restores AI score origin
+PASS 10 created report retains reviewed score after later decisions
+PASS 11 feedback edit creates separate unapproved snapshot
+PASS 12 feedback edit cannot change scores
+PASS 13 researcher edited feedback reaches preview
+PASS 14 feedback editing preserves previous snapshot
+PASS 15 student downloadable report has no origin labels
+PASS 16 student cannot edit report feedback
+PASS 17 approved report feedback cannot be overwritten
+TOTAL REVIEW 17 integration checks passed; isolated SQLite/mock.

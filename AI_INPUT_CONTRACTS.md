@@ -1,5 +1,17 @@
 # AI girdi sözleşmeleri · v1
 
+0.2.18 güncellemesi: V2 için tek güncel reports.id vardır; tekrar hazırlama ve tamamlanan insan incelemesi sonrası birleştirme aynı raporu günceller. Güncelleme önceki onay/yayını kaldırır; show işlemi vaka kapanış kapısıyla onay ve yayını birlikte yapar. Öğrenciye yalnız güncel rapor açılır. Araştırmacı geçmiş listeleri kaldırıldı; iç analiz/karar kayıtları silinmez. Öğrenci Word/XLSX çıktısı yalnız güncel puan ve feedbacktir. V1 tarihsel sözleşmesi korunur; şema değişmedi.
+
+## Güncel ek sözleşme · review_version=2 · 0.2.17
+
+Tarayıcının yeni analizleri audit.analysis_run detail.review_version=2 ile ayrılır; sürüm belirtilmeyen eski istemciler v1 olarak kalır. Profil karşılaştırması yalnız başlangıç/nihai ölçüm satırlarını alır, feedback döndürür; score/scores reddedilir. Toplanmamış nihai ölçümden değişim çıkarılmaz. Başlangıç problem/decision/reason, nihai final_decision/final_reason ve reflection her biri ayrı çağrıda yalnız kendi yanıtını sources içinde alır; vaka ve seçili rubrik bağlamı eşlik eder. Her soru rubrik boyutlarıyla doğrulanır, soru puanı ağırlıklı ortalamadır; feedback puan gerekçesi ve geliştirme önerisidir. Evreler arası genel toplam yoktur.
+
+Sohbet adımı deterministiktir: mesaj sayıları ve kilitsiz AI bölümündeki bilinen görünür/odaklı ziyaret süresi; AI çağrısı, yorum, puan ve insan kararı yok. Dört insan kararı sonrası rapor birleştirilir. student-v2 üretimi ek AI çağrısı yapmaz; kabul/düzenlenen puanlar ve feedbackler aynen projekte edilir. İç kaynaklar öğrenciye gönderilmez. Aşağıdaki v1 kuralları yalnız tarihsel sözleşmeye aittir.
+
+0.2.16: Başlangıç/nihai rubrik çıktısındaki her ölçütte score/level/source/quote/reason yanında öğrenciye yönelik feedback beklenir. Feedback metni kısa Türkçe,10–2500karakter ve teknik üretim dili içermeyen açıklamadır; eski feedback alanı bulunmayan sonuçlar korunur. Araştırmacının kabul ettiği/düzenlediği feedback varsa rapor üretiminde aynı metin kullanılır. Diğer AI adımları ayrı çağrı ve girdi allowlistlerini korur. Açık tekrar isteği yalnız seçili3–7adımında yeni attempt üretir; eski çıktı silinmez, yeni başarılı çıktı insan incelemesi olmadan onaylanmış sayılmaz.
+
+0.2.15 kullanıcı kararı: analiz adımları tek başlatma sonrası sırayla tetiklenir; her AI adımı ayrı çağrıdır ve girdi ayrılığı korunur. İnsan kararları otomatik verilmez. Öğrenci raporunda AI yazdı / araştırmacı düzenledi kaynak etiketleri gösterilmez; yalnız puanlar ve feedback sunulur. Araştırmacı AI önerisini öğrenci yanıtıyla karşılaştırır, düzenler veya onaylar. Onaysız rapor feedback metni yeni sürüm olarak düzeltilebilir. İç kaynak/karar geçmişi korunur, öğrenciye verilmez. Serbest geri bildirim metninde teknik model/prompt/JSON dili kullanmama kuralı sürer. Toplamlar sistem hesabıdır; eski rapor snapshotları yeniden yazılmaz.
+
 Sağlayıcı bilinmiyor. `mock` yalnız env=test; `compatible` HTTPS Chat Completions uyumlu sunucu adapter örneğidir. Gerçek sağlayıcı/model/anahtar doğrulanmadı. Model sessiz değişmez; model + directive her istek/adımda saklanır. Gizli anahtar payload veya browser'a eklenmez. Öğrenci/analiz metni güvenilmeyen veri olarak sistem yönergesinden ayrılır; JSON doğrulaması ve insan incelemesi yine zorunlu.
 
 | İşlem | Allowlist |

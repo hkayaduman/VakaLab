@@ -1,0 +1,11 @@
+PASS 1 edited score marked researcher origin
+PASS 2 unchanged criterion still marked AI origin
+PASS 3 original AI suggestion remains unchanged
+PASS 4 student preview discloses edited score origin
+PASS 5 AI feedback remains AI origin after score edit
+PASS 6 accepted final score has AI origin
+PASS 7 origin disclosure does not reveal private reasons or internals
+PASS 8 previous report snapshot unchanged
+PASS 9 explicit acceptance restores AI score origin
+PASS 10 created report retains origin snapshot after later decisions
+TOTAL PROVENANCE 10 integration checks passed; isolated SQLite/mock.

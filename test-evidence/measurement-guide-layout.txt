@@ -1,0 +1,4 @@
+1440px {"pageFits":true,"guideFits":true,"items":8}
+768px {"pageFits":true,"guideFits":true,"items":8}
+390px {"pageFits":true,"guideFits":true,"items":8}
+Existing journey data rendered; no database access.
