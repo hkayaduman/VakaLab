@@ -19,7 +19,22 @@ denyV2(fn()=>$analysis->decide($r,$steps[5]['id'],['action'=>'accept']),'chat st
 denyV2(fn()=>$analysis->step($r,$rid,5,true),'chat statistics cannot be sent to AI for rewriting');
 $feedback='Başlangıç ve nihai güven değerleriniz arasında iki puanlık artış var; bu değişim tek başına başarı kanıtı değildir.';
 $analysis->decide($r,$steps[2]['id'],['action'=>'edit','body'=>['feedback'=>$feedback]]);
-foreach([3,4,6] as $step){$out=obj($steps[$step]['output']);$edited=['questions'=>[]];foreach($out['questions'] as $id=>$q)$edited['questions'][$id]=['score'=>2,'feedback'=>'Bu sorudaki kararınızı somut vaka kanıtlarıyla ilişkilendirerek daha açık gerekçelendirebilirsiniz.'];$analysis->decide($r,$steps[$step]['id'],['action'=>'edit','body'=>$edited]);}
+foreach([3,4,6] as $step){
+    $accepted=$analysis->decide($r,$steps[$step]['id'],['action'=>'accept']);
+    $out=obj($steps[$step]['output']);$edited=['questions'=>[]];
+    foreach($out['questions'] as $id=>$q){
+        $criteria=$q['criteria'];foreach($criteria as &$criterion){$criterion['level']='Gelişiyor';$criterion['score']=2;$criterion['reason']='Karar kısmen somut vaka kanıtlarıyla destekleniyor.';}unset($criterion);
+        $edited['questions'][$id]=['criteria'=>$criteria,'score'=>99,'feedback'=>'Bu sorudaki kararınızı somut vaka kanıtlarıyla ilişkilendirerek daha açık gerekçelendirebilirsiniz.'];
+    }
+    $decision=$analysis->decide($r,$steps[$step]['id'],['action'=>'edit','body'=>$edited]);
+    verifyV2(obj($decision['body'])['questions'][array_key_first($edited['questions'])]['score']===2,'accepted AI result can be edited; aggregate is computed from criteria '.$step);
+    verifyV2($db->one('SELECT body FROM decisions WHERE id=?',[$accepted['id']])['body']===$accepted['body'],'previous acceptance preserved '.$step);
+    $invalid=$edited;$first=array_key_first($invalid['questions']);$criterion=array_key_first($invalid['questions'][$first]['criteria']);
+    $invalid['questions'][$first]['criteria'][$criterion]['score']=4;
+    denyV2(fn()=>$analysis->decide($r,$steps[$step]['id'],['action'=>'edit','body'=>$invalid]),'inconsistent researcher level and score rejected '.$step);
+    $invalid=$edited;$invalid['questions'][$first]['criteria'][$criterion]['reason']='  ';
+    denyV2(fn()=>$analysis->decide($r,$steps[$step]['id'],['action'=>'edit','body'=>$invalid]),'blank researcher scoring reason rejected '.$step);
+}
 $merge=$analysis->step($r,$rid,8);verifyV2($merge['status']==='completed'&&count(obj($merge['output'])['parts'])===4,'only four human reviews required for report');
 $report=$analysis->report($r,'create',['run_id'=>$rid]);$student=(new Export($app))->reportData($r,$report['id'],true)['report'];
 verifyV2($student['format']==='student-v2'&&array_keys($student['sections'])===['initial','final','reflection'],'student report includes separately scored reflection');

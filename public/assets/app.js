@@ -226,7 +226,10 @@ function decisionForm(s,id,initialAction='edit'){
         document.querySelector('dialog #dialog-close')?.click();await finishReview(s.run_id,id);
     });
     dialog.querySelector('#decision-action').onchange=()=>dialog.querySelector('#review-editor').hidden=getValue('decision-action')!=='edit';
-    for(const [i,[key]] of scores.entries()){const el=dialog.querySelector('#review-score-'+i);el.min=dims[key]?.min??0;el.max=dims[key]?.max??'';el.step='any';}
+    for(const [i,[key]] of scores.entries()){
+        const el=dialog.querySelector('#review-score-'+i),level=dialog.querySelector('#review-level-'+i);el.readOnly=true;el.step='any';
+        const update=()=>{const selected=dims[key]?.levels.find(l=>l.name===level.value);el.value=selected?.score??'';};level.onchange=update;update();
+    }
 }
 function labelNames(ids){return ids.length?ids.map(id=>{const d=dash.definitions.find(d=>d.id===id);return d?`${d.name} · v${d.version}`:`Tanımı bulunamayan etiket (${id})`;}).join(', '):'Etiket yok';}
 function labelCurrent(mid,v){const state=labelReviewState(v,mid);return `<p class="label-current"><b>Güncel araştırmacı seçimi:</b> ${esc(state.history.length?labelNames(state.current):'Henüz karar verilmedi')}</p>${state.aiKnown?`<p class="muted"><b>AI önerisi (araştırmacı seçimi değildir):</b> ${esc(labelNames(state.ai))}</p>`:'<p class="muted">AI etiket önerisi henüz hazırlanmadı.</p>'}`;}

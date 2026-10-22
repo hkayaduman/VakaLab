@@ -20,4 +20,12 @@ $bad=$rubric;$bad['dimensions'][]=$rubric['dimensions'][0];$invalid['duplicate s
 $bad=$rubric;$bad['dimensions'][0]['weight']=INF;$invalid['infinite weight']=$bad;
 $bad=$rubric;$bad['dimensions'][0]['max']=NAN;$invalid['nonfinite maximum']=$bad;
 foreach($invalid as $name=>$value){$blocked=false;try{Rules::rubric($value);}catch(Fault $e){$blocked=$e->getCode()===422;}verifyRubric($blocked,$name.' rejected at server boundary');}
+$sources=['answer'=>'Somut kanıt.'];
+$scores=['scores'=>['evidence'=>['level'=>'Yetkin','score'=>4,'source'=>'answer','quote'=>'Somut kanıt.','reason'=>'İlgili kanıt kullanılmış.']]];
+verifyRubric(Rules::scores($scores,$rubric,$sources)===4.0,'matching level score accepted');
+foreach(['mismatched score'=>['score'=>0],'empty reason'=>['reason'=>''],'whitespace reason'=>['reason'=>" \t\n"],'nontext reason'=>['reason'=>[]],'nonfinite score'=>['score'=>INF],'unknown level'=>['level'=>'Unknown']] as $name=>$change){
+    $bad=$scores;$bad['scores']['evidence']=array_replace($bad['scores']['evidence'],$change);$blocked=false;
+    try{Rules::scores($bad,$rubric,$sources);}catch(Fault $e){$blocked=$e->getCode()===422;}
+    verifyRubric($blocked,$name.' rejected');
+}
 echo "TOTAL RUBRIC $count checks passed. Pure domain validation; no database/config access.\n";

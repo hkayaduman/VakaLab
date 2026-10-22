@@ -32,13 +32,22 @@ function bindReviewV2(v,appId){
     });
 }
 function editReviewV2(s,v,appId){
-    const decision=v.decisions.filter(d=>d.step_id===s.id).at(-1),out=processObject(decision?.action==='edit'?decision.body:s.output),profile=Number(s.step)===2;
+    const decision=v.decisions.filter(d=>d.step_id===s.id).at(-1),out=processObject(decision&&['accept','edit'].includes(decision.action)?decision.body:s.output),profile=Number(s.step)===2;
     const questions=Object.entries(out.questions||{});
-    showDialog(`<h2>${reviewSections.find(section=>section.step===Number(s.step)).title} · Düzenle</h2>${profile?field('review-v2-comment','Profil değişimine ilişkin yorum',out.feedback,'textarea'):questions.map(([id,q],i)=>`<fieldset class="review-question"><legend>${esc(q.title)}</legend>${field('review-v2-score-'+i,'Puan (en fazla '+q.max+')',q.score,'number')}${field('review-v2-feedback-'+i,'Puanın gerekçesi ve gelişim önerisi',q.feedback,'textarea')}</fieldset>`).join('')}<button id="commit" class="spaced">Kaydet ve kabul et</button>`,async()=>{
-        const body=profile?{feedback:getValue('review-v2-comment')}:{questions:Object.fromEntries(questions.map(([id,q],i)=>{const value=getValue('review-v2-score-'+i);demandUi(value.trim()!=='','Puanı doldurun.');return [id,{score:Number(value),feedback:getValue('review-v2-feedback-'+i)}];}))};
+    const dimensions=q=>q.input.rubric.dimensions;
+    const dialog=showDialog(`<h2>${reviewSections.find(section=>section.step===Number(s.step)).title} · Düzenle</h2>${profile?field('review-v2-comment','Profil değişimine ilişkin yorum',out.feedback,'textarea'):questions.map(([id,q],i)=>`<fieldset class="review-question"><legend>${esc(q.title)}</legend>${field('review-v2-score-'+i,'Rubrikten hesaplanan puan',q.score,'number')}${dimensions(q).map((d,j)=>{const c=q.criteria[d.id],prefix='review-v2-'+i+'-'+j;return `<fieldset><legend>${esc(d.name)}</legend>${select(prefix+'-level','Düzey',d.levels.map(l=>[l.name,l.name+' ('+l.score+' puan)']),c.level)}${field(prefix+'-reason','Puanlama gerekçesi (zorunlu)',c.reason,'textarea')}<details><summary>Dayanak pasajını düzenle</summary>${select(prefix+'-source','Dayanak yanıt',Object.keys(q.input.sources).map(k=>[k,q.title]),c.source)}${field(prefix+'-quote','Öğrenci yanıtındaki dayanak pasaj',c.quote,'textarea')}</details></fieldset>`;}).join('')}${field('review-v2-feedback-'+i,'Puanın gerekçesi ve gelişim önerisi',q.feedback,'textarea')}</fieldset>`).join('')}<button id="commit" class="spaced">Kaydet ve kabul et</button>`,async()=>{
+        const body=profile?{feedback:getValue('review-v2-comment')}:{questions:Object.fromEntries(questions.map(([id,q],i)=>{
+            const criteria=structuredClone(q.criteria);
+            dimensions(q).forEach((d,j)=>{const prefix='review-v2-'+i+'-'+j,level=d.levels.find(l=>l.name===getValue(prefix+'-level')),reason=getValue(prefix+'-reason');demandUi(reason.trim()!=='','Puanlama gerekçesini doldurun.');criteria[d.id]={...criteria[d.id],level:level.name,score:Number(level.score),reason,source:getValue(prefix+'-source'),quote:getValue(prefix+'-quote')};});
+            return [id,{criteria,feedback:getValue('review-v2-feedback-'+i)}];
+        }))};
         await api('decision',{step_id:s.id,action:'edit',body,reason:'Araştırmacı bu bölümün yorumunu veya puanını düzenleyerek kabul etti.'});document.querySelector('dialog #dialog-close')?.click();await finishReview(s.run_id,appId);
     });
-    questions.forEach(([,q],i)=>{const input=document.getElementById('review-v2-score-'+i);input.min=q.min;input.max=q.max;input.step='any';});
+    questions.forEach(([,q],i)=>{
+        const input=dialog.querySelector('#review-v2-score-'+i);input.readOnly=true;input.step='any';
+        const update=()=>{let sum=0,weight=0;dimensions(q).forEach((d,j)=>{const level=d.levels.find(l=>l.name===getValue('review-v2-'+i+'-'+j+'-level'));sum+=Number(level.score)*Number(d.weight);weight+=Number(d.weight);});input.value=Math.round(sum/weight*10000)/10000;};
+        dimensions(q).forEach((d,j)=>dialog.querySelector('#review-v2-'+i+'-'+j+'-level').onchange=update);update();
+    });
 }
 
 function reviewReportActions(run,v,{merge,busy,decided}){

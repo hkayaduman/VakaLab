@@ -87,7 +87,18 @@ final class Review {
         $original=obj($s['output']);$body=in_array($action,['accept','edit'],true)?$original:[];
         if($action==='edit'){
             if($step===2)$body['feedback']=self::text($p['body']['feedback']??null);
-            else foreach($original['questions'] as $id=>$q){$edit=$p['body']['questions'][$id]??[];$score=$edit['score']??null;demand(is_numeric($score)&&is_finite((float)$score)&&(float)$score>=$q['min']&&(float)$score<=$q['max'],'Puan rubrik aralığında olmalı');$body['questions'][$id]['score']=(float)$score;$body['questions'][$id]['feedback']=self::text($edit['feedback']??null);}
+            else foreach($original['questions'] as $id=>$q){
+                $edit=$p['body']['questions'][$id]??[];
+                $criteria=$edit['criteria']??[];
+                $score=Rules::scores(['scores'=>$criteria],$q['input']['rubric'],$q['input']['sources']);
+                $body['questions'][$id]['criteria']=$criteria;
+                $body['questions'][$id]['score']=$score;
+                $body['questions'][$id]['feedback']=self::text($edit['feedback']??null);
+            }
+        }
+        if($action==='accept'&&$step!==2)foreach($original['questions'] as $id=>$q){
+            $body['questions'][$id]['score']=Rules::scores(['scores'=>$q['criteria']],$q['input']['rubric'],$q['input']['sources']);
+            $body['questions'][$id]['feedback']=self::text($q['feedback']);
         }
         $decision=['id'=>uid(),'step_id'=>$s['id'],'actor'=>$u['id'],'action'=>$action,'body'=>js($body),'reason'=>trim($p['reason']??'')?:'Araştırmacı bölüm kararını kaydetti.','created_at'=>now()];
         $db->tx(function()use($db,$s,$decision,$u,$step){$db->one('SELECT id FROM analysis_runs WHERE id=?'.($db->sqlite()?'':' FOR UPDATE'),[$s['run_id']]);demand(!$db->one("SELECT id FROM analysis_steps WHERE run_id=? AND status='running'",[$s['run_id']]),'Değerlendirme hazırlanıyor',409);demand($this->current($s['run_id'],$step)['id']===$s['id'],'Yeni sonucu inceleyin',409);$db->insert('decisions',$decision);$run=$db->one('SELECT app_id FROM analysis_runs WHERE id=?',[$s['run_id']]);$db->q('UPDATE reports SET approved_at=NULL,published_at=NULL WHERE app_id=?',[$run['app_id']]);$db->audit($u['id'],'decision',$decision['id'],$decision['reason']);});return $decision;
