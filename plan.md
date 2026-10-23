@@ -1,5 +1,11 @@
 # Geliştirme Planı ve Durum Takibi
 
+## 23 Ekim 2026 yerel hazırlık
+
+AUDIT-01 eski v1 teslim bütünlüğü düzeltildi; AUDIT-02 puan–düzey/gerekçe düzeltmesi güncel kodda doğrulandı. Yeni/eski teslim ayrımı ve değişmez veri regresyonları eklendi. PHP güvenlik güncellemesi ve 8.4.27 uyumluluk kayıtları korundu; güncel test kanıtları TEST_RESULTS.md ve `test-evidence/local-readiness-2026-10-23/` içinde. README/durum/yayın/hata belgeleri eşitlendi. Yerel MariaDB çalışma dosyaları ve anahtarları Git dışında tutulur; dosyalar silinmez. Mevcut çalışma DB'sine migration/seed/reset yok; bu tur commit/push/dağıtım yok.
+
+Sonraki dış işler: ayrı test hostingi + gerçek AI, kurum rubriği/onam/saklama ve mesaj kod kitabı, gerçek Disco import, hedef cihaz/kesinti kabulü. Yeni manuel test batch'i başlatma. Aşağıdaki eski açık-hata ve teslim kayıtları kendi tarihlerine aittir; güncel durum için bu bölüm ve STATUS_REVIEW.md esas alınır.
+
 ## Güncel kullanıcı kararı — 0.2.18 · 2026-10-21
 
 Araştırmacı ekranından önceki yorum/kararlar, önceki değerlendirmeler ve Rapor geçmişi · Onay ve yayın listeleri kaldırıldı. Tek güncel rapor alanında yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster var. Word ve Excel doğrudan öğrenci projeksiyonunu indirir. Excel gerçek XLSX dosyasıdır; profil yorumu ve altı soru puanı/feedbacki içerir, iç karar veya geçmiş içermez. PDF backend desteği korunur fakat bu alanda PDF/önizleme düğmesi yoktur (kullanıcının son tercihi).

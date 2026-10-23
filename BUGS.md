@@ -1,6 +1,12 @@
 # Hatalar, düzeltmeler ve açık doğrulamalar
 
-## 2026-10-21 durum incelemesi — yeni açık bulgular
+## 2026-10-23 güncel durum
+
+- **AUDIT-01 · DÜZELTİLDİ (yerel):** v1 bütünlük adımı yeni teslim kontrolü yerine geçmiş teslim kontrolünü kullanır. Sonradan eklenen `final_severity` eksikse `uncollected_fields` içinde belirtilir; tahmini değer yazılmaz. Yeni teslim gereksinimleri korunur. `tests/legacy-submission.php`: 20 kontrol, PHP 8.3.36 ve 8.4.27 üzerinde geçti; eski v1 akışı/raporu, v2 uyumluluğu, değişmez veriler ve geçersiz yeni teslim reddi kapsanır.
+- **AUDIT-02 · DÜZELTİLDİ:** `9098ff7` commit'inde puan–düzey eşleşmesi ve dolu gerekçe kontrolü uygulanmış. `tests/rubric.php` 21 kontrol ve `tests/review-v2.php` 68 kontrol bu incelemede yeniden geçti. AI sonucu ve insan düzenlemesi ortak sunucu doğrulamasını kullanır.
+- OPEN-01…06 dış ortam/araştırma kabulleri açık. Yeni manuel batch başlatılmadı. Kanıt: `test-evidence/local-readiness-2026-10-23/`; güncel sayılar TEST_RESULTS.md içinde.
+
+## 2026-10-21 tarihli teşhis — tarihsel kayıt
 
 - **AUDIT-01 · P1 · AÇIK:** final_severity eklenmeden teslim edilmiş kayıt, Analysis::step(1) → Rules::final nedeniyle failed olur; sonraki analiz engellenir. Yalnız bellek içi sentetik DB'de yeniden üretildi. Eski ham yanıtları değiştirmeden geçmiş kayıt doğrulaması ayrılmalı.
 - **AUDIT-02 · P2 · AÇIK:** Rules::scores puan-düzey eşleşmesini ve dolu puan açıklamasını doğrulamıyor. Sentetik rubrikte Yetersiz=0 iken score=4/level=Yetersiz/reason=boş kabul edildi. AI ve araştırmacı düzenleme aynı kontrolü kullanıyor.

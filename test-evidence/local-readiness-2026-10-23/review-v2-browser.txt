@@ -1,0 +1,46 @@
+PASS V2 BROWSER 1 history panels removed
+PASS V2 BROWSER 2 invalid profile feedback stops the sequence
+PASS V2 BROWSER 3 sections prepared serially in requested order
+PASS V2 BROWSER 4 exactly five simple sections
+PASS V2 BROWSER 5 profile only has comparison and editable feedback
+PASS V2 BROWSER 6 profile shows missing final fields and real confidence change
+PASS V2 BROWSER 7 chat only displays statistics without score, comment or decisions
+PASS V2 BROWSER 8 section 3 scores each answer separately
+PASS V2 BROWSER 9 section 4 scores each answer separately
+PASS V2 BROWSER 10 section 6 scores each answer separately
+PASS V2 BROWSER 11 report waits for four human reviews
+PASS V2 BROWSER 12 profile comment can be rejected without score
+PASS V2 BROWSER 13 profile edit contains only a comment
+PASS V2 BROWSER 14 accepted AI evaluation remains editable 3
+PASS V2 BROWSER 15 reopened editor retains latest researcher evaluation 3
+PASS V2 BROWSER 16 accepted AI evaluation remains editable 4
+PASS V2 BROWSER 17 reopened editor retains latest researcher evaluation 4
+PASS V2 BROWSER 18 accepted AI evaluation remains editable 6
+PASS V2 BROWSER 19 reopened editor retains latest researcher evaluation 6
+PASS V2 BROWSER 20 four decisions automatically merge without reviewing chat statistics
+PASS V2 BROWSER 21 reflection alone can be recalculated
+PASS V2 BROWSER 22 profile and other question scores unchanged
+PASS V2 BROWSER 23 new reflection result needs another decision
+PASS V2 BROWSER 24 five-section review fits 1440px
+PASS V2 BROWSER 25 five-section review fits 768px
+PASS V2 BROWSER 26 five-section review fits 390px
+PASS V2 BROWSER 27 new report has separately scored reflection
+PASS V2 BROWSER 28 exact reviewed comments and question scores reach report without further AI generation
+PASS V2 BROWSER 29 report has no chat opinion, internal decisions or invented aggregate
+PASS V2 BROWSER 30 only four requested report buttons
+PASS V2 BROWSER 31 no comment or evaluation history
+PASS V2 BROWSER 32 show button explains collection must close first
+PASS V2 BROWSER 33 student v2 docx downloads
+PASS V2 BROWSER 34 student v2 xlsx downloads
+PASS V2 BROWSER 35 internal review export remains available
+PASS V2 BROWSER 36 prepare overwrites the same report
+PASS V2 BROWSER 37 downloads wait for regenerated result review
+PASS V2 BROWSER 38 accepted recalculation automatically updates the same report
+PASS V2 BROWSER 39 single show button approves and publishes the current report
+PASS V2 BROWSER 40 blank scoring reason keeps the editor open
+PASS V2 BROWSER 41 accepted evaluation can be edited again after report publication
+PASS V2 BROWSER 42 editing withdraws prior publication and requires showing the updated report again
+PASS V2 BROWSER 43 four report actions fit 1440px
+PASS V2 BROWSER 44 four report actions fit 390px
+PASS V2 BROWSER 45 no browser JavaScript errors:
+TOTAL V2 BROWSER 45 checks passed. Isolated SQLite/mock; no physical-device or real-provider acceptance.

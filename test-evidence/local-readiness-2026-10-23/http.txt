@@ -1,0 +1,43 @@
+PASS HTTP 1 unauthenticated me denied
+PASS HTTP 2 CSRF missing denied
+PASS HTTP 3 student dashboard forbidden
+PASS HTTP 4 researcher dashboard allowed
+PASS HTTP 5 private participant note saved
+PASS HTTP 6 private participant note excluded from student me
+PASS HTTP 7 student onboarding preserves private researcher note
+PASS HTTP 8 student cannot close study
+PASS HTTP 9 unassigned HTTP denied
+PASS HTTP 10 HTTP AI initial gate
+PASS HTTP 11 HTTP atomic initial lock
+PASS HTTP 12 HTTP IDOR view denied
+PASS HTTP 13 delayed provider running
+PASS HTTP 14 same-session autosave during AI 0.000s
+PASS HTTP 15 parallel second message rejected
+PASS HTTP 16 parallel submit rejected
+PASS HTTP 17 delayed AI completes
+PASS HTTP 18 HTTP duplicate key idempotent
+PASS HTTP 19 only one user and one assistant message
+PASS HTTP 20 mock provider error recorded
+PASS HTTP 21 explicit retry successful
+PASS HTTP 22 retry does not duplicate student message
+PASS HTTP 23 attempt history preserved
+PASS HTTP 24 partial response explicitly marked
+PASS HTTP 25 researcher resolves expired reservation
+PASS HTTP 26 late fenced reply not committed
+PASS HTTP 27 early report denied over HTTP
+PASS HTTP 28 foreign report download denied
+PASS HTTP 29 frozen account login rejected
+PASS HTTP 30 student view excludes internal analysis and labels
+PASS HTTP 31 no destructive student endpoint
+PASS HTTP 32 no permanent delete admin endpoint
+PASS HTTP 33 case collection close HTTP
+PASS HTTP 34 separate HTTP publication
+PASS HTTP 35 published own report readable
+PASS HTTP 36 student real PDF download over HTTP
+PASS HTTP 37 student real DOCX download over HTTP
+PASS HTTP 38 student DOCX excludes private appendix
+PASS HTTP 39 researcher DOCX contains private appendix
+PASS HTTP 40 real XLSX HTTP download
+PASS HTTP 41 closed case blocks student changes
+PASS HTTP 42 logout revokes session
+TOTAL HTTP 42 assertions passed. Two PHP workers; SQLite; mock.

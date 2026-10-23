@@ -1,5 +1,17 @@
 # Proje Devam Bağlamı
 
+## Yerel hazırlık — 2026-10-23
+
+Kullanıcı önce yerelde yapılabilecek işleri sırayla tamamlama ve gerekli testleri çalıştırma talimatı verdi. AUDIT-02'nin `9098ff7` içinde zaten düzeltildiği doğrulandı; hata belgeleri gerideydi. AUDIT-01 v1 bütünlük adımında gerçekten sürüyordu: yeni `tests/legacy-submission.php` önce hatayı üretti. `Rules::submitted` geçmiş yanıtların profil/metin/aralık bütünlüğünü denetler, eksik `final_severity` için `uncollected_fields` döndürür. `Analysis` v1 adım1 bu yolu kullanır; yeni teslimin `Rules::final` zorunlulukları değişmez. v2 sözleşmesi korunur. Eski yanıt/snapshot/teslim kilidi yazılmaz. 20 yeni regresyon her iki PHP sürümünde geçti. Güncel kanıtlar TEST_RESULTS.md ve `test-evidence/local-readiness-2026-10-23/` içinde.
+
+README/BUGS/STATUS_REVIEW/RELEASE_READINESS/plan güncellendi; eski kayıtlar tarihçe olarak korunur. Yerel HEAD `9098ff7`, uzak dal fetch edilmedi. Çalışma ağacındaki önceki PHP güvenlik/8.4.27 değişiklikleri korundu. Kök dizine taşmış MariaDB çalışma dosyaları ve PEM anahtarları yalnız .gitignore ile teslim dışında tutuldu; silinmedi/okunmadı. Çalışma DB'sine migration/seed/reset yok; commit/push/dağıtım yok. Sonraki dış işler: ayrı test hostingi ve gerçek AI, kurum rubriği/kod kitabı/onam/saklama, gerçek Disco import ve hedef cihaz/kesinti kabulü. Yeni manuel batch isteme.
+
+## PHP güvenlik güncellemesi — 2026-10-23
+
+Yerel `.tools/php/php.exe` artık PHP 8.3.36 (NTS VS16 x64). Resmî ZIP SHA256: `3c9242622c7402b47c38d2ec2ed779cef3a290fd6f2bde6c35f9c482699e7900`. CVE-2026-109618 / CVE-2026-109619 için mevcut 8.3 dalı korundu; 8.4'e geçilmedi. Eski runtime `.tools/php-8.3.35-backup-20261023` altında geri dönüş yedeğidir; güvenlik açığı içerdiğinden web sunucusu olarak başlatılmamalı. Mevcut php.ini ve yerel VC runtime DLL'leri korundu; yeni PHP'nin eklentileri kendi paketinden geldi. Geçiş anında eski runtime'dan çalışan PHP süreci yoktu.
+
+Composer PHP koşulu `~8.3.36 || ~8.4.27 || ^8.5.12`; lock content hash/platform güncel, kütüphane sürümleri değişmedi. `bin/console.php check` eski yamasız sürümleri reddeder. Ortam/Composer kontrolleri, 81 SQLite, 68 review-v2, 39 export, 42 HTTP/iki worker ve 81 MariaDB kontrolü geçti; ayrı restore DB'de 8 tablo sayısı eşleşti. Kanıtlar `test-evidence/php-security-2026-10-23/`. İlk sandbox ortam kontrolü storage erişim kısıtına takıldı; normal izinli son koşu geçti. Testler ayrı sentetik SQLite/MariaDB/mock ortamında; çalışma DB'sine migration/seed/reset yok. Canlı hosting güncellenmedi/doğrulanmadı; bu işlem yalnız yerel PHP'yi kapsar. Commit/push yok.
+
 ## Güncel kullanıcı kararı — 0.2.18 · 2026-10-21
 
 Araştırmacı ekranından önceki yorum/kararlar, önceki değerlendirmeler ve Rapor geçmişi · Onay ve yayın listeleri kaldırıldı. Tek güncel rapor alanında yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster var. Word ve Excel doğrudan öğrenci projeksiyonunu indirir. Excel gerçek XLSX dosyasıdır; profil yorumu ve altı soru puanı/feedbacki içerir, iç karar veya geçmiş içermez. PDF backend desteği korunur fakat bu alanda PDF/önizleme düğmesi yoktur (kullanıcının son tercihi).
@@ -413,3 +425,9 @@ Kullanıcı süreyi açıkça sekmeye girişten sonraki sekmeye geçişe kadar g
 ## GitHub teslimi — 2026-10-21
 
 Kullanıcı tüm biriken düzenlemelerin GitHub'a gönderilmesini istedi. Hedef origin/main (hkayaduman/VakaLab), başlangıç commit'i 194f9d0f5b4be549c1921b027a46204ed6fc7960; uzak dal bu commit ile aynı doğrulandı. 0.2.10 kod/belge/test kanıtları 5f8a34964654bd3cbc94dc469447328ee7aab243 commit'iyle oluşturuldu ve origin/main dalına başarıyla gönderildi. 198 aday dosyada sır örüntüsü ve yapılandırılmış anahtar eşleşmesi bulunmadı; config/local.php, storage DB, vendor, .tools ve tests/tmp dışarıda. 41 PHP/JS dosyasında sözdizimi geçti; mevcut son testler yeniden yapılmış gibi yazılmadı. Gerçek ortam kabulü ayrı kalır. İlk push başarılı: 194f9d0 → 5f8a34964654bd3cbc94dc469447328ee7aab243. Bu teslim sonucu ayrı belge commit'iyle kayda geçiriliyor; üretime dağıtım yapılmadı.
+
+## PHP 8.4.27 uyumluluk doğrulaması · 2026-10-23
+
+Hostingini PHP 8.4.27'ye aldığını belirten kullanıcının uyumluluk sorusu üzerine resmî Windows NTS VS17 x64 paketi ayrı `.tools/php-8.4.27-test` klasöründe test edildi. SHA256 `93bd8a815a52156606fb906d0573437908c61f96e2cc52c03a51e36a41bf5236` doğrulandı. Varsayılan yerel PHP 8.3.36 olarak kaldı.
+
+Composer platform gereksinimleri ve CLI ortam kontrolü geçti. 81 SQLite genel (Word/PDF/XLSX dahil), 68 review-v2, 39 export, 42 gerçek HTTP/oturum/iki worker ve 81 MariaDB kontrolü: toplam 311 geçti. Ayrı restore DB'de 8 tablo sayısı eşleşti. Üç doğrudan PHP grubu E_ALL (32767) ile çalıştı; çıktılarda PHP Warning/Deprecated/Fatal görülmedi. Kanıtlar `test-evidence/php-8.4.27-compatibility/`. Ürün kodunda uyumluluk düzeltmesi gerekmedi. Çalışma verisine migration/seed/reset yok; canlı hosting/gerçek AI/fiziksel cihaz doğrulaması değildir.

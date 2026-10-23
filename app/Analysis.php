@@ -33,7 +33,7 @@ final class Analysis {
             $s=['id'=>uid(),'run_id'=>$rid,'step'=>$step,'attempt'=>$attempt,'status'=>'running','input'=>js($this->payload($run,$step)),'output'=>'{}','model'=>$this->app->config['ai']['model'],'directive'=>'analysis-v1','created_at'=>now()];$db->insert('analysis_steps',$s);$db->audit($u['id'],'analysis_step',$s['id'],'',['run'=>$rid,'step'=>$step]);return $s;});
         try{
             $run=$db->one('SELECT * FROM analysis_runs WHERE id=?',[$rid]);$a=$db->one('SELECT * FROM applications WHERE id=?',[$run['app_id']]);$d=obj($a['draft']);
-            if($step===1){Rules::initial($d);Rules::final($d);$out=['integrity'=>'submitted','revision'=>(int)$a['revision'],'warnings'=>$db->all("SELECT id,status,error FROM ai_requests WHERE app_id=? AND status<>'completed'",[$a['id']])];}
+            if($step===1){$uncollected=Rules::submitted($d);$out=['integrity'=>'submitted','revision'=>(int)$a['revision'],'uncollected_fields'=>$uncollected,'warnings'=>$db->all("SELECT id,status,error FROM ai_requests WHERE app_id=? AND status<>'completed'",[$a['id']])];}
             elseif($step===2)$out=['initial_confidence'=>$d['confidence'],'final_confidence'=>$d['final_confidence'],'difference'=>$d['final_confidence']-$d['confidence']];
             elseif($step===8)$out=$this->assemble($run);
             else{$payload=obj($s['input']);$out=(new Ai($this->app->config))->call($payload,true);

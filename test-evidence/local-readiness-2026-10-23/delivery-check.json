@@ -1,0 +1,26 @@
+{
+  "candidate_file_count": 62,
+  "secret_pattern_hits": [],
+  "documented_placeholders": [
+    {
+      "path": "INSTALL_SHARED_HOSTING.md",
+      "reason": "documented password placeholder; not a credential"
+    }
+  ],
+  "forbidden_tracked": [],
+  "excluded_local_files": {
+    "config/local.php": true,
+    "private_key.pem": true,
+    "public_key.pem": true,
+    "ibdata1": true,
+    "ib_logfile0": true,
+    "aria_log_control": true,
+    "undo001": true,
+    "undo002": true,
+    "undo003": true
+  },
+  "final_log_warnings": [],
+  "remote_access": false,
+  "commit_created": false,
+  "working_database_used": false
+}

@@ -1,4 +1,12 @@
-# VakaLab durum incelemesi — 21 Ekim 2026
+# VakaLab durum incelemesi — 23 Ekim 2026
+
+Yerel güncel HEAD `9098ff7`. Beş bölümlü v2 değerlendirme, dört insan kararı ve tek güncel öğrenci raporu uygulanmış durumda. Uzak dal bu incelemede sorgulanmadı. AUDIT-01 yerelde düzeltildi; AUDIT-02 son commit'te zaten düzeltilmişti ve regresyonları yeniden geçti. PHP 8.3.36 ve ayrı 8.4.27 test runtime'ı mevcut; Composer/CLI güvenlik gereksinimleri güncel. Bu turdaki yerel değişiklikler henüz commit/push edilmedi.
+
+Eski v1 teslimin eksik nihai ciddiyet alanı tahmin edilmez; bütünlük çıktısında ölçülmemiş olarak belirtilir. Yeni teslimde aynı alan hâlâ zorunludur. Yeni test önce eski kodda hatayı üretti, düzeltmeden sonra 20 kontrol geçti. Mevcut öğrenci verisi, teslim kilitleri ve snapshotlar değişmedi. Tam test kapsamı ve ilk sandbox kısıtı TEST_RESULTS.md içinde; kanıtlar `test-evidence/local-readiness-2026-10-23/`.
+
+Yereldeki kod bulguları kapandı. Sonraki işler ayrı test hostingi/HTTPS/yedek geri dönüşü, gerçek AI, kurum rubriği ve kodlama yönergesi, onam/saklama kararları, gerçek Disco import ve hedef cihaz/kesinti kabulüdür. Yerel otomatik başarı bu dış kabullerin yerine geçmez. Yeni manuel batch başlatılmadı.
+
+## 21 Ekim 2026 incelemesi — tarihsel kayıt
 
 Çalışan bir yerel araştırma pilotu mevcut. Öğrenci akışı, araştırmacı yönetimi, süreç ölçümü, analiz, rapor ve dışa aktarma uygulanmış durumda. Gerçek katılımcıyla veri toplamaya hazır kabul edilmemeli: aşağıdaki iki kod bulgusu ve dış ortam kabulleri açık.
 

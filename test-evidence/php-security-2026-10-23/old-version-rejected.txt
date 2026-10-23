@@ -1,0 +1,13 @@
+PHP 8.3.35
+pdo: OK
+pdo_mysql: OK
+mbstring: OK
+curl: OK
+zip: OK
+gd: OK
+dom: OK
+xml: OK
+xmlreader: OK
+xmlwriter: OK
+fileinfo: OK
+PHP güvenlik güncellemesi gerekli: 8.3.36+, 8.4.27+ veya 8.5.12+ ve gerekli eklentiler

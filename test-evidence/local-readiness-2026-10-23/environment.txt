@@ -1,0 +1,13 @@
+PHP 8.3.36
+pdo: OK
+pdo_mysql: OK
+mbstring: OK
+curl: OK
+zip: OK
+gd: OK
+dom: OK
+xml: OK
+xmlreader: OK
+xmlwriter: OK
+fileinfo: OK
+Vendor: OK

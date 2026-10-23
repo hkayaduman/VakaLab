@@ -1,0 +1,69 @@
+PASS 1 new contract recorded without schema change
+PASS 2 prepared section 1
+PASS 3 prepared section 2
+PASS 4 prepared section 3
+PASS 5 prepared section 5
+PASS 6 prepared section 4
+PASS 7 prepared section 6
+PASS 8 profile has comparison and feedback without score
+PASS 9 real confidence difference; no invented missing profile measurement
+PASS 10 separate question scores for section 3
+PASS 11 isolated answer payload problem
+PASS 12 rubric score and improvement feedback problem
+PASS 13 isolated answer payload decision
+PASS 14 rubric score and improvement feedback decision
+PASS 15 isolated answer payload reason
+PASS 16 rubric score and improvement feedback reason
+PASS 17 separate question scores for section 4
+PASS 18 isolated answer payload final_decision
+PASS 19 rubric score and improvement feedback final_decision
+PASS 20 isolated answer payload final_reason
+PASS 21 rubric score and improvement feedback final_reason
+PASS 22 separate question scores for section 6
+PASS 23 isolated answer payload reflection
+PASS 24 rubric score and improvement feedback reflection
+PASS 25 chat counts and 120-second navigation interval are computed exactly
+PASS 26 chat has only computed statistics without AI scoring/comment
+PASS 27 chat statistics have no human score/feedback decision
+PASS 28 chat statistics cannot be sent to AI for rewriting
+PASS 29 accepted AI result can be edited; aggregate is computed from criteria 3
+PASS 30 previous acceptance preserved 3
+PASS 31 inconsistent researcher level and score rejected 3
+PASS 32 blank researcher scoring reason rejected 3
+PASS 33 accepted AI result can be edited; aggregate is computed from criteria 4
+PASS 34 previous acceptance preserved 4
+PASS 35 inconsistent researcher level and score rejected 4
+PASS 36 blank researcher scoring reason rejected 4
+PASS 37 accepted AI result can be edited; aggregate is computed from criteria 6
+PASS 38 previous acceptance preserved 6
+PASS 39 inconsistent researcher level and score rejected 6
+PASS 40 blank researcher scoring reason rejected 6
+PASS 41 only four human reviews required for report
+PASS 42 student report includes separately scored reflection
+PASS 43 accepted profile comment reaches report unchanged
+PASS 44 report keeps each question separate
+PASS 45 reflection score preserved; no invented overall aggregate
+PASS 46 report includes the original reviewed student answer
+PASS 47 old reports recover answer from reviewed sources rather than live draft
+PASS 48 answer projection does not expose private scoring input
+PASS 49 student report excludes internal review and chat commentary
+PASS 50 previous report snapshots untouched
+PASS 51 profile comment can be regenerated independently
+PASS 52 new profile feedback requires a new decision
+PASS 53 other scores unaffected by profile rewrite
+PASS 54 profile rejection is a valid explicit review decision
+PASS 55 edited question scores remain bounded by rubric
+PASS 56 legacy runs preserved
+PASS 57 unpublished review report is unavailable to student
+PASS 58 reflection feedback edit updates the single unapproved report
+PASS 59 report feedback editing preserves scores without adding another report
+PASS 60 one-click student visibility respects open collection
+PASS 61 approved review report cannot be overwritten
+PASS 62 review report cannot be published while collection is open
+PASS 63 student receives only the approved published review projection
+PASS 64 reopening collection hides published review report
+PASS 65 preparing again overwrites the same report
+PASS 66 recalculation withdraws old student report pending review
+PASS 67 new human review automatically replaces the single report and requires showing again
+PASS 68 student sees exactly one current report
+TOTAL V2 68 checks passed; isolated SQLite/mock.

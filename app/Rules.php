@@ -16,6 +16,14 @@ final class Rules {
         demand($d['final_confidence']!==null,'Nihai güveni seçin');
         demand(($d['final_severity']??null)!==null,'Nihai algılanan ciddiyeti seçin');
     }
+    public static function submitted(array $d): array {
+        // Validate historical submissions without inventing later-added measurements.
+        // New submissions must continue to use final(), including final_severity.
+        $validated=self::draft($d);self::initial($validated);
+        foreach(['final_decision','final_reason','reflection'] as $key)demand(trim($validated[$key])!=='','Teslim edilmiş yanıt eksik');
+        demand($validated['final_confidence']!==null,'Teslim edilmiş nihai güven eksik');
+        return $validated['final_severity']===null?['final_severity']:[];
+    }
     public static function rubric(array $r): void {
         demand(isset($r['text'],$r['dimensions'])&&is_string($r['text'])&&trim($r['text'])!==''&&is_array($r['dimensions'])&&count($r['dimensions'])>0,'Rubrik metni ve boyutlar gerekli');$ids=[];
         foreach($r['dimensions'] as $d){

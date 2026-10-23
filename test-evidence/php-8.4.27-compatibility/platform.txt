@@ -1,0 +1,21 @@
+Checking non-dev platform requirements for packages in the vendor dir
+ext-ctype     8.4.27     success
+ext-curl      8.4.27     success
+ext-dom       20031129   success
+ext-fileinfo  8.4.27     success
+ext-filter    8.4.27     success
+ext-gd        8.4.27     success
+ext-iconv     8.4.27     success
+ext-json      8.4.27     success
+ext-libxml    8.4.27     success
+ext-mbstring  8.4.27     success
+ext-pdo       8.4.27     success
+ext-pdo_mysql 8.4.27     success
+ext-simplexml 8.4.27     success
+ext-xml       8.4.27     success
+ext-xmlreader 8.4.27     success
+ext-xmlwriter 8.4.27     success
+ext-zip       1.22.8     success
+ext-zlib      8.4.27     success
+php           8.4.27     success
+php-64bit     8.4.27     success

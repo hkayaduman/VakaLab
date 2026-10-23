@@ -1,4 +1,12 @@
-# Yayın öncesi durum — 0.2.10 · 2026-10-21
+# Yayın öncesi durum — 2026-10-23
+
+Güncel yerel uygulama: 0.2.18 beş bölümlü v2 değerlendirme, dört insan kararı ve tek güncel öğrenci raporu. Yerel HEAD `9098ff7`; uzak dal bu incelemede sorgulanmadı. AUDIT-01 düzeltildi, AUDIT-02 düzeltmesi yeniden doğrulandı. PHP güvenlik güncellemesi ve yerel hazırlık henüz commit/push edilmedi. Güncel otomatik kanıtlar TEST_RESULTS.md ve `test-evidence/local-readiness-2026-10-23/` içinde.
+
+Güncel rapor yolu: Genel durum → vaka/öğrenci → Çalışmayı aç → Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster. Öğrenciye göster tek işlemle onay ve yayın yapar; vaka veri toplama kapanış/kişisel ek süre kapısı geçerlidir. Yeni analiz, başarılı yeniden hesaplama veya karar değişikliği görünürlüğü kapatır; güncel inceleme tamamlanınca aynı rapor hazırlanıp yeniden gösterilir. Önceki v1 rapor/snapshot açıklamaları aşağıda tarihsel akışı anlatır.
+
+Yerel kontroller dışındaki kalanlar: ayrı test hostinginde kurulum/HTTPS/worker/izinler/yedekten dönüş; gerçek sağlayıcı ve AI çıktısı kalitesi; gerçek rubrik/kod kitabı/kurum politikaları; hedef cihaz ve gerçek kesinti kurtarması; hedef Disco uygulamasında import. Gerekli bilgi/erişim tablosu aşağıdadır. Yeni manuel batch başlatılmayacak; otomatik yapılamayan kritik kabul kısa tutulacak.
+
+## 0.2.10 ve önceki yayın hazırlığı — tarihsel kayıt
 
 0.2.10: Sade öğrenci raporu, okunabilir süreç ekranı, sıralı/etiketli AI eylemleri ve ayrı AI hazırlık beklemesi eklendi. Son kapsam: 82 navigation, 115 Chrome, 38 export, 28 etiket/süreç ve 75 SQLite kontrolü; diğer geçmiş testler tarihsel kanıttır. Gerçek AI/hosting/Disco import kabulü açık.
 

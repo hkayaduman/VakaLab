@@ -6,7 +6,8 @@ try{
     $cmd=$argv[1]??'help';
     if($cmd==='check'){
         echo 'PHP '.PHP_VERSION.PHP_EOL;$missing=[];foreach(['pdo','pdo_mysql','mbstring','curl','zip','gd','dom','xml','xmlreader','xmlwriter','fileinfo'] as $ext){echo "$ext: ".(extension_loaded($ext)?'OK':'MISSING').PHP_EOL;if(!extension_loaded($ext))$missing[]=$ext;}
-        demand(PHP_VERSION_ID>=80300&&!$missing,'Ortam gereksinimleri eksik',503);demand(is_writable(__DIR__.'/../storage'),'storage yazılabilir değil');echo 'Vendor: '.(class_exists('Mpdf\\Mpdf')?'OK':'MISSING').PHP_EOL;exit;
+        $patchedPhp=(PHP_VERSION_ID>=80336&&PHP_VERSION_ID<80400)||(PHP_VERSION_ID>=80427&&PHP_VERSION_ID<80500)||PHP_VERSION_ID>=80512;
+        demand($patchedPhp&&!$missing,'PHP güvenlik güncellemesi gerekli: 8.3.36+, 8.4.27+ veya 8.5.12+ ve gerekli eklentiler',503);demand(is_writable(__DIR__.'/../storage'),'storage yazılabilir değil');echo 'Vendor: '.(class_exists('Mpdf\\Mpdf')?'OK':'MISSING').PHP_EOL;exit;
     }
     if($cmd==='researcher-sql'){
         $login=$argv[2]??'';$password=getenv('VAKALAB_ADMIN_PASSWORD')?:'';demand(preg_match('/^[A-Za-z0-9@._-]{3,100}$/',$login)===1&&strlen($password)>=14,'ASCII hesap adı ve VAKALAB_ADMIN_PASSWORD (14+ karakter) gerekli');

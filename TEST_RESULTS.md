@@ -1,5 +1,38 @@
 # Gerçek test sonuçları — 2026-10-20
 
+## Yerel hazırlık ve hata kapatma — 2026-10-23
+
+AUDIT-01 için yeni regresyon eski kodda ilk bütünlük kontrolünde başarısız oldu; `Rules::submitted` ayrımından sonra geçti. Tarihsel v1 teslim/rapor akışı ve v2 uyumluluğu, eksik ölçümün bilinmiyor kalması, eski draft/snapshot/teslim kilidinin değişmemesi ve yeni eksik teslimin reddi doğrulandı. AUDIT-02'nin `9098ff7` düzeltmesi yeniden test edildi; puan–düzey uyuşmazlığı/boş gerekçe reddediliyor ve kabul edilmiş değerlendirme tekrar düzenlenebiliyor.
+
+Kanıt klasörü: `test-evidence/local-readiness-2026-10-23/`. Aşağıdaki sonuçlar bu tur gerçekten çalıştırıldı; gruplar örtüşen kapsamlar içerir.
+
+| Grup | Sonuç | Kanıt |
+|---|---|---|
+| Eski teslim regresyonu (PHP 8.3.36) | 20 geçti | legacy-submission.txt |
+| Rubrik puan/düzey/gerekçe | 21 geçti | rubric.txt |
+| SQLite genel + Word/PDF/XLSX | 81 geçti | run.txt |
+| V2 inceleme/güncel rapor | 68 geçti | review-v2.txt |
+| Adım yeniden hesaplama | 21 geçti | analysis-recalculate.txt |
+| Karar/feedback entegrasyonu | 17 geçti | analysis-provenance.txt |
+| Öğrenci raporu sözleşmesi | 15 geçti | student-report.txt |
+| Süreç/etiket/dışa aktarım | 28 + 39 geçti | process-data.txt, export-labels.txt |
+| Gezinme/süre hesaplamaları | 82 + 57 geçti | navigation.txt, presence.txt |
+| JS analiz/sıra + V2 durum/sıra | 27 + 13 geçti | js-analysis-progress.txt, js-review-v2.txt |
+| JS saat + süreç + etiket | 10 + 11 + 11 geçti | js-time.txt, js-process-data.txt, js-labels.txt |
+| Genel Chrome masaüstü/mobil emülasyon | 131 geçti | browser.txt |
+| V2 Chrome; kabul sonrası düzenleme/yayını geri çekme | 45 geçti | review-v2-browser.txt |
+| HTTP/oturum/dosya/iki worker | 42 geçti | http.txt |
+| MariaDB genel + ayrı DB'ye restore | 81 geçti; 8 tablo sayısı eşit | mysql.txt |
+| PHP 8.4.27: eski teslim/rubrik/genel/V2 | 20 + 21 + 81 + 68 geçti | php84-*.txt |
+| Composer validate + yerel CLI ortamı | Geçti | composer.txt, environment.txt |
+| Composer platform, PHP 8.3.36 / 8.4.27 | İkisinde de geçti | platform-php83.txt, platform-php84.txt |
+| Sözdizimi | 22 PHP + 8 ürün JS dosyası geçti | syntax.txt |
+| Yerel teslim adayı taraması | Sır örüntüsü yok; özel config/DB/PEM/runtime Git dışında | delivery-check.json |
+
+İlk genel SQLite koşusu 76 kontrolden sonra Windows sandbox dosya okunabilirliği kısıtında durdu; normal yerel izinli tekrar 81/81 geçti (`run-sandbox-first.txt` ilk denemedir). İlk MariaDB komutunda kurulumun üst dizini seçildiği için çalıştırılabilir dosya bulunamadı; doğru alt dizinle tekrar geçti (`mysql-path-first.txt` ilk denemedir). Bu ilk denemeler başarı sayılmadı. `js-review-editor.txt` yalnız yardımcı modülün yüklenmesini kaydeder; ayrı bir test sayısı değildir.
+
+Tüm veri testleri ayrı sentetik SQLite/MariaDB ve mock AI kullanır; çalışma DB'sine migration/seed/reset yapılmadı. Gerçek sağlayıcı, hosting, fiziksel cihaz, gerçek kesinti, Word uygulamasında görsel açılış veya gerçek Disco import bu sonuçların kapsamında değildir. Yeni manuel batch, commit/push veya dağıtım yok. Önceki tarihli AUDIT-01/02 açık kayıtları aşağıda tarihçe olarak korunur; güncel durum BUGS.md ve STATUS_REVIEW.md içindedir.
+
 ## Genel tarayıcı testi yeniden doğrulaması — 2026-10-22
 
 `tests/browser.cjs` içindeki eski v1 akışını zorlayan istek müdahalesi ve artık görünmeyen `data-analysis-step` beklentileri kaldırıldı. Genel test güncel beş bölümlü v2 ekranını ve tek güncel rapor akışını kullanır. Uygulama kodu, event/süre hesapları ve dışa aktarım davranışı değiştirilmedi.
@@ -383,3 +416,25 @@ Kullanıcının eski ekranın karışık olduğu bildirimiyle ana alan5açık ka
 Sonuçlar:130Chrome,81genelSQLite,21seçiliadımtekrar,17inceleme/feedback,15öğrencirapor,27analizJS(12ilerleme+5yenisonuç/birleştirme+10sıralama),28süreçPHP/11süreçJSgeçti.5PHPve3ürünJSsyntaxkontrolü/diffwhitespacegeçti. Chrome:doğrudangörünürpuan/feedback/3düğme,kabul/edit,yalnız3adımıyenileme,hatalıyenilemedeeskisonucukoruma,diğer4adımındeğişmemesi,yenisonucunyenionayistemesi,8birleştirmeyiyenileme,öğrenciyanıtınıkarttanaçma,mobiltaşmama,karttadüzenlenenfeedbackinrapordaaynıkalması,rapordüzenleme/onay/yayın/DOCX/PDF. PHPayrıcaeskiadımkimliğinekararverilememesi,aynırundaparalelistek/karar/raporkoruması,eskiraporlarınsabitkalmasıveaynıkararlarıtekrarbirlestirmemereddinidoğruladı.
 
 Kanıt:test-evidence/review-cards-*.txt;review-card-desktop.png/review-card-mobile.pnggörselincelendi. İlk Chrome koşusu 107 kontrolden sonra kapalıteknik8satırınıgörünürbekleyentestseçicisindedurdu;attachedbeklemesinegeçilince130tamgeçti. İlkstandartPHPkoşusuXLSXis_readablesandboxsınırındadurdu;normalizinlison81koşugeçti. İlkkoşulargeçtisayılmadı. ÇalışmaDB/seed/migrationyok;gerçekAI/hosting/Discoimport/fizikselcihazdoğrulamasıyapılmadı. Kullanıcıyenikartdüzeninikabul etmişsayılmadı;yenimanuelbatchçıkarılmadı. Commit/push/dağıtımyok. AUDIT-01/02buçalışmadakapatılmadı.
+
+## PHP güvenlik güncellemesi · 2026-10-23
+
+Yerel PHP 8.3.35 → 8.3.36; resmî Windows NTS x64 ZIP SHA256 doğrulandı. Mevcut 8.3 dalı ve php.ini korundu. Yeni paketin eklentileri kullanıldı; mevcut yerel VC runtime DLL'leri taşındı. Composer bağımlılık sürümleri değişmedi. PHP minimum güvenlik seviyeleri Composer ve CLI ortam kontrolüne eklendi.
+
+| Kontrol | Sonuç | Kanıt klasörü: test-evidence/php-security-2026-10-23/ |
+|---|---|---|
+| Ortam ve eklentiler | Geçti | environment.txt |
+| SQLite genel/Word/PDF/XLSX | 81 geçti | domain.txt |
+| Güncel v2 öğrenci raporu | 68 geçti | review-v2.txt |
+| Veri çıktıları | 39 geçti | exports.txt |
+| HTTP/oturum/iki worker/dosya indirme | 42 geçti | http.txt |
+| MariaDB işlevler + ayrı DB'ye restore | 81 geçti; 8 tablo sayısı eşleşti | mysql.txt |
+| Eski PHP 8.3.35 ortam kontrolü | Beklenen exit 1 ile reddedildi | old-version-rejected.txt |
+
+Toplam 311 otomatik kontrol geçti; ayrıca 8 restore tablo sayısı doğrulandı. Aktif `.tools/php/php.exe` üzerinde sürüm, CLI check ve Composer validate tekrar geçti; Composer platform gereksinimleri yeni runtime'da geçti. İlk sandbox check storage erişiminde durdu; normal izinli tekrar başarılı. Python PATH takma adı bulunamadığı için HTTP/MariaDB testleri paketlenmiş Python'un mutlak yoluyla tekrar çalıştırıldı. Testler yalnız ayrı sentetik DB/mock kullanır; çalışma DB'sinde migration/seed/reset yapılmadı. Hosting, gerçek AI ve tarayıcı görsel kabulü bu koşuda test edilmedi. Canlı sunucu güncellemesi veya commit/push yok.
+
+## PHP 8.4.27 uyumluluk doğrulaması · 2026-10-23
+
+Hostingini PHP 8.4.27'ye aldığını belirten kullanıcının uyumluluk sorusu üzerine resmî Windows NTS VS17 x64 paketi ayrı `.tools/php-8.4.27-test` klasöründe test edildi. SHA256 `93bd8a815a52156606fb906d0573437908c61f96e2cc52c03a51e36a41bf5236` doğrulandı. Varsayılan yerel PHP 8.3.36 olarak kaldı.
+
+Composer platform gereksinimleri ve CLI ortam kontrolü geçti. 81 SQLite genel (Word/PDF/XLSX dahil), 68 review-v2, 39 export, 42 gerçek HTTP/oturum/iki worker ve 81 MariaDB kontrolü: toplam 311 geçti. Ayrı restore DB'de 8 tablo sayısı eşleşti. Üç doğrudan PHP grubu E_ALL (32767) ile çalıştı; çıktılarda PHP Warning/Deprecated/Fatal görülmedi. Kanıtlar `test-evidence/php-8.4.27-compatibility/`. Ürün kodunda uyumluluk düzeltmesi gerekmedi. Çalışma verisine migration/seed/reset yok; canlı hosting/gerçek AI/fiziksel cihaz doğrulaması değildir.

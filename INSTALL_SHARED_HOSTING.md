@@ -2,11 +2,13 @@
 
 0.2.0 güncellemesi: Mevcut DB için önce özel yedek alın; `php bin/console.php migrate` migration 002 uygular. SQLite yerel geçişinde `php bin/upgrade-sqlite.php` özel yedek + eski tüm sütunların hash karşılaştırmasını yapar. MySQL DDL atomik değildir; yarım kalmış 002 otomatik tekrar edilmez, ayrı DB kopyasında incelenir. SSH yoksa 002.sql sonrası mevcut users(student)/cases/definitions kayıtlarının owner_id alanını mevcut ilk araştırmacı kimliğiyle doldurun ve schema_migrations içine 2 kaydını yalnız başarılı doğrulama sonrası ekleyin; eski global kapanış varsa ilgili cases.collection_closed_at alanlarına taşıyın. Birden çok eski araştırmacı varsa sahiplik eşlemesini dağıtımdan önce açıkça doğrulayın. Taze SSH'siz kurulumda da 001 + 002 birlikte gerekir; yalnız 001 güncel kod için yeterli değildir.
 
-Durum: Yerelde PHP 8.3.35, MariaDB 11.4.12 ve SQLite ile denendi. Gerçek hosting, gerçek API, HTTPS/proxy ve hosting yedeği henüz denenmedi. Kullanıcı kabulü olmadan araştırmaya başlanmamalı.
+Durum: 23 Ekim 2026'da yerel PHP 8.3.35 → 8.3.36 güvenlik güncellemesi yapıldı; MariaDB 11.4.12 ve SQLite ile denendi. Gerçek hosting, gerçek API, HTTPS/proxy ve hosting yedeği henüz denenmedi. Kullanıcı kabulü olmadan araştırmaya başlanmamalı.
 
 ## 1. Ön kontrol
 
-PHP 8.3+; PDO MySQL, mbstring, curl, openssl, zip, gd, dom, xml, xmlreader, xmlwriter, fileinfo; MySQL 8+ veya MariaDB 10.6+ InnoDB ve utf8mb4. Bu alt sürüm sınırları hedef gereksinimdir; gerçekten test edilen DB MariaDB 11.4.12'dir. Minimum 256 MB PHP memory_limit önerilir; uzun dosyalarda gerçek limit testi yapın. AI timeout örneği 45 s; PHP/proxy timeout daha uzun olmalı. Dış HTTPS/cURL, yazılabilir özel temp dizini ve en az iki eşzamanlı PHP isteği gerekli.
+PHP 8.3.36+ (8.4 serisinde 8.4.27+, 8.5 serisinde 8.5.12+); PDO MySQL, mbstring, curl, openssl, zip, gd, dom, xml, xmlreader, xmlwriter, fileinfo; MySQL 8+ veya MariaDB 10.6+ InnoDB ve utf8mb4. Bu alt sürüm sınırları hedef gereksinimdir; gerçekten test edilen DB MariaDB 11.4.12'dir. Minimum 256 MB PHP memory_limit önerilir; uzun dosyalarda gerçek limit testi yapın. AI timeout örneği 45 s; PHP/proxy timeout daha uzun olmalı. Dış HTTPS/cURL, yazılabilir özel temp dizini ve en az iki eşzamanlı PHP isteği gerekli.
+
+21 Ekim 2026 tarihli kritik açıklar için [resmî PHP güvenlik duyurusu](https://www.php.net/archive/2026.php#2026-10-21-5). Hosting panelinden uygulamanın web PHP sürümünü ve ayrıca CLI sürümünü doğrulayın; yerel `.tools/php` güncellemesi hostingi güncellemez. Sağlayıcı dağıtım yaması kullanıyorsa iki CVE'nin giderildiğini sağlayıcıdan doğrulayın. Güncelleme öncesi özel yedek alın; sonra yukarıdaki ortam kontrolünü, giriş/oturum, DB bağlantısı ve Word/PDF/XLSX çıktısını ayrı test ortamında tekrar kontrol edin. Mevcut veriye seed veya yeni kurulum SQL'i uygulamayın.
 
 ```text
 php bin/console.php check

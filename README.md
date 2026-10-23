@@ -2,11 +2,7 @@
 
 0.2.18 yerel güncelleme: Beş bölümlü değerlendirme ve tek güncel öğrenci raporu. Rapor alanı yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster düğmeleridir; geçmiş listeleri gösterilmez. Yeniden inceleme tamamlanınca aynı rapor güncellenir, öğrenciye tekrar açılması gerekir. Vaka veri toplama kapanış kuralı korunur. Yeni akış için Ctrl+F5; ayrıntılar CONTEXT.md.
 
-**0.2.12 — Yerel geliştirme:** Sayfa içi öğrenci onayları sahte ayrılışı önler. Vakalarım’a dönüş ile aynı vakayı yeniden açma arası Vaka dışında olarak ayrı kaydedilir. Henüz commit/push yapılmadı.
-
-**0.2.11 — Önceki yerel aşama:** Bölümden ayrılma/dönüş süreleri ve Uygulama dışında etkinliği, açık kilitli AI erişimi; AI beklemesi dışarıdaki zamanı içermez. Araştırmacı tabloları ve nihai ciddiyet sorusu güncellendi. Henüz commit/push yapılmadı.
-
-**0.2.10 — Son GitHub sürümü:** Ayrı araştırmacı çalışma alanları, sadeleştirilmiş yönetim, öğrenci raporu ve okunabilir süreç kayıtları. Etiketli AI soru gönderimi, yanıt hazırlık beklemesi, yanıt gelişi ve görüntüleme ayrı etkinliklerdir; Disco CSV aynı akışı ve ayrı bekleme kulvarını taşır. Eski sorular da korunur. Güncel test kapsamı [TEST_RESULTS.md](TEST_RESULTS.md), devam bilgisi [CONTEXT.md](CONTEXT.md). Gerçek hosting/AI/kurum rubriği kabulü tamamlanmadı.
+**23 Ekim 2026 yerel durum:** Yerel HEAD `9098ff7`; uzak GitHub dalı bu incelemede sorgulanmadı. Puan–rubrik düzeyi eşleşmesi ve dolu gerekçe doğrulaması mevcut. Eski v1 teslimler sonradan eklenen nihai ciddiyet ölçümü olmadan analiz edilebilir; ölçülmemiş alan analiz çıktısında belirtilir, eski yanıtlar değiştirilmez. Yeni teslimlerde nihai ciddiyet zorunludur. PHP güvenlik güncellemesi ve bu yerel düzeltme henüz commit edilmedi. Güncel doğrulamalar [TEST_RESULTS.md](TEST_RESULTS.md), kalan dış kabuller [RELEASE_READINESS.md](RELEASE_READINESS.md).
 
 0.2.1: Genel durumda matris yerine vaka/öğrenci listesi, vaka kartında atanan öğrenci diyaloğu; JSON gerektirmeyen rubrik boyut/düzey formu ve okunaklı/aranabilir/JSON indirilebilir işlem geçmişi. Şema değişikliği yok. Güncel koşular TEST_RESULTS.md, kullanım RELEASE_READINESS.md.
 
@@ -14,13 +10,13 @@
 
 Öğretmen adaylarının pedagojik vakalarda AI öncesi muhakemesini, vaka bazında AI etkileşimini, nihai kararını ve yansıtmasını toplayan Türkçe araştırma uygulaması. PHP/MySQL + vanilla JS/CSS; shared hosting için kalıcı worker gerektirmez.
 
-Öğrenci paneli: altı çalışma bölümü + ayrı Son teslim sekmesi, başlangıç/profil atomik kilidi, revision/autosave, aynı hesap için sekme kurtarması, tek AI isteği, nihai/yansıtma tek teslimi. Araştırmacı: vaka/öğrenci seçimi, katılımcı/vaka/atama, sürümlü rubrik/etiket, olaylar/taslaklar/süreler, ayrı sıralı analiz, kararlar, rapor snapshot/onay/yayın, gerçek DOCX/PDF/XLSX/CSV/JSON indirme.
+Öğrenci paneli: altı çalışma bölümü + ayrı Son teslim sekmesi, başlangıç/profil atomik kilidi, revision/autosave, aynı hesap için sekme kurtarması, tek AI isteği, nihai/yansıtma tek teslimi. Araştırmacı: vaka/öğrenci seçimi, katılımcı/vaka/atama, sürümlü rubrik/etiket, olaylar/taslaklar/süreler, beş bölümlü değerlendirme ve dört insan kararı, tek güncel rapor ve Öğrenciye göster; gerçek DOCX/XLSX/CSV/JSON indirme. Tarihsel v1 raporlar ve PDF backend desteği korunur.
 
 **Araştırmada kullanıma onay verilmedi.** Gerçek rubrik/onam ve AI sağlayıcısı bekleniyor. Mock sentetiktir. Gerçek hosting ve fiziksel mobil testleri yapılmadı. Çalıştırılan testlerin kapsamı [TEST_RESULTS.md](TEST_RESULTS.md), açık işler [plan.md](plan.md), devam bağlamı [CONTEXT.md](CONTEXT.md).
 
 ## Yerel başlatma
 
-PHP 8.3 ve gereken eklentiler, Composer; [kurulum rehberindeki](INSTALL_SHARED_HOSTING.md) bağımlılıklar. Yerel `.tools/php/php.exe` bu çalışma sırasında Windows testleri için edinilmiştir; sunucu dağıtımına eklenmez.
+PHP 8.3.36+ (8.4 serisinde 8.4.27+, 8.5 serisinde 8.5.12+) ve gereken eklentiler, Composer; [kurulum rehberindeki](INSTALL_SHARED_HOSTING.md) bağımlılıklar. Yerel `.tools/php/php.exe` Windows testleri içindir; sunucu dağıtımına eklenmez. 21 Ekim 2026 güvenlik düzeltmeleri gereklidir: [resmî PHP duyurusu](https://www.php.net/archive/2026.php#2026-10-21-5).
 
 ```text
 composer install --no-interaction --prefer-dist

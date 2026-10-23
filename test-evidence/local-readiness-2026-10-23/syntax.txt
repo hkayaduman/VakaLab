@@ -1,0 +1,23 @@
+No syntax errors detected in D:\VakaLab\app\Admin.php
+No syntax errors detected in D:\VakaLab\app\Ai.php
+No syntax errors detected in D:\VakaLab\app\Analysis.php
+No syntax errors detected in D:\VakaLab\app\App.php
+No syntax errors detected in D:\VakaLab\app\Auth.php
+No syntax errors detected in D:\VakaLab\app\bootstrap.php
+No syntax errors detected in D:\VakaLab\app\Db.php
+No syntax errors detected in D:\VakaLab\app\EventLabels.php
+No syntax errors detected in D:\VakaLab\app\Export.php
+No syntax errors detected in D:\VakaLab\app\MessageLabels.php
+No syntax errors detected in D:\VakaLab\app\Migration.php
+No syntax errors detected in D:\VakaLab\app\Navigation.php
+No syntax errors detected in D:\VakaLab\app\Review.php
+No syntax errors detected in D:\VakaLab\app\Rules.php
+No syntax errors detected in D:\VakaLab\app\Scope.php
+No syntax errors detected in D:\VakaLab\app\StudentReport.php
+No syntax errors detected in D:\VakaLab\app\Telemetry.php
+No syntax errors detected in D:\VakaLab\bin\console.php
+No syntax errors detected in D:\VakaLab\bin\upgrade-sqlite.php
+No syntax errors detected in D:\VakaLab\public\api.php
+No syntax errors detected in D:\VakaLab\public\index.php
+No syntax errors detected in D:\VakaLab\tests\legacy-submission.php
+PHP syntax: 22; JavaScript syntax: 8. All passed.

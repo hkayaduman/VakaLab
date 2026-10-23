@@ -6,3 +6,12 @@
 /tests/tmp/
 *.log
 __pycache__/
+# Portable MariaDB test processes can leave these runtime files at the repo root.
+/aria_log.*
+/aria_log_control
+/ib_buffer_pool
+/ib_logfile0
+/ibdata1
+/undo[0-9]*
+/private_key.pem
+/public_key.pem

@@ -1,5 +1,9 @@
 # Değişiklik günlüğü
 
+## 2026-10-23 — Yerel yayın hazırlığı
+
+Eski v1 teslimlerin sonradan eklenen nihai ciddiyet alanı olmadan analiz edilmesi düzeltildi; eksik ölçüm bütünlük çıktısında belirtilir, yeni teslim zorunlulukları korunur. 20 regresyon eski analiz/rapor, v2 uyumluluğu ve değişmez öğrenci kayıtlarını kapsar. Önceki puan–rubrik düzeyi/gerekçe düzeltmesinin güncel doğrulaması ve PHP güvenlik/8.4.27 sonuçları test belgelerinde birleştirildi. Durum belgeleri eşitlendi; MariaDB çalışma dosyaları ve PEM anahtarları Git dışında tutulur. Çalışma verisi/migration/dağıtım yok; test kapsamı TEST_RESULTS.md içinde.
+
 ## Güncel kullanıcı kararı — 0.2.18 · 2026-10-21
 
 Araştırmacı ekranından önceki yorum/kararlar, önceki değerlendirmeler ve Rapor geçmişi · Onay ve yayın listeleri kaldırıldı. Tek güncel rapor alanında yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster var. Word ve Excel doğrudan öğrenci projeksiyonunu indirir. Excel gerçek XLSX dosyasıdır; profil yorumu ve altı soru puanı/feedbacki içerir, iç karar veya geçmiş içermez. PDF backend desteği korunur fakat bu alanda PDF/önizleme düğmesi yoktur (kullanıcının son tercihi).

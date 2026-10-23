@@ -1,0 +1,58 @@
+PASS PRESENCE 1 outside is an explicit interval between section visits
+PASS PRESENCE 2 one plus two minutes in section; three minutes outside
+PASS PRESENCE 3 edits belong only to the resumed interval
+PASS PRESENCE 4 outside has a stable activity name and code
+PASS PRESENCE 5 raw observations unchanged
+PASS PRESENCE 6 leaving for another app also starts outside interval
+PASS PRESENCE 7 duplicate outside notifications do not restart interval
+PASS PRESENCE 8 missing return never fabricates outside duration
+PASS PRESENCE 9 locked AI access is distinct from actual chat
+PASS PRESENCE 10 raw event description also identifies locked AI
+PASS PRESENCE 11 submission ends tracking including later section entries
+PASS PRESENCE 12 same request wait pauses outside and resumes for ten seconds
+PASS PRESENCE 13 return while waiting does not create a false viewing interval
+PASS PRESENCE 14 returning does not create a duplicate question
+PASS PRESENCE 15 reply recorded once
+PASS PRESENCE 16 AI section total is sixty seconds excluding outside minute
+PASS PRESENCE 17 presence segments keep unique export identities
+PASS PRESENCE 18 Disco exports two bounded waits
+PASS PRESENCE 19 Disco contains explicit outside duration
+PASS PRESENCE 20 response outside ends pending wait without charging hidden seconds
+PASS PRESENCE 21 actual hidden reply timestamp and context preserved
+PASS PRESENCE 22 viewing resumes only on return after hidden reply
+PASS PRESENCE 23 hidden reply not fabricated again on return
+PASS PRESENCE 24 missing response retains open wait after bounded outside pause
+PASS PRESENCE 25 asynchronous send after departure remains one client-timed question
+PASS PRESENCE 26 request started outside only accumulates visible wait after return
+PASS PRESENCE 27 two absences produce three waits for the same request
+PASS PRESENCE 28 two absences excluded from AI total exactly
+PASS PRESENCE 29 outside intervals total fifty seconds
+PASS PRESENCE 30 repeated returns never duplicate question
+PASS PRESENCE 31 all repeated wait CSV rows have unique event IDs
+PASS PRESENCE 32 every CSV duration equals its own end minus start
+PASS PRESENCE 33 outside failed response is not labeled successful
+PASS PRESENCE 34 failed wait excludes outside time
+PASS PRESENCE 35 outside partial response is not labeled successful
+PASS PRESENCE 36 partial wait excludes outside time
+PASS PRESENCE 37 cross-section wait excludes outside minute without losing final-section work
+PASS PRESENCE 38 final section duration excludes only outside interval
+PASS PRESENCE 39 reply in final does not invent AI viewing before actual return
+PASS PRESENCE 40 three hours outside are retained exactly, never charged to section
+PASS PRESENCE 41 legacy visibility boundaries preserve exact observed durations
+PASS PRESENCE 42 backward return timestamp is unknown instead of negative duration
+PASS PRESENCE 43 missing middle observations are flagged; known outside boundaries stay exact
+PASS PRESENCE 44 same-timestamp transitions never produce negative or inflated seconds
+PASS PRESENCE 45 departure and return after final submission produce no new durations
+PASS PRESENCE 46 backward clock at return cannot inflate AI preparation time
+PASS PRESENCE 47 AI duration crossing a backward clock is explicitly unknown
+PASS PRESENCE 48 unreliable AI wait is excluded from duration CSV instead of exported as numeric time
+PASS PRESENCE 49 all affected section intervals are unknown after backward clock
+PASS PRESENCE 50 home and reopening produce a separate case-away interval
+PASS PRESENCE 51 case-away seconds preserve exact home/reopening boundaries
+PASS PRESENCE 52 case absence never mislabeled as application absence
+PASS PRESENCE 53 unobserved reopening does not fabricate an away end
+PASS PRESENCE 54 read-only parallel tab does not fabricate a case-away interval
+PASS PRESENCE 55 overlapping case window prevents an invented case-away interval
+PASS PRESENCE 56 old unclosed trace does not hide an observed home/reopening gap
+PASS PRESENCE 57 old unclosed trace remains unknown without inventing its end
+TOTAL PRESENCE 57 checks passed; isolated in-memory database.
