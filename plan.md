@@ -1,5 +1,7 @@
 # Geliştirme Planı ve Durum Takibi
 
+**23 Ekim 2026 GitHub teslimi:** Yerel hazırlık, eski v1 teslim düzeltmesi ve PHP güvenlik/8.4.27 kanıtları `ee31172` commit'iyle main'e gönderildi. Aşağıdaki commit/push yok kayıtları kendi aşamalarına aittir. Sıradaki işler dış ortam ve araştırma kabulleridir; hosting dağıtımı yapılmadı.
+
 ## 23 Ekim 2026 yerel hazırlık
 
 AUDIT-01 eski v1 teslim bütünlüğü düzeltildi; AUDIT-02 puan–düzey/gerekçe düzeltmesi güncel kodda doğrulandı. Yeni/eski teslim ayrımı ve değişmez veri regresyonları eklendi. PHP güvenlik güncellemesi ve 8.4.27 uyumluluk kayıtları korundu; güncel test kanıtları TEST_RESULTS.md ve `test-evidence/local-readiness-2026-10-23/` içinde. README/durum/yayın/hata belgeleri eşitlendi. Yerel MariaDB çalışma dosyaları ve anahtarları Git dışında tutulur; dosyalar silinmez. Mevcut çalışma DB'sine migration/seed/reset yok; bu tur commit/push/dağıtım yok.

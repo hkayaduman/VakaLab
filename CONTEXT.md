@@ -1,5 +1,9 @@
 # Proje Devam Bağlamı
 
+## GitHub teslimi tamamlandı — 2026-10-23
+
+Kullanıcı testler tamamsa GitHub'a push edilmesini açıkça istedi. Fetch ile yerel HEAD ve origin/main `9098ff7` eşitliği doğrulandı. Kod, belgeler, yeni eski-teslim regresyonu ve PHP güvenlik/8.4.27/yerel hazırlık kanıtları (62 dosya) `ee31172` commit'iyle origin/main'e başarıyla gönderildi. 62 adayda sır örüntüsü yok; kurulum belgesindeki açık parola yer tutucusu gerçek sır değildir. config/local.php, çalışma DB, PEM ve MariaDB çalışma dosyaları, vendor, .tools ve tests/tmp gönderilmedi. Beş yeni test logunda yalnız satır sonu boşlukları temizlendi; test sonuçları değiştirilmedi. Git kimliği eksikti; önceki commit'in Halil Kayaduman/GitHub noreply kimliği yalnız komuta özel kullanıldı, global ayar değiştirilmedi. Testler gereksiz tekrarlanmadı; son geçerli kapsam TEST_RESULTS.md içindedir. Bu teslim kaydı ayrı belge commit'iyle gönderilir. Hosting dağıtımı ve çalışma DB yazımı yok; gerçek AI/hosting/kurum/Disco/hedef cihaz-kesinti kabulü açık. Aşağıdaki commit/push yok kayıtları tarihçedir.
+
 ## Yerel hazırlık — 2026-10-23
 
 Kullanıcı önce yerelde yapılabilecek işleri sırayla tamamlama ve gerekli testleri çalıştırma talimatı verdi. AUDIT-02'nin `9098ff7` içinde zaten düzeltildiği doğrulandı; hata belgeleri gerideydi. AUDIT-01 v1 bütünlük adımında gerçekten sürüyordu: yeni `tests/legacy-submission.php` önce hatayı üretti. `Rules::submitted` geçmiş yanıtların profil/metin/aralık bütünlüğünü denetler, eksik `final_severity` için `uncollected_fields` döndürür. `Analysis` v1 adım1 bu yolu kullanır; yeni teslimin `Rules::final` zorunlulukları değişmez. v2 sözleşmesi korunur. Eski yanıt/snapshot/teslim kilidi yazılmaz. 20 yeni regresyon her iki PHP sürümünde geçti. Güncel kanıtlar TEST_RESULTS.md ve `test-evidence/local-readiness-2026-10-23/` içinde.

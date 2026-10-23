@@ -1,5 +1,7 @@
 # Yayın öncesi durum — 2026-10-23
 
+**GitHub teslimi:** Bu yerel hazırlığın kod/belge/test kanıtları `ee31172` commit'iyle 23 Ekim 2026'da origin/main'e gönderildi. Aşağıdaki commit/push yok ifadeleri teslim öncesi tarihsel kayıttır. GitHub teslimi hosting dağıtımı veya gerçek ortam kabulü değildir; dış doğrulamalar bekliyor.
+
 Güncel yerel uygulama: 0.2.18 beş bölümlü v2 değerlendirme, dört insan kararı ve tek güncel öğrenci raporu. Yerel HEAD `9098ff7`; uzak dal bu incelemede sorgulanmadı. AUDIT-01 düzeltildi, AUDIT-02 düzeltmesi yeniden doğrulandı. PHP güvenlik güncellemesi ve yerel hazırlık henüz commit/push edilmedi. Güncel otomatik kanıtlar TEST_RESULTS.md ve `test-evidence/local-readiness-2026-10-23/` içinde.
 
 Güncel rapor yolu: Genel durum → vaka/öğrenci → Çalışmayı aç → Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster. Öğrenciye göster tek işlemle onay ve yayın yapar; vaka veri toplama kapanış/kişisel ek süre kapısı geçerlidir. Yeni analiz, başarılı yeniden hesaplama veya karar değişikliği görünürlüğü kapatır; güncel inceleme tamamlanınca aynı rapor hazırlanıp yeniden gösterilir. Önceki v1 rapor/snapshot açıklamaları aşağıda tarihsel akışı anlatır.

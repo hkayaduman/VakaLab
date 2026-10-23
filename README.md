@@ -1,5 +1,7 @@
 # VakaLab
 
+**GitHub teslimi · 23 Ekim 2026:** Aşağıdaki yerel hazırlık değişiklikleri, PHP güvenlik/8.4.27 kanıtları ve eski teslim düzeltmesi `ee31172` commit'iyle `origin/main` dalına gönderildi. Önceki “henüz commit/push edilmedi” kayıtları teslim öncesi durumu anlatır. Hosting dağıtımı yapılmadı; gerçek AI/hosting/kurum kabulü açık.
+
 0.2.18 yerel güncelleme: Beş bölümlü değerlendirme ve tek güncel öğrenci raporu. Rapor alanı yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster düğmeleridir; geçmiş listeleri gösterilmez. Yeniden inceleme tamamlanınca aynı rapor güncellenir, öğrenciye tekrar açılması gerekir. Vaka veri toplama kapanış kuralı korunur. Yeni akış için Ctrl+F5; ayrıntılar CONTEXT.md.
 
 **23 Ekim 2026 yerel durum:** Yerel HEAD `9098ff7`; uzak GitHub dalı bu incelemede sorgulanmadı. Puan–rubrik düzeyi eşleşmesi ve dolu gerekçe doğrulaması mevcut. Eski v1 teslimler sonradan eklenen nihai ciddiyet ölçümü olmadan analiz edilebilir; ölçülmemiş alan analiz çıktısında belirtilir, eski yanıtlar değiştirilmez. Yeni teslimlerde nihai ciddiyet zorunludur. PHP güvenlik güncellemesi ve bu yerel düzeltme henüz commit edilmedi. Güncel doğrulamalar [TEST_RESULTS.md](TEST_RESULTS.md), kalan dış kabuller [RELEASE_READINESS.md](RELEASE_READINESS.md).
