@@ -1,0 +1,13 @@
+{
+  "pdf_pages": 3,
+  "pdf_six_original_answers": true,
+  "xlsx_scores_and_feedback_roundtrip": true,
+  "docx_text_roundtrip": true,
+  "docx_visual_check": "not_completed_missing_libreoffice",
+  "pdf_visual_check": "all_three_pages_inspected",
+  "files": {
+    "student-report.docx": "8e91313b7f2642e0a938de485ff721d2499b4cee5f2fbc627dc8c3df1831b774",
+    "student-report.pdf": "772d6e654f0a6c17eee6203f2eb5585d5a5a9f4c02359212a2297516fdc5e41d",
+    "student-report.xlsx": "8cd38b3233dcd451f16a3bd46d36cc712c7f6e69205703965e440a92a5472596"
+  }
+}

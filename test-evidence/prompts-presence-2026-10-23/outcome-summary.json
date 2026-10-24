@@ -1,0 +1,19 @@
+{
+  "synthetic_only": true,
+  "user_case_modified": false,
+  "user_case_evaluation_started": false,
+  "chat_short_question": "passed after native role transport",
+  "scope_refusal": "financial/legal request refused, but no-unsolicited-guidance rule FAILED",
+  "label_roles": "passed",
+  "updated_label_descriptions": "FAILED: old name-based assignments returned despite revised exclusions",
+  "known_initial_helper_false_passes": [
+    "short_case_question",
+    "scope_and_role_attack"
+  ],
+  "browser_screenshot_focus_test": "passed; does not reproduce Windows Snipping Tool",
+  "outside_total_seconds": 38.47,
+  "hidden_seconds": 35.502,
+  "visible_unfocused_seconds": 2.968,
+  "cause_of_hidden_state": "unknown; cannot attribute to screenshot tool from logs",
+  "production_acceptance": false
+}

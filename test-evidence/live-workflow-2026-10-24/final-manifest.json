@@ -1,0 +1,20 @@
+{
+  "at_utc": "2026-10-24T18:23:18.4421773Z",
+  "source_sha256": {
+    "app/Ai.php": "9e6b14865e0da880f63752ba1e7b7c634efa878a8ce841f34b7208928cd18f5e",
+    "app/Review.php": "86b6d863c59704cadc8796d63bc071e7236a334a1ccc31e1071bfdd40e4664f7",
+    "app/Export.php": "662ef1106bdafb51a58b7fbb6243bb3403ff015fb28b57728ffc0efa057f60bc",
+    "tests/review-v2.php": "cca7297091834732656d53413e9d06b407ebb6711e6dce7c13367ae740f662bc",
+    "tests/live-workflow.php": "ccfb92ebd532cb84f10103b3c7309b81e3f7b4fe916aedf146a727a7b2b29e8b",
+    "tests/scoring-live.php": "7853205e902a693a8f764a340c8cd6b051292dfe92e7a25dd32ea0761ed7c027"
+  },
+  "model": "openai/gpt-5-nano",
+  "review_directive": "review-v2.1",
+  "local_checks": 439,
+  "browser_label_group_checks": 11,
+  "technical_workflow": "passed_with_simulated_researcher_correction",
+  "scoring_semantics": "AI-SCORE-04_OPEN",
+  "docx_visual": "not_completed_missing_libreoffice",
+  "working_database_opened": false,
+  "github_pushed": false
+}

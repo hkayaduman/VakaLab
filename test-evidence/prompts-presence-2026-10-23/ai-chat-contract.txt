@@ -1,0 +1,10 @@
+PASS CHAT CONTRACT 1 new requests identify the approved chat prompt version
+PASS CHAT CONTRACT 2 case context and conversation use native API roles in original order
+PASS CHAT CONTRACT 3 only application-owned prompt becomes system instruction
+PASS CHAT CONTRACT 4 injected case instructions remain user-level context data
+PASS CHAT CONTRACT 5 role-changing text cannot upgrade actual API role
+PASS CHAT CONTRACT 6 wire input preserves case/message allowlist without private metadata
+PASS CHAT CONTRACT 7 untrusted system conversation role is rejected
+PASS CHAT CONTRACT 8 untrusted developer conversation role is rejected
+PASS CHAT CONTRACT 9 untrusted tool conversation role is rejected
+TOTAL CHAT CONTRACT 9 checks passed. Pure payload tests; no config, database or API access.

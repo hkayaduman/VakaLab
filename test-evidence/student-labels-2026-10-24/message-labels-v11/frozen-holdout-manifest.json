@@ -1,0 +1,13 @@
+{
+  "purpose": "untouched holdout after application source freeze; no tuning to these results",
+  "model": "openai/gpt-5-nano",
+  "holdout_batches": [
+    11,
+    12
+  ],
+  "source_hashes": {
+    "app/Ai.php": "c50a023c68547cbb6511d64071c5eb2ef39ea0c9a68898841dadabc4742b97e5",
+    "app/MessageLabels.php": "e5c905ec8cd5c65e6ad57f6d6c91080a225c03edfa53bf582cc5e64d8dbb7149"
+  },
+  "fixture_sha256": "b61241eda20bfa49758eee4baff206f64b47606400c739b5be480300f598a2c3"
+}

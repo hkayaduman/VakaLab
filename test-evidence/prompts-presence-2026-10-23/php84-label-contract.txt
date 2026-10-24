@@ -1,0 +1,13 @@
+PASS LABEL CONTRACT 1 batch records active prompt version and exact label definitions
+PASS LABEL CONTRACT 2 AI receives name plus explicit description and parsed definition body
+PASS LABEL CONTRACT 3 unchanged current definitions reuse cache
+PASS LABEL CONTRACT 4 editing description invalidates cache and sends updated definition
+PASS LABEL CONTRACT 5 editing name invalidates cache and sends current name
+PASS LABEL CONTRACT 6 new assistant-response label is included in next request
+PASS LABEL CONTRACT 7 known assistant label is valid for assistant message; no forced student-only tagging
+PASS LABEL CONTRACT 8 strict label response covers exact message IDs only
+PASS LABEL CONTRACT 9 strict label response allows only current provided label IDs for assistant too
+PASS LABEL CONTRACT 10 legacy analysis labeling has one existing batch before cache reuse
+PASS LABEL CONTRACT 11 legacy analysis sends the same complete current definition structure
+PASS LABEL CONTRACT 12 label updates never rewrite student or AI messages
+TOTAL LABEL CONTRACT 12 checks passed. Isolated SQLite/mock only.

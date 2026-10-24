@@ -2,7 +2,7 @@
 declare(strict_types=1);
 // Presence-bounded visits. Outside-app intervals are explicit, never charged to a section.
 final class Navigation {
-    public const TABS=['case'=>'Vaka','profile'=>'Vaka profili','initial'=>'Başlangıç değerlendirmesi','ai'=>'AI sohbeti','final'=>'Nihai değerlendirme','reflection'=>'Yansıtma','confirm'=>'Son teslim','outside'=>'Uygulama dışında','away'=>'Vaka dışında'];
+    public const TABS=['case'=>'Vaka','profile'=>'Vaka profili','initial'=>'Başlangıç değerlendirmesi','ai'=>'AI sohbeti','final'=>'Nihai değerlendirme','reflection'=>'Yansıtma','confirm'=>'Son teslim','outside'=>'Vaka sekmesi etkin değil','away'=>'Vaka dışında'];
     public static function time(?string $value): ?float {
         if(!$value||!preg_match('/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/',$value))return null;
         try{$date=new DateTimeImmutable($value);$errors=DateTimeImmutable::getLastErrors();if($errors&&($errors['warning_count']||$errors['error_count']))return null;return (float)$date->format('U.u');}catch(Throwable){return null;}
@@ -46,7 +46,7 @@ final class Navigation {
                     foreach(['ai_labels','researcher_labels','effective_labels'] as $field)$point[$field]=$message[$field]??[];
                     $point['label_sources']=isset($message['label_source'])?[$message['label_source']]:[];$rows[]=$point;
                 }
-                foreach($responses as $response){$at=self::time($response['at']);if($at===null||$at<self::time($v['start_at'])||(self::time($v['end_at'])!==null&&$at>self::time($v['end_at'])))continue;$point=$v;$point['activity_id']=$response['event_id'].'-response';$point['activity']=self::responseName($response['status']).($v['section']==='outside'?' · Uygulama dışındayken':' · Sohbet sekmesi açık değildi');$point['activity_code']='AI_RESPONSE';$point['activity_type']='ai_response';$point['start_at']=$point['end_at']=$response['at'];$point['start_sequence']=$response['sequence'];$point['duration_seconds']=0.0;$point['quality']='point_event';$point['start_event_id']=$point['end_event_id']=$response['event_id'];$point['response_observed']=true;$point['ai_question_count']=0;$point['edited_fields']=[];$point['background_seen']=null;$point['end_reason']='response_arrived';$point['next_section']=null;$point['next_section_name']=null;$rows[]=$point;}
+                foreach($responses as $response){$at=self::time($response['at']);if($at===null||$at<self::time($v['start_at'])||(self::time($v['end_at'])!==null&&$at>self::time($v['end_at'])))continue;$point=$v;$point['activity_id']=$response['event_id'].'-response';$point['activity']=self::responseName($response['status']).($v['section']==='outside'?' · Vaka sekmesi etkin değilken':' · Sohbet sekmesi açık değildi');$point['activity_code']='AI_RESPONSE';$point['activity_type']='ai_response';$point['start_at']=$point['end_at']=$response['at'];$point['start_sequence']=$response['sequence'];$point['duration_seconds']=0.0;$point['quality']='point_event';$point['start_event_id']=$point['end_event_id']=$response['event_id'];$point['response_observed']=true;$point['ai_question_count']=0;$point['edited_fields']=[];$point['background_seen']=null;$point['end_reason']='response_arrived';$point['next_section']=null;$point['next_section_name']=null;$rows[]=$point;}
                 continue;
             }
             $start=self::time($v['start_at']);$end=self::time($v['end_at']);$previous=$start;$valid=$start!==null;
@@ -127,7 +127,7 @@ final class Navigation {
                     $ps=self::time($piece['start_at']);$pe=self::time($piece['end_at'])??INF;
                     if($ps===null||$ce<=$ps||$cs>=$pe){$next[]=$piece;continue;}
                     $changed=true;
-                    if($cs>$ps){$left=$piece;$left['end_at']=$cut['start_at'];$left['end_event_id']=$cut['start_event_id'];$left['end_reason']=$isWait?'app_outside':'next_question';$left['next_section']=$isWait?'outside':null;$left['next_section_name']=$isWait?'Uygulama dışında':null;$next[]=$left;}
+                    if($cs>$ps){$left=$piece;$left['end_at']=$cut['start_at'];$left['end_event_id']=$cut['start_event_id'];$left['end_reason']=$isWait?'app_outside':'next_question';$left['next_section']=$isWait?'outside':null;$left['next_section_name']=$isWait?'Vaka sekmesi etkin değil':null;$next[]=$left;}
                     if($ce<$pe){$right=$piece;$right['start_at']=$cut['end_at'];$right['start_event_id']=$cut['end_event_id'];$right['start_sequence']=$cut['end_sequence']??$cut['start_sequence'];$next[]=$right;}
                 }
                 $pieces=$next;
@@ -166,7 +166,7 @@ final class Navigation {
                 $active['next_section']=$reason==='next_section'?($end['section']??null):($reason==='app_outside'?'outside':($reason==='app_return'?($end['section']??null):null));
                 $active['next_section_name']=self::TABS[$active['next_section']]??null;
                 $section=$active['section'];
-                $active['activity']=($section==='outside'?'Uygulama dışında':($active['locked']?($section==='ai'?'Kilitli AI bölümünü görüntüleme':'Kilitli '.(self::TABS[$section]??'bölüm').' bölümünü görüntüleme'):(self::TABS[$section]??'Bölüm').($active['edited_fields']?' güncelleme':' görüntüleme')));
+                $active['activity']=($section==='outside'?'Vaka sekmesi etkin değil':($active['locked']?($section==='ai'?'Kilitli AI bölümünü görüntüleme':'Kilitli '.(self::TABS[$section]??'bölüm').' bölümünü görüntüleme'):(self::TABS[$section]??'Bölüm').($active['edited_fields']?' güncelleme':' görüntüleme')));
                 if($section==='ai'&&!$active['locked'])$active['activity']=$active['request_keys']?'AI sohbeti · Mesaj gönderme denemesi':'AI sohbeti görüntüleme';
                 $active['activity_code']=$section==='outside'?'APP_OUTSIDE':($section==='ai'&&!$active['locked']?($active['request_keys']?'AI_SEND_ATTEMPT':'AI_VIEW'):strtoupper($section).($active['locked']?'_LOCKED':($active['edited_fields']?'_EDIT':'_VIEW')));
                 $visits[]=$active;$active=null;
@@ -223,6 +223,6 @@ final class Navigation {
         $visits=array_merge($visits,$gaps);
         usort($visits,fn($a,$b)=>[self::time($a['start_at'])??PHP_FLOAT_MAX,$a['trace_id'],$a['start_sequence']]<=>[self::time($b['start_at'])??PHP_FLOAT_MAX,$b['trace_id'],$b['start_sequence']]);
         foreach($visits as $i=>&$visit){$visit['sequence']=$i+1;$visit['overlapping_tab']=false;foreach(array_slice($visits,0,$i) as $earlier){if($earlier['trace_id']!==$visit['trace_id']&&self::time($earlier['end_at'])!==null&&self::time($visit['start_at'])!==null&&self::time($earlier['end_at'])>self::time($visit['start_at'])){$visit['overlapping_tab']=true;break;}}}unset($visit);
-        return ['visits'=>$visits,'milestones'=>$milestones,'definition'=>'Bölüm süresi uygulamadan ayrılınca kapanır; dönüşte yeniden başlar. Aradaki süre Uygulama dışında olarak ayrı kaydedilir. Son teslim sonrası izlenmez; eksik kapanış tahmin edilmez.'];
+        return ['visits'=>$visits,'milestones'=>$milestones,'definition'=>'Bölüm süresi vaka sayfası gizlendiğinde veya pencere odağını kaybettiğinde kapanır; yeniden etkin olduğunda başlar. Aradaki süre Vaka sekmesi etkin değil olarak ayrı gösterilir. Son teslim sonrası izlenmez; eksik kapanış tahmin edilmez.'];
     }
 }

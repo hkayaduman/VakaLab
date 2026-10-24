@@ -1,0 +1,75 @@
+PASS 1 new contract recorded without schema change
+PASS 2 prepared section 1
+PASS 3 prepared section 2
+PASS 4 prepared section 3
+PASS 5 prepared section 5
+PASS 6 prepared section 4
+PASS 7 prepared section 6
+PASS 8 profile has comparison and feedback without score
+PASS 9 structured output remains opt-in for existing compatible providers
+PASS 10 legacy analysis format remains compatible when strict V2 schemas are enabled
+PASS 11 strict profile contract requires feedback instead of response alias
+PASS 12 strict question contract uses actual rubric IDs and only the current answer source
+PASS 13 real confidence difference; no invented missing profile measurement
+PASS 14 separate question scores for section 3
+PASS 15 isolated answer payload problem
+PASS 16 rubric score and improvement feedback problem
+PASS 17 isolated answer payload decision
+PASS 18 rubric score and improvement feedback decision
+PASS 19 isolated answer payload reason
+PASS 20 rubric score and improvement feedback reason
+PASS 21 separate question scores for section 4
+PASS 22 isolated answer payload final_decision
+PASS 23 rubric score and improvement feedback final_decision
+PASS 24 isolated answer payload final_reason
+PASS 25 rubric score and improvement feedback final_reason
+PASS 26 separate question scores for section 6
+PASS 27 isolated answer payload reflection
+PASS 28 rubric score and improvement feedback reflection
+PASS 29 chat counts and 120-second navigation interval are computed exactly
+PASS 30 chat has only computed statistics without AI scoring/comment
+PASS 31 chat statistics have no human score/feedback decision
+PASS 32 chat statistics cannot be sent to AI for rewriting
+PASS 33 serialized JSON object cannot become student feedback
+PASS 34 serialized JSON array cannot become student feedback
+PASS 35 accepted AI result can be edited; aggregate is computed from criteria 3
+PASS 36 previous acceptance preserved 3
+PASS 37 inconsistent researcher level and score rejected 3
+PASS 38 blank researcher scoring reason rejected 3
+PASS 39 accepted AI result can be edited; aggregate is computed from criteria 4
+PASS 40 previous acceptance preserved 4
+PASS 41 inconsistent researcher level and score rejected 4
+PASS 42 blank researcher scoring reason rejected 4
+PASS 43 accepted AI result can be edited; aggregate is computed from criteria 6
+PASS 44 previous acceptance preserved 6
+PASS 45 inconsistent researcher level and score rejected 6
+PASS 46 blank researcher scoring reason rejected 6
+PASS 47 only four human reviews required for report
+PASS 48 student report includes separately scored reflection
+PASS 49 accepted profile comment reaches report unchanged
+PASS 50 report keeps each question separate
+PASS 51 reflection score preserved; no invented overall aggregate
+PASS 52 report includes the original reviewed student answer
+PASS 53 old reports recover answer from reviewed sources rather than live draft
+PASS 54 answer projection does not expose private scoring input
+PASS 55 student report excludes internal review and chat commentary
+PASS 56 previous report snapshots untouched
+PASS 57 profile comment can be regenerated independently
+PASS 58 new profile feedback requires a new decision
+PASS 59 other scores unaffected by profile rewrite
+PASS 60 profile rejection is a valid explicit review decision
+PASS 61 edited question scores remain bounded by rubric
+PASS 62 legacy runs preserved
+PASS 63 unpublished review report is unavailable to student
+PASS 64 reflection feedback edit updates the single unapproved report
+PASS 65 report feedback editing preserves scores without adding another report
+PASS 66 one-click student visibility respects open collection
+PASS 67 approved review report cannot be overwritten
+PASS 68 review report cannot be published while collection is open
+PASS 69 student receives only the approved published review projection
+PASS 70 reopening collection hides published review report
+PASS 71 preparing again overwrites the same report
+PASS 72 recalculation withdraws old student report pending review
+PASS 73 new human review automatically replaces the single report and requires showing again
+PASS 74 student sees exactly one current report
+TOTAL V2 74 checks passed; isolated SQLite/mock.

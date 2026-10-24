@@ -1,0 +1,36 @@
+{
+  "source": "read-only local SQLite, PRAGMA query_only=ON",
+  "participant": "TEST-OGR-03",
+  "case": "SENTETİK · Akranlar arası anlaşmazlık",
+  "date": "2026-10-23",
+  "timezone": "Europe/Istanbul",
+  "outside_intervals": [
+    {
+      "start": "13:32:41.361",
+      "end": "13:32:44.124",
+      "seconds": 2.763
+    },
+    {
+      "start": "13:33:05.845",
+      "end": "13:33:07.859",
+      "seconds": 2.014
+    },
+    {
+      "start": "13:33:36.921",
+      "end": "13:34:10.614",
+      "seconds": 33.693
+    }
+  ],
+  "total_seconds": 38.47,
+  "outside_entry_signals": {
+    "visible": true,
+    "focused": false,
+    "app_active": false
+  },
+  "destination_application_known": false,
+  "analysis_runs_in_user_case": 0,
+  "chat_prompt_changes_activated": false,
+  "label_prompt_changes_activated": false,
+  "real_provider_calls_by_agent_this_turn": 0,
+  "user_case_records_modified": false
+}

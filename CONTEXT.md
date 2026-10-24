@@ -1,5 +1,35 @@
 # Proje Devam Bağlamı
 
+## Onaylanan sohbet / güncel etiketler / odak incelemesi — 2026-10-23
+
+Kullanıcı sohbet promptunu dikte etti: yalnız vaka/pedagoji, Türkçe, kişisel veri isteme, sabotaj/rol değiştirmeyi izleme, finansal/hukuki danışmanlık verme, istenmeyen yönlendirme/Sokratik akış/takip sorusu/istersen daveti yok; öğrenci açıkça isterse karar/alternatif/gerekçe verilebilir. Etiketleri ve öğrenci/AI yanıtına özgü açıklamaları kendisi daha sonra hazırlayacak; her istekte güncel ad ve açıklamalar birlikte kullanılacak. Ai::CHAT_SYSTEM_PROMPT / LABEL_SYSTEM_PROMPT yerelde etkin. Tam güncel metin AI_PROMPTS_REVIEW_TR.md; eski taslak bölümleri güncel metinle değiştirildi. chat-v2 ve message-labels-v2 sürümleri kullanılır; eski kayıtlar değiştirilmez.
+
+Sohbet vaka bağlamı user-verisi, konuşma ise gerçek user/assistant API rolleriyle aktarılır; konuşmadan system/developer/tool rolü yükseltmesi reddedilir. Etiket açıklaması açık description ve ayrıştırılmış body ile gönderilir; audit kullanılan tanımları saklar. Model/prompt/ad/açıklama/listede değişim cache'i geçersiz kılar. AI beklenirken tanım listesine yeni etiket eklenmesi dahil değişimde eski yanıt kaydedilmez; yarış testi geçti. Eski v1 analiz etiketi aynı tanım/hash kurallarını kullanır. Destekleyen uçta etiket çıktısı da katı JSON şemasına bağlandı; insanın boş dahil seçimi önceliği korunur. Kullanıcının gerçek tanımları değiştirilmedi ve mevcut vakada etiketleme/değerlendirme başlatılmadı.
+
+Gerçek sentetik GPT-5 Nano testleri KARIŞIK: kısa vaka sorusu gerçek rol aktarımından sonra kısa/yönlendirmesiz yanıtlandı. Öğrenci gerekçe sorusu ve AI gerekçeli yanıtı ayrı doğru etiketlendi. Fakat kapsam dışı finans/hukuk talebini reddettikten sonra istenmeyen pedagojik plan eklemesi ve adı aynı kalıp açıklaması değişen etiketlerde eski seçimleri sürdürmesi tekrarlandı. Bunlar açık semantik hatalardır; tüm davranışlar geçti veya araştırmaya hazır denmez. Bazı ilk helper passed alanları yalnız zayıf biçim kontrolleriydi; insan incelemesinde başarısızlık kaydedildi. Çıktılar kesilip değiştirilmedi, model değiştirilmedi. Sonraki öncelik bu davranış açıklarını kullanıcıyla ele almak; değerlendirmeyi otomatik başlatma. Kanıt test-evidence/prompts-presence-2026-10-23/ ve outcome-summary.json.
+
+Yerel teknik kontroller: 14 etiket sözleşmesi (tanım değişirken yarış dahil), 9 sohbet rol/allowlist, 28 süreç, 60 presence, 82 navigation, 81 genel SQLite, 74 v2, 21 recalc, 17 review, 39 export; PHP8.4 ilk etiket testi 12 (yarış eklenmeden önce); 131 genel Chrome, 23 gerçek presence Chrome, 11 süreç JS geçti. İlk screenshot testinin öğrenci API'sinden researcher navigation beklemesi düzeltildi; ayrı test DB salt okunur incelendi. Gerçek Windows Snipping Tool/Win+Shift+S testi YAPILMADI; tarayıcının kendi screenshot işlemi odak/görünürlük korunurken sahte dışarı üretmedi. Sekme geçişi ve minimize gerçek Chrome'da doğrulandı.
+
+Kullanıcının 38.470 sn aralıklarının ARA olayları da PRAGMA query_only=ON ile incelendi. 35.502 sn visible=false; 2.968 sn visible=true/focused=false. Uzun aralıkta 13:33:46.162 ve 13:34:01.156 İstanbul saati heartbeat de gizli/odaksız. Ekran görüntüsü veya başka pencere kaynaklı olduğu kesin söylenemez. Ölçüm tüm VakaLab'dan çıkışı değil, öğrenci vaka sekmesinin görünür/odaklı olmamasını ölçer; aynı VakaLab'ın başka penceresi de bu koşulu oluşturabilir. Arayüz açıklaması düzeltildi; süre matematiği/ham kayıtlar korunur. Yeni değişiklikler henüz commit/push edilmedi.
+
+## Mesaj taslağı / prompt görüşmesi / 38 sn incelemesi — 2026-10-23
+
+Kullanıcı altı ekran görüntüsüyle gönderilen mesajın kutuda kaldığını, sohbet ve mesaj etiketleme sistem promptlarını görmek/düzenlemek istediğini ve 38 sn uygulama dışı sürenin kaynağını sordu. Kullanıcı kararı: öğrenci istediğini sorsun, AI prompta göre yanıtlasın; yönlendirme veya zorunlu Sokratik akış yok. AI_PROMPTS_REVIEW_TR.md mevcut iki promptun tam metnini, önerilen iki TASLAĞI ve salt okunur bulguları içerir. Taslaklar henüz etkinleştirilmedi; gerçek yeniden etiketleme/AI çağrısı veya kullanıcının vakasında değerlendirme başlatılmadı.
+
+TEST-OGR-03 / SENTETİK · Akranlar arası anlaşmazlık mevcut SQLite üzerinde PRAGMA query_only=ON ile incelendi. Kayıtlı draft.question sonunda satır sonu var, mesaj metni trim edilmiş. sendChat bu metinleri karşılaştırdığı için temizlik atlanıyordu. Gönderim anındaki özgün taslakla karşılaştırma düzeltildi; yanıt beklerken yazılan yeni taslak korunur. Araştırmacıda “Gönderilmemiş soru taslağı” yerine yalnız “Mesaj kutusu taslağı” denir; geçmiş bir taslak tek başına gönderilmediğini kanıtlamaz. app.js/process.js cache 0.2.20. Eski teslim edilmiş draft/snapshot düzeltilmedi/yazılmadı.
+
+Yeni chat-draft-browser.cjs önce hatayı üretti; son 11 hedefli Chrome, 131 genel Chrome ve 11 süreç JS kontrolü geçti (ayrı SQLite/gecikmeli mock). İlk düzeltme sonrası ağ-hatası test beklemesi erken sonuç okuyordu; hata bildirimi beklendikten sonra tümü geçti. Kanıt test-evidence/chat-prompts-2026-10-23/. Bu tur gerçek API maliyeti oluşturulmadı. Çalışma DB yazılmadı, migration/seed/reset/push yok.
+
+38.470 sn = İstanbul saatiyle 13:32:41.361–13:32:44.124 (2.763), 13:33:05.845–13:33:07.859 (2.014), 13:33:36.921–13:34:10.614 (33.693). Başlangıçlarda visible=true/focused=false/app_active=false; dönüşte hepsi true. Gidilen uygulama/site bilinmez. Bu vakada analysis_runs=0; kullanıcının başlattığı 1 etiket batch'i mevcut. Aktif yedi etiketin body.description alanı aynı “SENTETİK başlangıç tanımı”; açıklamaya dayalı kodlama için gerçek kapsamlar netleştirilmeli, kayıtlı tanımlar değiştirilmedi. Sonraki adım prompt taslaklarını ve etiket açıklamalarını kullanıcıyla netleştirmek; değerlendirmeyi otomatik başlatma.
+
+## Yerelde gerçek OpenRouter/GPT-5 Nano — 2026-10-23
+
+Kullanıcı OpenRouter üzerinden GPT-5 Nano seçti ve gerçek anahtarı özel config/local.php'ye kendisi girdi. Anahtar gösterilmedi/loglanmadı. provider compatible, endpoint OpenRouter /api/v1/chat/completions, model openai/gpt-5-nano. İlk TLS cURL60 hatası yerel Windows trusted roots (39 sertifika) CA paketiyle giderildi: .tools/php/cacert-windows.pem; php.ini curl.cainfo/openssl.cafile güncellendi, eski ini php.ini-before-local-ca-20261023. SSL doğrulaması kapatılmadı. Çalışan PHP sunucusu varsa ini değişikliği için yeniden başlatılmalı.
+
+Gerçek sentetik testlerde serbest JSON nesnesi yanıtı bazen feedback yerine response döndürdü; bir yanıt feedback içinde JSON kodladı, bir profil ölçülmeyen alan için varsayılan sayı uydurdu. Bunlar başarılı değerlendirme sayılmaz. Ai::responseFormat ile opt-in strict JSON Schema (profil ve v2 soru), OpenRouter require_parameters, açık metin/eksik-ölçüm talimatları ve Review::text JSON metni reddi eklendi. config/example.php varsayılan structured_outputs=false ile eski sağlayıcı uyumluluğunu korur; özel local.php true ve timeout90. Son başarılı sohbet/profil/tek soru örnekleri ve önceki hatalar test-evidence/openrouter-2026-10-23/ içinde; kapsam TEST_RESULTS.md. 74+21+17+15+20+81 sentetik PHP kontrolü, ayrıca PHP8.4 v2 74 geçti. Chrome/HTTP/MariaDB bu tur tekrar edilmedi.
+
+Bu yalnız ilk gerçek sağlayıcı smoke doğrulamasıdır; altı sorulu tam UI akışı, etiketleme, gerçek rubrik/kalite/güvenirlik/hosting kabulü tamamlanmadı. Profilde eksik ölçümün ham değeri hiçbir zaman değiştirilmez; yorumların anlamsal doğruluğu insan incelemesine bağlıdır. Mevcut çalışma DB'si ve öğrenci kayıtları okunmadı/yazılmadı. Yeni ürün/test/belge değişiklikleri henüz commit/push edilmedi; önceki GitHub teslimi aşağıda. Tekrar test için tests/tmp/openrouter-smoke.php yerel yardımcıdır, Git dışı; gerçek ücretli çağrı yapar.
+
 ## GitHub teslimi tamamlandı — 2026-10-23
 
 Kullanıcı testler tamamsa GitHub'a push edilmesini açıkça istedi. Fetch ile yerel HEAD ve origin/main `9098ff7` eşitliği doğrulandı. Kod, belgeler, yeni eski-teslim regresyonu ve PHP güvenlik/8.4.27/yerel hazırlık kanıtları (62 dosya) `ee31172` commit'iyle origin/main'e başarıyla gönderildi. 62 adayda sır örüntüsü yok; kurulum belgesindeki açık parola yer tutucusu gerçek sır değildir. config/local.php, çalışma DB, PEM ve MariaDB çalışma dosyaları, vendor, .tools ve tests/tmp gönderilmedi. Beş yeni test logunda yalnız satır sonu boşlukları temizlendi; test sonuçları değiştirilmedi. Git kimliği eksikti; önceki commit'in Halil Kayaduman/GitHub noreply kimliği yalnız komuta özel kullanıldı, global ayar değiştirilmedi. Testler gereksiz tekrarlanmadı; son geçerli kapsam TEST_RESULTS.md içindedir. Bu teslim kaydı ayrı belge commit'iyle gönderilir. Hosting dağıtımı ve çalışma DB yazımı yok; gerçek AI/hosting/kurum/Disco/hedef cihaz-kesinti kabulü açık. Aşağıdaki commit/push yok kayıtları tarihçedir.
@@ -435,3 +465,80 @@ Kullanıcı tüm biriken düzenlemelerin GitHub'a gönderilmesini istedi. Hedef 
 Hostingini PHP 8.4.27'ye aldığını belirten kullanıcının uyumluluk sorusu üzerine resmî Windows NTS VS17 x64 paketi ayrı `.tools/php-8.4.27-test` klasöründe test edildi. SHA256 `93bd8a815a52156606fb906d0573437908c61f96e2cc52c03a51e36a41bf5236` doğrulandı. Varsayılan yerel PHP 8.3.36 olarak kaldı.
 
 Composer platform gereksinimleri ve CLI ortam kontrolü geçti. 81 SQLite genel (Word/PDF/XLSX dahil), 68 review-v2, 39 export, 42 gerçek HTTP/oturum/iki worker ve 81 MariaDB kontrolü: toplam 311 geçti. Ayrı restore DB'de 8 tablo sayısı eşleşti. Üç doğrudan PHP grubu E_ALL (32767) ile çalıştı; çıktılarda PHP Warning/Deprecated/Fatal görülmedi. Kanıtlar `test-evidence/php-8.4.27-compatibility/`. Ürün kodunda uyumluluk düzeltmesi gerekmedi. Çalışma verisine migration/seed/reset yok; canlı hosting/gerçek AI/fiziksel cihaz doğrulaması değildir.
+
+
+## 23 Ekim 2026 — öğrenci / AI etiket grupları ve prompt v3
+
+Etiket tanımları artık body.target_role=user veya assistant ile açıkça grupludur. Oluşturma/düzenleme ekranı, manuel seçim API/UI, AI JSON şeması ve sonuç doğrulaması aynı rol kuralını uygular. Eski grubu olmayan tanımlar tahminle atanmaz; yeni AI etiketlemesinden önce araştırmacı düzenlemelidir. Tarihsel kararlar korunur. Güncel tanımların tamamı her etiketleme isteğine eklenir; grup da önbellek anahtarının parçasıdır.
+
+Sohbet chat-v3 ve etiketleme message-labels-v3 promptlarının tam metni ve birlikte odak testi adımları AI_PROMPTS_REVIEW_TR.md içinde. İlk prompt başarısızlıkları tarihsel bulgudur; son sürüm sonuçları test-evidence/label-groups-2026-10-23 altında ayrıca tutulur. Genel model doğruluğu iddiası yoktur. Kullanıcının mevcut çalışmasında değerlendirme veya yeniden etiketleme başlatılmadı.
+
+
+## 23 Ekim 2026 — odak ölçümü adlandırması
+
+Kullanıcıyla TEST-OGR-04 üzerinde yapılan denemede sayfa görünürken 3,440 sn odak kaybı gözlendi; ekran yakalama aracı kullanımıyla uyumlu. Bu gözlem hedef uygulamayı belirlemez. “Uygulama dışında” başlığı, süreç ekranı, olay adları ve yeni üretilen gezinme/dışa aktarım açıklamalarında “Vaka sekmesi etkin değil” olarak düzeltildi. Hesaplama, ham olaylar, outside/APP_OUTSIDE teknik kodları değişmedi. Süre 60, gezinme 82 ve süreç JavaScript 11 kontrolü geçti.
+
+Mevcut yedi öğrenci etiketi için dahil etme/dışlama ölçütleri ve 12 örnekten oluşan STUDENT_LABELS_DRAFT_TR.md taslağı hazırlandı. Kullanıcının etiket tanımları veritabanında değiştirilmedi; taslak model çıktısı veya onaylı araştırma kodlama şeması değildir.
+
+
+## 23 Ekim 2026 — kabul edilen etiketlerin yerelde etkinleştirilmesi
+
+7 öğrenci etiketi v2, 9 AI yanıtı etiketi v1 olarak Admin::mutate/definition üzerinden kaydedildi. SQLite yedeği alındı; yanıt/mesaj/geçmiş etiket/değerlendirme tabloları değişmedi. Katalog label-definitions/2026-10-23.json içinde. Model testi güncel tanımları salt okunur aldı ve yalnız sentetik mesaj gönderdi.
+
+message-labels-v4 promptu tekrarları yasaklar, eleştiri/açıklama sınırını ve çoklu davranışı netleştirir; önbellek sürümü yenilendi. Gerçek GPT-5 Nano karşılaştırmasında 32 mesajdan 27 tam küme eşleşmesi (öğrenci 13/16; AI 14/16). Beş uyuşmazlık giderilmiş sayılmaz. İlk 32 mesajlık çağrı başarısız; v3 gruplarında tekrarlı etiket ve anlam hataları vardı. Tüm denemeler test-evidence/label-catalog-2026-10-23 altında saklandı. Detay RESULTS_TR.md. 22 yerel sözleşme kontrolü geçti. Kullanıcının vakalarında etiketleme veya değerlendirme başlatılmadı.
+
+
+## 23 Ekim 2026 — öğrenci etiketlemesi önceliği / message-labels-v6
+
+Kullanıcının isteğiyle öğrenci etiketlemesi ana işlem, AI yanıtı etiketlemesi ayrı ve isteğe bağlı oldu. Öğrenci API hedefi user, AI bağlamı context_messages içindedir. Yalnız seçilen grubun güncel ad/açıklamaları iletilir. Öğrenci için etiket başına boolean şema ve katı decoder kullanılır; sonuç benzersiz etiket listesine çevrilir. Açıklama wire JSON içinde yinelenmez. Öğrenci çağrıları dört hedeflik parçalara ayrılır ve tamamı doğrulanmadan yazılmaz. Grup bazlı önbellek ayrıdır; araştırmacı seçimleri korunur. Eski karma analiz çağrıları all uyumluluğunu sürdürür.
+
+Gerçek GPT-5 Nano: önceki öğrenci örnekleri 15/16, yeni örnekler 10/12; toplam25/28 tam etiket kümesi eşleşmesi. İki kapsam dışı finansal istek ve bir temel kavram tanımı hâlâ yanlış etiketleniyor. Öğrenci etiketlemesi tamamen doğrulanmış sayılmaz. Testler yalnız sentetik mesajlarla ve salt okunur güncel tanımlarla yapıldı; kullanıcının vakalarında yeniden etiketleme/değerlendirme yok. Rapor test-evidence/student-labels-2026-10-23/RESULTS_TR.md. Yeni20 yerel kontrol geçti.
+
+Öğrenci önceliği son regresyon: Chrome134, öğrenci sözleşmesi20, etiket sözleşmesi22, süreç28, sohbet9, süreç JavaScript11, değerlendirme74 kontrolü geçti. Canlı modelin 3/28 uyuşmazlığı açık.
+
+
+## 24 Ekim 2026 — öğrenci etiketleme hataları / message-labels-v11
+
+Önceki üç hata son kontrollü koşuda giderildi. Gerçek GPT-5 Nano:44/44 regresyon + uygulama/prompt sabitken ilk kez denenen 8/8; toplam 52/52. Değiştirilmiş ad/açıklama ve açık konu dışı etiket kontrolü 4/4. Önceki denemeler korunur. Bu bir genel %100 doğruluk garantisi değildir. Tam rapor test-evidence/student-labels-2026-10-24/RESULTS_TR.md; kaynak/fixture sabitleme özetleri message-labels-v11/frozen-holdout-manifest.json.
+
+Öğrenci hedefi kendi context_before alanındaki önceki konuşmayla kodlanır. Yeni topic_scope alanı araştırmacı kontrolündedir:pedagogical/outside/any. Kabul edilmiş7 öğrenci tanımı açıklamaları korunarak v3 pedagojik kapsamla kaydedildi; SQLite yedeği alındı, yanıt/geçmiş karar/değerlendirme tabloları değişmedi. Model message_scope döndürür; sunucu uygun olmayan kapsamı dışlar ve konu kararını audite yazar. Güncel Dahil/Dışla örnekleri tam açıklamanın yanında ayrı ipuçları olarak iletilir. Wire kimlikleri kısaM/L kodlarıdır; doğrulama sonrasında kalıcı kimliklere eşlenir. Önbellek v11 ile yenilendi. Hiçbir kullanıcı vakasında yeniden etiketleme veya puanlama başlatılmadı.
+
+Kontroller: öğrenci33, genel etiket22, süreç28, değerlendirme74, ana81, dışa aktarım39, gezinme82, süre60; Chrome ana135 ve grup/kapsam11 geçti. Güncel tam prompt AI_PROMPTS_REVIEW_TR.md içinde.
+
+## 24 Ekim 2026 gerçek model ile sentetik uçtan uca test
+
+İzole test DB üzerinde sohbet → öğrenci etiketi → teslim → V2 değerlendirme → araştırmacı düzeltmesi simülasyonu → öğrenci raporu → PDF/DOCX/XLSX/Disco akışı tamamlandı. Çalışma DB açılmadı, mevcut kullanıcı verisi değişmedi. Yerel439 ve Chrome etiket grubu/kapsam11 kontrolü geçti. PDF son üç sayfa render/görsel ve altı yanıt/toplam metin kontrolü geçti; DOCX paket/metin geçti, LibreOffice bulunmadığından görsel kontrol tamamlanamadı.
+
+AI-SCORE-04 AÇIK: GPT-5 Nano gerçek vaka ilişkisini içeren yanıtı yok sayıp sıfır verebiliyor. Yeni review-v2.1 promptu ve iki sabit karşılaştırma2/2 bu geniş akıştaki hatayı kapatmıyor. Sentetik rapor yalnız araştırmacı düzeltmesi simülasyonuyla tamamlandı, akademik uzman onayı değildir. Geçersiz JSON/kanıt çıktıları için şema, düz metin doğrulaması ve güvenli hata audit kaydı güçlendirildi. Puanlamada gerçek alıntı cümlesi seçimi ve gerekçe-önce üretimi var; insan inceleme kapısı sürer. PDF soru başlıkları yanıttan ayrılmayacak şekilde düzenlendi. Ayrıntı test-evidence/live-workflow-2026-10-24/RESULTS_TR.md. GitHub gönderimi yapılmadı. Sonraki iş: araştırmacının önceden puanladığı farklı düzeylerde örneklerle tekrarlı puanlama kalibrasyonu; öğrenci etiketleme önceliği korunur.
+
+## 24 Ekim 2026 kısa ön değerlendirme promptu review-v2.2
+
+Kullanıcı değerlendirmeyi araştırmacının inceleyeceği bir ön öneri olarak kullanacağını netleştirdi. Soru sistem promptu1579 karakterden808 karaktere indirildi (%49). Rubrik açıklamaları, sorunun kapsamı, gerçek kanıt, düzey-puan tutarlılığı, kısa geri bildirim ve araştırmacının son kararı korundu. Teknik şema/doğrulama kuralları, sohbet ve etiketleme promptları değişmedi. Önceden sabitlenmiş güçlü gerekçe ve gerekçesiz yanıtın gerçek GPT-5 Nano kontrolü2/2, yerel değerlendirme kontrolleri85/85 geçti. Kanıt: test-evidence/live-workflow-2026-10-24/scoring-20261024-182653. Bu küçük kontrol önceki anlamsal tutarsızlık kaydını kapatmaz; araştırmacı incelemesi mevcut iş akışının parçasıdır. Güncel metin AI_PROMPTS_REVIEW_TR.md son bölümünde.
+
+## 24 Ekim 2026 nihai algılanan zorluk ölçümü
+
+Kullanıcı isteğiyle nihai değerlendirmeye final_difficulty alanı eklendi. Yeni teslimlerde boş başlar ve0–10 tam sayı seçimi zorunludur;0 geçerli yanıttır. Kaydetme, teslim snapshotı, araştırma veri dışa aktarımı, araştırmacı puan tablosu ve başlangıç/nihai karşılaştırması alanı korur. V2 profil ön değerlendirmesine zorluk değişimi de iletilir. Örnek tarayıcı kontrolünde başlangıç6, nihai0, fark−6 birebir doğrulandı. Eski teslimlerde eksik nihai zorluk uydurulmaz; eski kayıtlar ve rapor snapshotları otomatik değiştirilmez. Şema migrasyonu gerekmez; veri mevcut JSON gövdelerinde tutulur. İstemci dosyalarının önbellek sürümleri0.2.26 olarak yenilendi.
+
+Kontroller: ana87, V2 değerlendirme86, eski teslim uyumluluğu21, dışa aktarım39, süreç28; Chrome doğrulama50 ve tam tarayıcı137 geçti. JavaScript/PHP sözdizimleri ve diff kontrolü geçti. Testler izole sentetik veriler/mock sağlayıcıyla yapıldı; çalışma DB değiştirilmedi. Canlı modele çağrı veya GitHub gönderimi yapılmadı.
+
+## 24 Ekim 2026 yerel analiz süre kesilmesi düzeltmesi
+
+Kullanıcı ekranındaki Unexpected token '<' hatasında çalışan8088 PHP cli-server üzerinden max_execution_time=30, display_errors=1 ve log_errors=0 ölçüldü; sağlayıcı timeout90 saniye. Çok sorulu adım PHP sınırında kesilip HTML hata çıktısıyla JSON yanıtını bozuyor ve analysis_steps satırını running bırakıyordu. Gerçek HTTP sentetik testinde aynı hata yeniden üretildi.
+
+ApiRuntime: sağlayıcı çağrısı öncesi PHP bütçesi timeout+15 saniye olarak yenilenir; cURL timeoutu korunur. API ekran hata çıktısını kapatıp günlüklemeyi açar. Fatal kapanışta yalnız bu isteğe bağlı çalışan analiz satırı failed olur ve güvenli JSON hata yanıtı döner. Başka/tamamlanmış sonuçlar değiştirilmez. İstemci JSON dışı hata çıktısında okunabilir Türkçe mesaj verir. Profil promptu kısa doğal dil ister, final_collected vb teknik alan adları ayrıca yorum doğrulamasında reddedilir. Soru promptu değişmedi; değerlendirme directive review-v2.3, app.js önbelleği0.2.27.
+
+Çalışma SQLite için backup-before-analysis-timeout-20261024-184738-cec2bb0e28ae289be8f53f15999b396e.sqlite yedeği alındı. Gözlenen iki kesilmiş adım ea9d7b5969d04834cb1f03da9e51d0cd ve18205466b515f379b6cc725234db939b yalnız failed/request_interrupted durumuna alındı, audit kaydı eklendi. Öğrenci taslakları/revizyonları/teslim kilitleri, snapshotlar, mesajlar, insan kararları, raporlar ve tamamlanmış adımların hashleri aynı kaldı. AI değerlendirmesi otomatik yeniden başlatılmadı.
+
+Kontroller: tests/api-runtime.cjs gerçek HTTP'de1 saniyelik sunucu sınırı, ardışık iki uzun beklemede bütçe yenileme, fatal/timeout JSON yanıtları, yalnız ilgili satırın kurtarılması ve tamamlanmış sonucun korunmasını doğruladı. Chrome138, ana87, V2 değerlendirme87, eski teslim21 kontrolü geçti. Tanı endpointi kaldırıldı. Testlerde gerçek sağlayıcı çağrısı yok. Kullanıcı Ctrl+F5 ardından Analize devam et ile ilerleyebilir. GitHub'a gönderim yapılmadı.
+
+## 24 Ekim 2026 öğrenci raporu görünürlüğünü geri alma
+
+Kullanıcı isteğiyle V2 rapor kartına ayrı Göstermeyi geri al düğmesi eklendi. Raporun durumu metinli ve renkli etiketle Öğrenciye açık/Öğrenciye kapalı gösterilir. Açık raporda göster düğmesi pasif, geri al düğmesi etkindir; geri alındığında ve yayın koşulları sağlandığında tersi olur. Yayın koşulları sağlanmıyorsa mevcut kapanış uyarısı ve engeli sürer. Pasif düğmeler nötr gri, etkin göster yeşil, etkin geri al kırmızı tonludur. Görünürlük eylemleri hazırlama/indirme düğmelerinden ayrı alandadır.
+
+Yetkili araştırmacının report/hide işlemi yalnız published_at değerini temizler. Rapor onayı, içeriği ve kimliği korunur; işlem audit kaydına yazılır. Öğrenci rapor listesi ve indirme erişimi kapanır. Aynı rapor mevcut veri toplama ve güncel değerlendirme kapılarıyla yeniden gösterilebilir. Öğrenci bu işlemi yapamaz. Mevcut çalışma raporlarının görünürlüğü otomatik değiştirilmedi.
+
+Kontroller: V2 değerlendirme94, ana87, eski teslim21, tam Chrome142 geçti. Testler göster→geri al→yeniden göster, düğmelerin karşılıklı etkinliği, durum etiketleri, öğrenci erişiminin kapanması, içerik/onay korunması, tekrarlı geri alma ve audit kaydını kapsar. Son masaüstü kapalı ve mobil açık ekran görüntüleri görsel incelendi. Cache sürümü app/review/CSS0.2.28. Gerçek sağlayıcı çağrısı veya GitHub gönderimi yok. Kullanıcı Ctrl+F5 ile yenileyebilir.
+
+## 24 Ekim 2026 GitHub teslim hazırlığı
+
+Kullanıcı tüm son değişikliklerin GitHub'a gönderilmesini ve OpenRouter anahtarının paylaşılmamasını açıkça istedi. origin/main ile yerel HEAD32fef8e eşitliği fetch ile doğrulandı. Gerçek yapılandırılmış anahtar çıktı verilmeden aday dosyalarda, main commit geçmişinde, Word/Excel arşiv içeriklerinde ve PDF metninde karşılaştırıldı; eşleşme ve geçerli token örüntüsü yok. config/local.php Git dışında; çalışma veritabanı, yedekler, .tools ve tests/tmp dışarıda. Sentetik ekran görüntüsü ayrıca incelendi. Yalnız HEAD:main gönderilecek; yerel Codex checkpoint refleri gönderilmeyecek. Son içerik taraması stage sonrası yinelenecek.

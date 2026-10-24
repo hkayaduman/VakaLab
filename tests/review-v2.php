@@ -12,12 +12,29 @@ foreach([[0,'ai'],[120,'final']] as $i=>[$seconds,$section])$events[]=['key'=>ui
 $run=$analysis->newRun($r,$a['id'],'test-rubric-v1',2);$rid=$run['id'];verifyV2(Review::version($db,$rid)===2,'new contract recorded without schema change');
 $steps=[];foreach([1,2,3,5,4,6] as $step){$steps[$step]=$analysis->step($r,$rid,$step);verifyV2($steps[$step]['status']==='completed','prepared section '.$step);}
 $profile=obj($steps[2]['output']);verifyV2(isset($profile['feedback'],$profile['profile'])&&!isset($profile['score'],$profile['scores']),'profile has comparison and feedback without score');
+verifyV2($profile['profile'][2]['initial']===6&&$profile['profile'][2]['final']===4&&$profile['profile'][2]['change']===-2&&$profile['profile'][2]['final_collected'],'final perceived difficulty reaches profile comparison with exact difference');
+verifyV2(Ai::responseFormat(['task'=>'profile_comparison'])===['type'=>'json_object'],'structured output remains opt-in for existing compatible providers');
+verifyV2(Ai::responseFormat(['step'=>8],true)===['type'=>'json_object'],'legacy analysis format remains compatible when strict V2 schemas are enabled');
+$profileFormat=Ai::responseFormat(['task'=>'profile_comparison'],true);
+$feedbackPattern='~'.$profileFormat['json_schema']['schema']['properties']['feedback']['pattern'].'~u';
+foreach(['{"summary":"Açıklama"}','["Açıklama"]'," \n {\"summary\":\"Açıklama\"}"," \n [\"Açıklama\"]"] as $encoded)verifyV2(preg_match($feedbackPattern,$encoded)===0,'native feedback contract excludes encoded object or array');
+foreach(['Yanıtınız vaka bilgisiyle ilişkilidir.'," \n Yanıtınız vaka bilgisiyle ilişkilidir."] as $plain)verifyV2(preg_match($feedbackPattern,$plain)===1,'native feedback contract permits plain Turkish text');
+verifyV2($profileFormat['type']==='json_schema'&&$profileFormat['json_schema']['strict']===true&&$profileFormat['json_schema']['schema']['required']===['feedback']&&$profileFormat['json_schema']['schema']['additionalProperties']===false,'strict profile contract requires feedback instead of response alias');
+$questionPayload=obj($steps[3]['output'])['questions']['problem']['input'];$questionFormat=Ai::responseFormat($questionPayload,true)['json_schema']['schema'];
+$quoteOptions=$questionFormat['properties']['scores']['properties']['reasoning']['properties']['quote']['enum'];
+verifyV2(count($quoteOptions)>0&&count(array_filter($quoteOptions,fn($quote)=>!str_contains($questionPayload['sources']['problem'],$quote)))===0,'native scoring evidence is selected only from exact current answer sentences');
+verifyV2($questionFormat['properties']['scores']['required']===array_column($questionPayload['rubric']['dimensions'],'id')&&$questionFormat['properties']['scores']['properties']['reasoning']['properties']['source']['enum']===['problem'],'strict question contract uses actual rubric IDs and only the current answer source');
 verifyV2($profile['profile'][1]['change']===2&&$profile['profile'][0]['final_collected']===false&&$profile['profile'][0]['change']===null,'real confidence difference; no invented missing profile measurement');
 foreach([3=>3,4=>2,6=>1] as $step=>$count){$out=obj($steps[$step]['output']);verifyV2(count($out['questions'])===$count,'separate question scores for section '.$step);foreach($out['questions'] as $id=>$q){verifyV2(array_keys($q['input']['sources'])===[$id]&&!isset($q['input']['profile'],$q['input']['messages']),'isolated answer payload '.$id);verifyV2($q['score']===0&&$q['max']===4&&strlen($q['feedback'])>10,'rubric score and improvement feedback '.$id);}}
 $stats=obj($steps[5]['output']);verifyV2($stats['statistics']['seconds']===120&&$stats['statistics']['student_messages']===1&&$stats['statistics']['assistant_messages']===1,'chat counts and 120-second navigation interval are computed exactly');verifyV2(isset($stats['statistics']['student_messages'])&&!isset($stats['feedback'],$stats['questions'],$stats['scores'])&&$steps[5]['model']==='system','chat has only computed statistics without AI scoring/comment');
 denyV2(fn()=>$analysis->decide($r,$steps[5]['id'],['action'=>'accept']),'chat statistics have no human score/feedback decision');
 denyV2(fn()=>$analysis->step($r,$rid,5,true),'chat statistics cannot be sent to AI for rewriting');
 $feedback='Başlangıç ve nihai güven değerleriniz arasında iki puanlık artış var; bu değişim tek başına başarı kanıtı değildir.';
+denyV2(fn()=>$analysis->decide($r,$steps[2]['id'],['action'=>'edit','body'=>['feedback'=>js(['summary'=>'Bu alan düz metin olmalı.','note'=>'JSON öğrenci yorumuna geçmemeli.'])]]),'serialized JSON object cannot become student feedback');
+denyV2(fn()=>Review::text(js(['İlk açıklama metni.','İkinci açıklama metni.'])),'serialized JSON array cannot become student feedback');
+denyV2(fn()=>Review::text('"note": "Bu bir düz metin paragrafı değildir."'),'serialized JSON fragment cannot become student feedback');
+denyV2(fn()=>Review::text('```text Açıklama metni burada ```'),'code block cannot become student feedback');
+denyV2(fn()=>Review::text('Güven değişimi final_collected=true alanına göre yorumlandı.'),'technical profile field cannot become student feedback');
 $analysis->decide($r,$steps[2]['id'],['action'=>'edit','body'=>['feedback'=>$feedback]]);
 foreach([3,4,6] as $step){
     $accepted=$analysis->decide($r,$steps[$step]['id'],['action'=>'accept']);
@@ -70,4 +87,18 @@ $fresh=$analysis->step($r,$rid,6,true);denyV2(fn()=>(new Export($app))->reportDa
 $analysis->decide($r,$fresh['id'],['action'=>'accept']);$analysis->step($r,$rid,8);
 $updated=$db->one('SELECT * FROM reports WHERE id=?',[$again['id']]);verifyV2(!$updated['approved_at']&&!$updated['published_at']&&count($db->all('SELECT id FROM reports'))===count($oldReports)+1,'new human review automatically replaces the single report and requires showing again');
 $analysis->report($r,'show',['id'=>$updated['id']]);verifyV2(count($app->view($u,$a['id'])['reports'])===1,'student sees exactly one current report');
+$visible=$db->one('SELECT * FROM reports WHERE id=?',[$updated['id']]);
+denyV2(fn()=>$analysis->report($u,'hide',['id'=>$visible['id']]),'student cannot revoke researcher publication');
+$hidden=$analysis->report($r,'hide',['id'=>$visible['id']]);
+verifyV2($hidden['published_at']===null&&$hidden['approved_at']===$visible['approved_at']&&$hidden['body']===$visible['body']&&$hidden['id']===$visible['id'],'hide preserves report approval content and identity');
+verifyV2(count($app->view($u,$a['id'])['reports'])===0,'hidden report disappears from student report list');
+denyV2(fn()=>(new Export($app))->reportData($u,$visible['id']),'hidden report cannot be downloaded by student');
+verifyV2((bool)$db->one("SELECT id FROM audit WHERE action='report_hide' AND target=?",[$visible['id']]),'visibility withdrawal is audited');
+$analysis->report($r,'hide',['id'=>$visible['id']]);verifyV2(count($app->view($u,$a['id'])['reports'])===0,'repeated hide remains safe');
+$analysis->report($r,'show',['id'=>$visible['id']]);verifyV2(count($app->view($u,$a['id'])['reports'])===1,'researcher can show the same report again');
+$invalidConfig=$c;$invalidConfig['ai']['mode']='invalid_json';
+$failed=(new Analysis(new App($db,$invalidConfig)))->step($r,$rid,2,true);
+$failureAudit=$db->one("SELECT detail FROM audit WHERE target=? AND action='analysis_step_failed'",[$failed['id']]);
+verifyV2($failed['status']==='failed'&&obj($failed['output'])===[],'invalid provider output is not persisted as a completed review');
+verifyV2($failureAudit&&isset(obj($failureAudit['detail'])['validation_error'])&&!str_contains($failureAudit['detail'],'api_key'),'failed review records validation diagnosis without provider credentials');
 echo "TOTAL V2 $n checks passed; isolated SQLite/mock.\n";

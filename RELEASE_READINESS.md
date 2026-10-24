@@ -1,3 +1,12 @@
+# Güncel durum — 24 Ekim 2026
+
+Yerel geliştirme ve kullanıcı denemeleri tamamlanan bölüm için GitHub teslimi hazırlanıyor. Son değişiklikler: sade ön değerlendirme promptları, öğrenci öncelikli güncel tanım/kapsam etiketlemesi, nihai algılanan zorluk, PHP süre kesilmesi kurtarması ve öğrenci raporu görünürlüğünü geri alma. AI puanları araştırmacının inceleyeceği ön önerilerdir; otomatik akademik doğruluk onayı verilmez. Ayrı test hostingi, hedef Disco importu ve kurumun rubrik/kod kitabı/onam kabulü sonraki işlerdir.
+
+Son ilgili kontroller: Chrome142, V2 değerlendirme94, ana87, eski teslim21; süre ve etiketleme kapsamları TEST_RESULTS.md içinde. Gerçek OpenRouter GPT-5 Nano sentetik test kanıtları test-evidence altında korunur. DOCX paket/metin doğrulandı; bu bilgisayarda LibreOffice olmadığından son Word görsel kontrolü tamamlanamadı. PDF üç sayfa görsel incelendi.
+
+Teslim güvenliği: config/local.php, çalışma DB/yedekler, .tools ve tests/tmp Git dışında. Yapılandırılmış gerçek anahtar, main geçmişi ve gönderilecek içerikle çıktılara yazılmadan karşılaştırıldı. Kaynak, test kanıtı ve belge taramasında anahtar bulunmadı. Yerel uygulama checkpoint refleri gönderilmez; yalnız main dalı gönderilir. Aşağıdaki eski sürüm açıklamaları tarihsel kayıttır.
+
+---
 # Yayın öncesi durum — 2026-10-23
 
 **GitHub teslimi:** Bu yerel hazırlığın kod/belge/test kanıtları `ee31172` commit'iyle 23 Ekim 2026'da origin/main'e gönderildi. Aşağıdaki commit/push yok ifadeleri teslim öncesi tarihsel kayıttır. GitHub teslimi hosting dağıtımı veya gerçek ortam kabulü değildir; dış doğrulamalar bekliyor.

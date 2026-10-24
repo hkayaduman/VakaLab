@@ -24,11 +24,11 @@ final class EventLabels {
         'message_send'=>['AI mesajı gönderimi başlatıldı','Mesaj durumu','AI isteğinin gönderilme girişimi kaydedildi; başarı ve soru amacı sunucu isteğiyle eşleştirilerek belirlenir.'],
         'app_presence'=>['Uygulama durumu değişti','Gezinme','Uygulamadan ayrılma veya uygulamaya dönüş kaydı.'],
     ];
-    public const SECTIONS = ['case'=>'Vaka metni','profile'=>'Vaka profili','initial'=>'Başlangıç değerlendirmesi','ai'=>'AI sohbeti','final'=>'Nihai değerlendirme','reflection'=>'Yansıtma','confirm'=>'Son teslim','outside'=>'Uygulama dışında','away'=>'Vaka dışında'];
+    public const SECTIONS = ['case'=>'Vaka metni','profile'=>'Vaka profili','initial'=>'Başlangıç değerlendirmesi','ai'=>'AI sohbeti','final'=>'Nihai değerlendirme','reflection'=>'Yansıtma','confirm'=>'Son teslim','outside'=>'Vaka sekmesi etkin değil','away'=>'Vaka dışında'];
     public static function describe(array $event): array {
         [$name,$category,$description] = self::TYPES[$event['type']] ?? ['Tanımlanmamış olay','Tanımlanmamış','Özgün olay kodunu inceleyin.'];
         $p=(is_array($event['payload']??null)?$event['payload']:(json_decode($event['payload']??'{}',true)?:[]));
-        if($event['type']==='app_presence'){$name=($p['app_active']??false)?'Uygulamaya döndü':'Uygulamadan ayrıldı';$description=($p['app_active']??false)?'Bölüm süresi yeniden başladı.':'Bölüm süresi durdu; dönüşe kadar Uygulama dışında süresi kaydedilir.';}
+        if($event['type']==='app_presence'){$name=($p['app_active']??false)?'Vaka sekmesi yeniden etkin':'Vaka sekmesi etkinliğini kaybetti';$description=($p['app_active']??false)?'Bölüm süresi yeniden başladı.':'Sayfa gizli veya pencere odaksız; vaka sekmesi yeniden etkin olana kadar bölüm süresi durur.';}
         if($event['type']==='section_open'&&!empty($p['locked'])){$name=$event['section']==='ai'?'Kilitli AI bölümünü görüntüleme':'Kilitli bölüm görüntüleme';$description='İstenen bölüm kilitliydi; erişim denemesi kaydedildi.';}
         return $event + ['type_tr'=>$name,'section_tr'=>self::SECTIONS[$event['section']] ?? 'Tanımlanmamış bölüm','event_category'=>$category,'event_description'=>$description];
     }

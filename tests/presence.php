@@ -10,7 +10,7 @@ $events=presenceEvents($spec);$original=js($events);$visits=Navigation::build($e
 presenceCheck(array_column($visits,'section')===['initial','outside','initial','final'],'outside is an explicit interval between section visits');
 presenceCheck(array_column(array_slice($visits,0,3),'duration_seconds')===[60.0,180.0,120.0],'one plus two minutes in section; three minutes outside');
 presenceCheck($visits[0]['activity']==='Başlangıç değerlendirmesi görüntüleme'&&$visits[2]['activity']==='Başlangıç değerlendirmesi güncelleme','edits belong only to the resumed interval');
-presenceCheck($visits[1]['activity']==='Uygulama dışında'&&$visits[1]['activity_code']==='APP_OUTSIDE','outside has a stable activity name and code');
+presenceCheck($visits[1]['activity']==='Vaka sekmesi etkin değil'&&$visits[1]['activity_code']==='APP_OUTSIDE','outside has a stable activity name and code');
 presenceCheck(js($events)===$original,'raw observations unchanged');
 $focus=$events;$focus[1]['type']='focus';$focus[1]['payload']=js(['view_id'=>'presence-view','visible'=>true,'focused'=>false,'app_active'=>false]);
 presenceCheck(Navigation::build($focus)['visits'][1]['duration_seconds']===180.0,'leaving for another app also starts outside interval');
@@ -41,13 +41,13 @@ $parse=function($csv){$f=fopen('php://temp','w+');fwrite($f,substr($csv,3));rewi
 $rows=$parse($ex->disco($r,['app_id'=>$a['id']]));
 presenceCheck(array_column(array_values(array_filter($rows,fn($v)=>$v['Activity Code']==='AI_WAIT')),'Duration Seconds')===['10','10'],'Disco exports two bounded waits');
 $outside=current(array_filter($rows,fn($v)=>$v['Activity Code']==='APP_OUTSIDE'));
-presenceCheck($outside['Duration Seconds']==='60'&&$outside['Section']==='Uygulama dışında','Disco contains explicit outside duration');
+presenceCheck($outside['Duration Seconds']==='60'&&$outside['Section']==='Vaka sekmesi etkin değil','Disco contains explicit outside duration');
 // Response during absence remains a point and must not open AI viewing while outside.
 $hidden=$aiSpec;$hidden[3]=['response_visible','ai','10:01:00',['request'=>$request['id'],'status'=>'completed','app_active'=>false]];$hidden[4]=['app_presence','ai','10:01:30',[]];
 $load($hidden);$parts=$app->view($r,$a['id'])['navigation']['activities'];
 presenceCheck(array_column(array_values(array_filter($parts,fn($v)=>($v['activity_type']??'')==='ai_wait')),'duration_seconds')===[10.0],'response outside ends pending wait without charging hidden seconds');
 $response=current(array_filter($parts,fn($v)=>($v['activity_type']??'')==='ai_response'));
-presenceCheck($response['start_at']==='2026-10-21T10:01:00Z'&&str_contains($response['activity'],'Uygulama dışındayken'),'actual hidden reply timestamp and context preserved');
+presenceCheck($response['start_at']==='2026-10-21T10:01:00Z'&&str_contains($response['activity'],'Vaka sekmesi etkin değilken'),'actual hidden reply timestamp and context preserved');
 presenceCheck(array_column(array_values(array_filter($parts,fn($v)=>($v['activity_code']??'')==='AI_VIEW')),'duration_seconds')===[20.0,30.0],'viewing resumes only on return after hidden reply');
 presenceCheck(count(array_filter($parts,fn($v)=>($v['activity_type']??'')==='ai_response'))===1,'hidden reply not fabricated again on return');
 // An open wait must also produce a bounded pause followed by an unknown open end.
@@ -95,4 +95,12 @@ $gapVisits=Navigation::build(presenceEvents($gapSpec))['visits'];presenceCheck(a
 $gapReadonly=$gapSpec;$gapReadonly[2][3]['read_only_tab']=true;presenceCheck(count(array_filter(Navigation::build(presenceEvents($gapReadonly))['visits'],fn($v)=>$v['section']==='away'))===0,'read-only parallel tab does not fabricate a case-away interval');
 $parallelGap=$gapSpec;array_splice($parallelGap,2,0,[['section_open','initial','10:00:30',['view_id'=>'parallel-view']],['section_leave','initial','10:03:30',['reason'=>'home','view_id'=>'parallel-view']]]);$parallelGapVisits=Navigation::build(presenceEvents($parallelGap))['visits'];presenceCheck(count(array_filter($parallelGapVisits,fn($v)=>$v['section']==='away'&&$v['start_at']==='2026-10-21T10:01:00Z'))===0,'overlapping case window prevents an invented case-away interval');
 $staleSpec=$gapSpec;array_unshift($staleSpec,['section_open','final','09:00:00',['view_id'=>'stale-unclosed']]);$staleVisits=Navigation::build(presenceEvents($staleSpec))['visits'];$staleGaps=array_values(array_filter($staleVisits,fn($v)=>$v['section']==='away'));presenceCheck(count($staleGaps)===1&&$staleGaps[0]['duration_seconds']===180.0,'old unclosed trace does not hide an observed home/reopening gap');presenceCheck(count(array_filter($staleVisits,fn($v)=>$v['end_at']===null))===1,'old unclosed trace remains unknown without inventing its end');
+$focusOnly=presenceEvents([['section_open','ai','11:00:00',[]],['focus','ai','11:00:02',['app_active'=>false,'visible'=>true,'focused'=>false]],['focus','ai','11:00:05',[]],['section_open','final','11:00:10',[]]]);
+$focusOutside=array_values(array_filter(Navigation::build($focusOnly)['visits'],fn($v)=>$v['section']==='outside'));
+presenceCheck(count($focusOutside)===1&&$focusOutside[0]['duration_seconds']===3.0,'visible-but-unfocused interval is measured without claiming a destination app');
+$combined=presenceEvents([['section_open','ai','11:00:00',[]],['focus','ai','11:00:02',['app_active'=>false,'visible'=>true,'focused'=>false]],['visibility','ai','11:00:03',['app_active'=>false,'visible'=>false,'focused'=>false]],['heartbeat','ai','11:00:04',['app_active'=>false,'visible'=>false,'focused'=>false]],['focus','ai','11:00:05',['app_active'=>false,'visible'=>false,'focused'=>true]],['visibility','ai','11:00:06',[]],['section_open','final','11:00:10',[]]]);
+$combinedOutside=array_values(array_filter(Navigation::build($combined)['visits'],fn($v)=>$v['section']==='outside'));
+presenceCheck(count($combinedOutside)===1&&$combinedOutside[0]['duration_seconds']===4.0,'focus then visibility loss forms one continuous outside interval without double count');
+$focused=presenceEvents([['section_open','ai','11:00:00',[]],['heartbeat','ai','11:00:05',[]],['section_open','final','11:00:10',[]]]);
+presenceCheck(count(array_filter(Navigation::build($focused)['visits'],fn($v)=>$v['section']==='outside'))===0,'remaining visible and focused creates no outside interval');
 echo "TOTAL PRESENCE $count checks passed; isolated in-memory database.\n";

@@ -10,7 +10,7 @@ function legacyCheck(bool $ok,string $name): void {global $count;if(!$ok)throw n
 function legacyDenied(callable $fn,string $name): void {try{$fn();}catch(Fault $e){legacyCheck($e->getCode()===422,$name);return;}throw new RuntimeException('Not rejected: '.$name);}
 $r=$db->one("SELECT * FROM users WHERE id='test-researcher'");
 $a=$db->one("SELECT * FROM applications WHERE user_id='test-student-6' AND case_id='test-case-1'");
-$original=obj($a['draft']);$legacy=$original;unset($legacy['final_severity']);
+$original=obj($a['draft']);$legacy=$original;unset($legacy['final_severity'],$legacy['final_difficulty']);
 // Historical data is constructed only inside this disposable in-memory fixture.
 $db->q('UPDATE applications SET draft=? WHERE id=?',[js($legacy),$a['id']]);
 $db->q("UPDATE snapshots SET body=? WHERE app_id=? AND kind='submit'",[js($legacy),$a['id']]);
@@ -19,7 +19,7 @@ $snapshots=$db->all('SELECT * FROM snapshots WHERE app_id=? ORDER BY id',[$a['id
 $run=$analysis->newRun($r,$a['id'],'test-rubric-v1');
 $step=$analysis->step($r,$run['id'],1);
 legacyCheck($step['status']==='completed','historical v1 submission passes integrity without later-added field');
-legacyCheck((obj($step['output'])['uncollected_fields']??[])===['final_severity'],'missing historical severity explicitly reported as uncollected');
+legacyCheck((obj($step['output'])['uncollected_fields']??[])===['final_severity','final_difficulty'],'historical missing measurements explicitly reported as uncollected');
 for($n=2;$n<=8;$n++){
     $step=$analysis->step($r,$run['id'],$n);
     legacyCheck($step['status']==='completed','historical v1 analysis completes step '.$n);
@@ -31,6 +31,7 @@ $v2=$analysis->newRun($r,$a['id'],'test-rubric-v1',2);
 legacyCheck($analysis->step($r,$v2['id'],1)['status']==='completed','historical submission remains compatible with v2');
 $profile=(new Review($app))->profile($legacy);
 legacyCheck($profile[3]['final']===null&&$profile[3]['change']===null,'uncollected severity stays unknown in profile');
+legacyCheck($profile[2]['final']===null&&$profile[2]['change']===null&&!$profile[2]['final_collected'],'uncollected historical difficulty is not imputed');
 legacyCheck($before===$db->one('SELECT * FROM applications WHERE id=?',[$a['id']]),'analysis preserves historical draft revision state and submission lock');
 legacyCheck($snapshots===$db->all('SELECT * FROM snapshots WHERE app_id=? ORDER BY id',[$a['id']]),'immutable submission snapshots unchanged');
 $u=$db->one("SELECT * FROM users WHERE id='test-student-5'");

@@ -1,5 +1,19 @@
 # Hatalar, düzeltmeler ve açık doğrulamalar
 
+## Gerçek GPT-5 Nano davranış açıkları — 2026-10-23
+
+- **AI-BEHAVIOR-01 · AÇIK:** chat-v2 ve doğal API rolleriyle kısa vaka sorusu düzeldi; kapsam dışı finans/hukuk sorusunda model talebi reddetse de istem dışı pedagojik plan/davet ekledi. Prompttaki yasak ve örneklere rağmen tekrarlandı. Teknik başarı veya bütünüyle çözülmüş sayılmaz.
+- **AI-LABEL-01 · AÇIK:** güncel açıklamalar her istekte gönderiliyor; ancak adlar sabitken açıklaması daraltılan etiketlerin dışlama kuralları gerçek sentetik GPT-5 Nano testinde uygulanmadı. Normal öğrenci/AI rol eşleşmesi geçti. Katı şema yalnız geçerli kimlik/JSON garantisidir; bu semantik hatayı çözmez.
+- Teknik aktarım/cache/audit/yarış korumaları uygulandı; kullanıcının gerçek etiketleri değiştirilmedi ve mevcut vakasında değerlendirme/yeniden etiketleme yapılmadı. Kanıt ve başarısız ilk denemelerin doğru yorumu TEST_RESULTS.md / test-evidence/prompts-presence-2026-10-23/outcome-summary.json içinde.
+
+## Mesaj kutusunda gönderilen taslak kalıyor — DÜZELTİLDİ (yerel, 2026-10-23)
+
+Gönderilen metin trim edilirken, temizlik koşulu özgün draft.question ile kırpılmış metni karşılaştırıyordu. Kullanıcının testinde sondaki satır sonu yüzünden koşul sağlanmadı. Temizlik özgün gönderim taslağına bağlandı; yanıt sırasında yazılmış farklı taslak korunur. Geçmiş teslim edilmiş veri değiştirilmedi. Araştırmacı başlığında artık “Gönderilmemiş” çıkarımı yapılmaz. 11 hedefli ve 131 genel Chrome, 11 süreç JS geçti; test-evidence/chat-prompts-2026-10-23/. Yeni sohbet/etiketleme promptları yalnız taslaktır; kullanıcı değerlendirmesi başlatılmadı.
+
+## İlk gerçek OpenRouter testi — 2026-10-23
+
+OPEN-01 artık anahtar/sağlayıcı bilgisi eksikliği değildir: özel yerel OpenRouter/GPT-5 Nano ayarıyla sentetik sohbet, profil ve tek soru puanlama smoke testi tamamlandı. Gerçek rubrik kalitesi, tam altı sorulu UI akışı ve mesaj etiketleme kabulü açık kalır. İlk testteki yerel CA eksikliği düzeltildi; JSON alan/tür sapmaları için opt-in katı şema, kodlanmış JSON'un öğrenci yorumuna geçmesini önleyen kontrol eklendi. 45 sn puanlama timeout'u local.php'de 90 sn yapıldı. Bir erken örnekte model ölçülmeyen profile sayı uydurdu; ham veri değişmedi, örnek kalite kabulü sayılmadı. Şema anlamsal doğruluk garantisi değildir; insan kararı zorunludur. Ayrıntılar TEST_RESULTS.md ve test-evidence/openrouter-2026-10-23/ içinde. Değişiklikler henüz commit/push edilmedi.
+
 ## 2026-10-23 güncel durum
 
 - **AUDIT-01 · DÜZELTİLDİ (yerel):** v1 bütünlük adımı yeni teslim kontrolü yerine geçmiş teslim kontrolünü kullanır. Sonradan eklenen `final_severity` eksikse `uncollected_fields` içinde belirtilir; tahmini değer yazılmaz. Yeni teslim gereksinimleri korunur. `tests/legacy-submission.php`: 20 kontrol, PHP 8.3.36 ve 8.4.27 üzerinde geçti; eski v1 akışı/raporu, v2 uyumluluğu, değişmez veriler ve geçersiz yeni teslim reddi kapsanır.
@@ -92,3 +106,31 @@ Genişletilmiş süre testinde yakalandı ve düzeltildi: başlangıç/bitiş s�
 ## 0.2.12 — Eski açık uç yeni Vaka dışında aralığını gizliyordu (düzeltildi)
 
 2026-10-21 0.2.12 kullanıcı yeni ekran incelemesi: TEST-OGR-01 / Sınıfta dijital araç kullanımı, son onay 13:38:06.747–13:38:17.978 (11.231sn) kesintisiz submit_confirmed ile kapandı; sahte native ayrılış yok. Önceki 13.384 ve8.273sn dışarı aralıklarında visible=false gözlemi var. Vakalarım13:36:49.989→yeniden açılış13:37:24.941 arası34.952sn ilk hesapta görünmüyordu: eski günden kalma end=null trace, sonsuza kadar açık paralel pencere varsayılıp boşluğu engelliyordu. Düzeltildi: sadece bitişi bilinen ve gerçekten çakışan aralık bu boşluğu engeller. Eski açık uçlar bilinmiyor kalır; kapanış uydurulmaz. Salt okunur gerçek DB yeniden hesabı Vaka dışında34.952sn doğruladı. 57 presence,82navigation,16 gerçek Chrome onay/boşluk testi geçti; Chrome fixture eski açık uç kaydını da içerir, CSV/UI doğrulandı. Çalışma DB yazılmadı; yeni manuel tekrar gerekmiyor. Kullanıcının düzeltme sonrası ekran teyidi henüz yok. Commit/push yok.
+
+
+## 23 Ekim 2026 — öğrenci / AI etiket grupları ve prompt v3
+
+Etiket tanımları artık body.target_role=user veya assistant ile açıkça grupludur. Oluşturma/düzenleme ekranı, manuel seçim API/UI, AI JSON şeması ve sonuç doğrulaması aynı rol kuralını uygular. Eski grubu olmayan tanımlar tahminle atanmaz; yeni AI etiketlemesinden önce araştırmacı düzenlemelidir. Tarihsel kararlar korunur. Güncel tanımların tamamı her etiketleme isteğine eklenir; grup da önbellek anahtarının parçasıdır.
+
+Sohbet chat-v3 ve etiketleme message-labels-v3 promptlarının tam metni ve birlikte odak testi adımları AI_PROMPTS_REVIEW_TR.md içinde. İlk prompt başarısızlıkları tarihsel bulgudur; son sürüm sonuçları test-evidence/label-groups-2026-10-23 altında ayrıca tutulur. Genel model doğruluğu iddiası yoktur. Kullanıcının mevcut çalışmasında değerlendirme veya yeniden etiketleme başlatılmadı.
+
+
+## AI-LABEL-02 — 16 tanımla kalan anlam eşleşmesi sorunları (açık)
+
+message-labels-v4 / GPT-5 Nano: 32 sentetik mesajın 5’inde beklenen etiket kümesinden sapma. Eleştiri isteğinin açıklama sayılması, fazladan eleştiri/karar etiketi, kapsam dışı talebe etiket verilmesi, AI sorusuna fazladan kapsam/metin düzenleme etiketi ve devam davetinin atlanması görüldü. Rol doğrulaması geçti; anlam doğruluğu kesinleşmiş değildir. Tam örnekler test-evidence/label-catalog-2026-10-23/RESULTS_TR.md içinde. Beklenen etiketler veya tanımlar model sonucuna göre değiştirilmedi.
+
+
+## AI-LABEL-03 — öğrenci öncelikli v6: 3/28 uyuşmazlık (24 Ekim v11 kontrol kümesinde giderildi)
+
+Kapsam dışı iki yatırım talebine etiket verilmesi ve “Arabuluculuk kavramını bir cümleyle tanımla” talebinin Açıklama istedi sayılması sürdü. Eski küme15/16; yeni küme10/12. Bu örneklerin beklenen etiketleri değiştirilmedi. Ayrıntı test-evidence/student-labels-2026-10-23/RESULTS_TR.md içinde. Öğrenci grubu, çoklu/boş karar dönüşümü ve insan düzeltmeleri yerel kontrollerde doğrulandı; anlam hataları kapanmış sayılmaz.
+
+
+## 24 Ekim 2026 — AI-LABEL-03 doğrulaması
+
+Önceki üç örnek v11 koşusunda doğru.52/52 öğrenci mesajı ve4/4 değişen tanım testi geçti. Rapor: test-evidence/student-labels-2026-10-24/RESULTS_TR.md. Önceki yanlış sonuçlar silinmedi; tüm olası gelecek mesajlarda hatasızlık iddiası yok. İsteğe bağlı AI yanıtı etiketlemesinin eski anlam hataları bu öğrenci testleriyle kapanmış sayılmaz.
+
+## AI-SCORE-04 — GPT-5 Nano puanlama tutarsızlığı açık
+
+24 Ekim canlı sentetik uçtan uca testinde, doğru vaka bağlantısı içeren bir yanıt için model hem gerçek alıntıyı seçti hem de bağlantının bulunmadığını ileri sürerek sıfır verdi. İlk koşuda gerekçe, güncel review-v2.1 promptuyla tekrarında temel problem yanıtı etkilendi. Katı JSON, gerçek alıntı ve düzey-puan eşleşmesi bu anlamsal hatayı tek başına engellemiyor. Açık gerekçe / gerekçesiz yanıt için sabit iki karşılaştırma geçti; bu dar sonuç genel puanlama doğrulaması değildir.
+
+Düz metin yerine kodlanmış nesne/dizi veya alan parçası döndürülmesi için geri bildirim şeması ve sunucu doğrulaması güçlendirildi. Kaynakta olmayan kanıt alıntısı için katı soru şemasında yalnız mevcut öğrenci yanıtından çıkarılan cümleler seçilebilir. Puanlamada kaynak/kanıt/gerekçe, düzey ve puandan önce üretilir. Araştırmacı onay/düzeltme kapısı sürer. Sentetik rapor testindeki düzeltme gerçek öğrenci veya uzman onayı sayılmaz. Canlı sonuçlar test-evidence/live-workflow-2026-10-24 altında; önceki hatalar silinmedi.

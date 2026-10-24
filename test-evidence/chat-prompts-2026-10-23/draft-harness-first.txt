@@ -1,0 +1,12 @@
+PASS CHAT DRAFT 1 reply clears exactly submitted draft including trailing newline
+PASS CHAT DRAFT 2 cleared question persists to server draft
+PASS CHAT DRAFT 3 server chat has one normalized sent message
+PASS CHAT DRAFT 4 reload does not restore sent message as unsent draft
+PASS CHAT DRAFT 5 typing another draft during response is preserved
+PASS CHAT DRAFT 6 new unsent draft is persisted rather than erased
+PASS CHAT DRAFT 7 new draft is not silently sent as a message
+PASS CHAT DRAFT 8 sending the new draft clears it only after its own response
+PASS CHAT DRAFT 9 network failure preserves unsent draft for retry
+Error: network uncertainty preserves request idempotency key
+    at check (D:\VakaLab\tests\chat-draft-browser.cjs:10:58)
+    at D:\VakaLab\tests\chat-draft-browser.cjs:44:2

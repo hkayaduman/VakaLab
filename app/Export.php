@@ -161,7 +161,20 @@ final class Export {
             }
             (new \PhpOffice\PhpWord\Writer\Word2007($w))->save($path);
         }elseif($format==='pdf'){
-            demand(class_exists('Mpdf\\Mpdf'),'Vendor kurulmadı',503);$m=new \Mpdf\Mpdf(['tempDir'=>__DIR__.'/../storage','default_font'=>'dejavusans','default_font_size'=>10]);$escape=fn($x)=>htmlspecialchars((string)$x,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');$html='<style>h1{color:#183b40;font-size:22pt}h2{color:#246852;font-size:13pt;margin-top:22px}h2,h3{page-break-after:avoid}h3{font-size:10pt;color:#000;margin-bottom:5px}p{line-height:1.6}table{border-collapse:collapse;width:100%;margin:12px 0}td{border:1px solid #dce4de;padding:9px}tr:first-child{background:#edf3ef;font-weight:bold}</style>';foreach($reports as $i=>$r){if($i)$html.='<pagebreak />';$html.='<h1>VakaLab — Vaka Raporu</h1>';foreach(self::blocks($r) as $b){if($b['type']==='table'){$html.='<table>';foreach($b['rows'] as $row){$html.='<tr>';foreach($row as $cell)$html.='<td>'.$escape($cell).'</td>';$html.='</tr>';}$html.='</table>';}else{$tag=in_array($b['type'],['heading','section'],true)?'h2':($b['type']==='label'?'h3':'p');$style=$b['type']==='section'?' style="page-break-before:always"':'';$html.="<$tag$style>".nl2br($escape($b['text']))."</$tag>";}}}$m->WriteHTML($html);$m->Output($path,\Mpdf\Output\Destination::FILE);
+            demand(class_exists('Mpdf\\Mpdf'),'Vendor kurulmadı',503);$m=new \Mpdf\Mpdf(['tempDir'=>__DIR__.'/../storage','default_font'=>'dejavusans','default_font_size'=>10]);$escape=fn($x)=>htmlspecialchars((string)$x,ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8');
+            $html='<style>h1{color:#183b40;font-size:22pt}h2{color:#246852;font-size:13pt;margin-top:22px}h2,h3{page-break-after:avoid}h3{font-size:10pt;color:#000;margin-top:10px;margin-bottom:5px}p{line-height:1.5;margin:8px 0}div{margin:0;padding:0}table{border-collapse:collapse;width:100%;margin:12px 0}td{border:1px solid #dce4de;padding:9px}tr:first-child{background:#edf3ef;font-weight:bold}</style>';
+            foreach($reports as $i=>$r){
+                if($i)$html.='<pagebreak />';$html.='<h1>VakaLab — Vaka Raporu</h1>';$keep=false;
+                foreach(self::blocks($r) as $b){
+                    // Keep consecutive question/answer labels with their following paragraph.
+                    if($b['type']==='label'&&!$keep){$html.='<div style="page-break-inside:avoid">';$keep=true;}
+                    if($b['type']==='table'){$html.='<table>';foreach($b['rows'] as $row){$html.='<tr>';foreach($row as $cell)$html.='<td>'.$escape($cell).'</td>';$html.='</tr>';}$html.='</table>';}
+                    else{$tag=in_array($b['type'],['heading','section'],true)?'h2':($b['type']==='label'?'h3':'p');$style=$b['type']==='section'?' style="page-break-before:always"':'';$html.="<$tag$style>".nl2br($escape($b['text']))."</$tag>";}
+                    if($keep&&$b['type']!=='label'){$html.='</div>';$keep=false;}
+                }
+                if($keep)$html.='</div>';
+            }
+            $m->WriteHTML($html);$m->Output($path,\Mpdf\Output\Destination::FILE);
         }else throw new Fault('Dosya biçimi geçersiz');
     }
     private static function blocks(array $r): array {

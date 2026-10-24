@@ -23,6 +23,13 @@ const login=async(page,name)=>{await page.goto(url);await page.locator('#login')
  await page.locator('[data-section="ai"]').click();
  const id=await page.evaluate(()=>work.application.id);
  await page.evaluate(()=>drainEvents());
+ await page.screenshot({path:path.join(tmp,'presence-in-app-capture.png')});
+ await new Promise(r=>setTimeout(r,450));await page.evaluate(()=>drainEvents());
+ const captureRead=spawnSync(php,['-r',"require 'app/bootstrap.php';$db=new Db(cfg());$db->pdo->exec('PRAGMA query_only=ON');echo js(Navigation::build($db->all('SELECT * FROM events WHERE app_id=?',[$argv[1]])));",id],{cwd:root,env,encoding:'utf8',windowsHide:true});
+ if(captureRead.status!==0)throw Error(captureRead.stderr);
+ const captureView=JSON.parse(captureRead.stdout);
+ check(captureView.visits.every(v=>v.section!=='outside'),'browser screenshot while focused does not itself fabricate an outside interval');
+ await page.evaluate(()=>drainEvents());
  const other=await context.newPage();await other.goto('about:blank');await other.bringToFront();
  // Disable Playwright focus emulation so actual tab departure/return is observable.
  await page.waitForFunction(()=>document.hidden||!document.hasFocus());await new Promise(r=>setTimeout(r,650));

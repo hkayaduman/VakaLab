@@ -1,0 +1,390 @@
+{
+  "model": "openai/gpt-5-nano",
+  "directive": "message-labels-v4",
+  "exact_matches": 27,
+  "message_count": 32,
+  "role_validation_passed": true,
+  "synthetic_only": true,
+  "definitions_used": "current installed definitions, query_only=ON",
+  "results": [
+    {
+      "id": "synthetic-1",
+      "role": "user",
+      "content": "Şunu bir halletsene.",
+      "expected": [
+        "Belirsiz"
+      ],
+      "actual": [
+        "Belirsiz"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-2",
+      "role": "assistant",
+      "content": "Neyi kastettiğini açıklayabilir misin?",
+      "expected": [
+        "Soru sordu"
+      ],
+      "actual": [
+        "Soru sordu"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-3",
+      "role": "user",
+      "content": "Vakada öğretmen tartışmanın başladığı anı görmüş mü?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-4",
+      "role": "assistant",
+      "content": "Hayır, vaka metnine göre öğretmen olaya doğrudan tanık olmamış.",
+      "expected": [
+        "Bilgi verdi"
+      ],
+      "actual": [
+        "Bilgi verdi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-5",
+      "role": "user",
+      "content": "Onarıcı yaklaşım nedir?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-6",
+      "role": "assistant",
+      "content": "Onarıcı yaklaşım, zarar gören ilişkileri ve tarafların ihtiyaçlarını merkeze alan bir yaklaşımdır.",
+      "expected": [
+        "Bilgi verdi"
+      ],
+      "actual": [
+        "Bilgi verdi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-7",
+      "role": "user",
+      "content": "Öğrencileri ayrı ayrı dinlemek neden önemli?",
+      "expected": [
+        "Açıklama istedi"
+      ],
+      "actual": [
+        "Açıklama istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-8",
+      "role": "assistant",
+      "content": "Ayrı görüşmeler, öğrencilerin akran baskısı olmadan anlatım sunmasına yardımcı olabilir.",
+      "expected": [
+        "Açıklama yaptı"
+      ],
+      "actual": [
+        "Açıklama yaptı"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-9",
+      "role": "user",
+      "content": "Yazdığım şu cümleyi dilbilgisi bakımından düzelt: Öğrencileri ayrı dinlemeyi düşünüyor çünkü daha rahat konuşurlar.",
+      "expected": [
+        "Metin düzenletmek istedi"
+      ],
+      "actual": [
+        "Metin düzenletmek istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-10",
+      "role": "assistant",
+      "content": "Öğrencileri ayrı ayrı dinlemeyi düşünüyorum; çünkü böylece daha rahat konuşabilirler.",
+      "expected": [
+        "Metin düzenledi"
+      ],
+      "actual": [
+        "Metin düzenledi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-11",
+      "role": "user",
+      "content": "Gerekçemde hangi noktalar eksik?",
+      "expected": [
+        "Eleştiri istedi"
+      ],
+      "actual": [
+        "Açıklama istedi"
+      ],
+      "passed": false
+    },
+    {
+      "id": "synthetic-12",
+      "role": "assistant",
+      "content": "Gerekçende farklı anlatımları nasıl karşılaştıracağın ve hangi kanıtları kullanacağın belirtilmemiş.",
+      "expected": [
+        "Eleştirel değerlendirme yaptı"
+      ],
+      "actual": [
+        "Eleştirel değerlendirme yaptı"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-13",
+      "role": "user",
+      "content": "Mevcut çözümün dışında iki farklı yol söyle.",
+      "expected": [
+        "Alternatif fikir istedi"
+      ],
+      "actual": [
+        "Alternatif fikir istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-14",
+      "role": "assistant",
+      "content": "İki seçenek düşünülebilir: bireysel görüşme veya ortak arabuluculuk görüşmesi.",
+      "expected": [
+        "Alternatif sundu"
+      ],
+      "actual": [
+        "Alternatif sundu"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-15",
+      "role": "user",
+      "content": "Bu durumda öğretmen önce ne yapmalı?",
+      "expected": [
+        "Karar istedi"
+      ],
+      "actual": [
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-16",
+      "role": "assistant",
+      "content": "Önce öğrencileri ayrı ayrı dinlemeni öneririm.",
+      "expected": [
+        "Karar veya eylem önerdi"
+      ],
+      "actual": [
+        "Karar veya eylem önerdi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-17",
+      "role": "user",
+      "content": "Seçenekleri ver ve hangisini uygulamam gerektiğini söyle.",
+      "expected": [
+        "Alternatif fikir istedi",
+        "Karar istedi"
+      ],
+      "actual": [
+        "Alternatif fikir istedi",
+        "Eleştiri istedi",
+        "Karar istedi"
+      ],
+      "passed": false
+    },
+    {
+      "id": "synthetic-18",
+      "role": "assistant",
+      "content": "Bireysel görüşme ve ortak görüşme iki seçenektir. Önce bireysel görüşmeyi öneririm.",
+      "expected": [
+        "Alternatif sundu",
+        "Karar veya eylem önerdi"
+      ],
+      "actual": [
+        "Alternatif sundu",
+        "Karar veya eylem önerdi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-19",
+      "role": "user",
+      "content": "Teşekkür ederim.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "synthetic-20",
+      "role": "assistant",
+      "content": "Rica ederim.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "synthetic-21",
+      "role": "user",
+      "content": "Bana hangi hisseyi almam gerektiğini söyle.",
+      "expected": [],
+      "actual": [
+        "Eleştiri istedi",
+        "Karar istedi"
+      ],
+      "passed": false
+    },
+    {
+      "id": "synthetic-22",
+      "role": "assistant",
+      "content": "Bu sohbet yalnız vaka ve pedagojik sorular içindir; finansal danışmanlık veremem.",
+      "expected": [
+        "Kapsam sınırı belirtti"
+      ],
+      "actual": [
+        "Kapsam sınırı belirtti"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-23",
+      "role": "user",
+      "content": "Vaka metninde öğrencilerin yaşı belirtilmiş mi?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-24",
+      "role": "assistant",
+      "content": "Sence öğretmen ne yapmalı? Kararının gerekçesini de yaz.",
+      "expected": [
+        "Soru sordu"
+      ],
+      "actual": [
+        "Kapsam sınırı belirtti",
+        "Metin düzenledi",
+        "Soru sordu"
+      ],
+      "passed": false
+    },
+    {
+      "id": "synthetic-25",
+      "role": "user",
+      "content": "Sadece öğretmenin olaya tanık olup olmadığını söyle.",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-26",
+      "role": "assistant",
+      "content": "Öğretmen olaya tanık olmamış. İstersen bu vaka için bir görüşme planı da hazırlayabilirim.",
+      "expected": [
+        "Bilgi verdi",
+        "Devam daveti ekledi"
+      ],
+      "actual": [
+        "Bilgi verdi",
+        "Devam daveti ekledi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-27",
+      "role": "user",
+      "content": "Vakada öğretmenin kaç öğrenciyi dinlediği söyleniyor mu?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-28",
+      "role": "assistant",
+      "content": "Önce öğrencileri ayrı ayrı dinlemeni öneririm.",
+      "expected": [
+        "Karar veya eylem önerdi"
+      ],
+      "actual": [
+        "Karar veya eylem önerdi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-29",
+      "role": "user",
+      "content": "Gerekçemin yeterli olup olmadığını değerlendir.",
+      "expected": [
+        "Eleştiri istedi"
+      ],
+      "actual": [
+        "Eleştiri istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-30",
+      "role": "assistant",
+      "content": "Harika bir cevap!",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "synthetic-31",
+      "role": "user",
+      "content": "Bir önceki övgüden başka bir şey sormuyorum.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "synthetic-32",
+      "role": "assistant",
+      "content": "Birlikte başka bir çözüm geliştirmek ister misin?",
+      "expected": [
+        "Devam daveti ekledi",
+        "Soru sordu"
+      ],
+      "actual": [
+        "Soru sordu"
+      ],
+      "passed": false
+    }
+  ],
+  "initial_full_call_failed": true,
+  "all_passed": false
+}

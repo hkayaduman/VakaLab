@@ -1,0 +1,559 @@
+{
+  "date": "2026-10-24",
+  "model": "openai/gpt-5-nano",
+  "directive": "message-labels-v11",
+  "regression_passed": 44,
+  "regression_total": 44,
+  "untouched_holdout_passed": 8,
+  "untouched_holdout_total": 8,
+  "total_passed": 52,
+  "total": 52,
+  "description_override_passed": 4,
+  "description_override_total": 4,
+  "application_source_unchanged_after_holdout_freeze": true,
+  "fixture_unchanged_after_holdout_freeze": true,
+  "student_records_relabelled": false,
+  "general_accuracy_guarantee": false,
+  "results": [
+    {
+      "id": "synthetic-1",
+      "content": "Şunu bir halletsene.",
+      "expected": [
+        "Belirsiz"
+      ],
+      "actual": [
+        "Belirsiz"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-3",
+      "content": "Vakada öğretmen tartışmanın başladığı anı görmüş mü?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-5",
+      "content": "Onarıcı yaklaşım nedir?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-7",
+      "content": "Öğrencileri ayrı ayrı dinlemek neden önemli?",
+      "expected": [
+        "Açıklama istedi"
+      ],
+      "actual": [
+        "Açıklama istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-9",
+      "content": "Yazdığım şu cümleyi dilbilgisi bakımından düzelt: Öğrencileri ayrı dinlemeyi düşünüyor çünkü daha rahat konuşurlar.",
+      "expected": [
+        "Metin düzenletmek istedi"
+      ],
+      "actual": [
+        "Metin düzenletmek istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-11",
+      "content": "Gerekçemde hangi noktalar eksik?",
+      "expected": [
+        "Eleştiri istedi"
+      ],
+      "actual": [
+        "Eleştiri istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-13",
+      "content": "Mevcut çözümün dışında iki farklı yol söyle.",
+      "expected": [
+        "Alternatif fikir istedi"
+      ],
+      "actual": [
+        "Alternatif fikir istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-15",
+      "content": "Bu durumda öğretmen önce ne yapmalı?",
+      "expected": [
+        "Karar istedi"
+      ],
+      "actual": [
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-17",
+      "content": "Seçenekleri ver ve hangisini uygulamam gerektiğini söyle.",
+      "expected": [
+        "Alternatif fikir istedi",
+        "Karar istedi"
+      ],
+      "actual": [
+        "Alternatif fikir istedi",
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-19",
+      "content": "Teşekkür ederim.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "synthetic-21",
+      "content": "Bana hangi hisseyi almam gerektiğini söyle.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "synthetic-23",
+      "content": "Vaka metninde öğrencilerin yaşı belirtilmiş mi?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-25",
+      "content": "Sadece öğretmenin olaya tanık olup olmadığını söyle.",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-27",
+      "content": "Vakada öğretmenin kaç öğrenciyi dinlediği söyleniyor mu?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-29",
+      "content": "Gerekçemin yeterli olup olmadığını değerlendir.",
+      "expected": [
+        "Eleştiri istedi"
+      ],
+      "actual": [
+        "Eleştiri istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "synthetic-31",
+      "content": "Bir önceki övgüden başka bir şey sormuyorum.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-1",
+      "content": "Vakada olay bahçede mi yaşanmış?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-2",
+      "content": "Arabuluculuk kavramını bir cümleyle tanımla.",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-3",
+      "content": "Tarafları tek tek dinlemek hangi nedenle önyargıyı azaltır?",
+      "expected": [
+        "Açıklama istedi"
+      ],
+      "actual": [
+        "Açıklama istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-4",
+      "content": "Önerdiğim kararın tutarsız noktalarını bul.",
+      "expected": [
+        "Eleştiri istedi"
+      ],
+      "actual": [
+        "Eleştiri istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-5",
+      "content": "İki farklı müdahale seçeneği sun ve birini seçerek öner.",
+      "expected": [
+        "Alternatif fikir istedi",
+        "Karar istedi"
+      ],
+      "actual": [
+        "Alternatif fikir istedi",
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-6",
+      "content": "Şu cümlenin dilini düzelt: İki öğrenciyi dinlemek lazım. Sonra gerekçemin eksiklerini değerlendir.",
+      "expected": [
+        "Eleştiri istedi",
+        "Metin düzenletmek istedi"
+      ],
+      "actual": [
+        "Eleştiri istedi",
+        "Metin düzenletmek istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-7",
+      "content": "Sence bu pedagojik vakada ilk hangi adımı atmalıyım?",
+      "expected": [
+        "Karar istedi"
+      ],
+      "actual": [
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-8",
+      "content": "Bahsettiğin çözümden farklı bir yol öner.",
+      "expected": [
+        "Alternatif fikir istedi"
+      ],
+      "actual": [
+        "Alternatif fikir istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-9",
+      "content": "Bu yöntemin nasıl uygulandığını bir örnekle anlat.",
+      "expected": [
+        "Açıklama istedi"
+      ],
+      "actual": [
+        "Açıklama istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-10",
+      "content": "Çok sağ ol, cevabını aldım.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-11",
+      "content": "En kârlı yatırım için hangi fonu alayım?",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-12",
+      "content": "Görüşümü yazdım; başka bir şey sormuyorum.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-13",
+      "content": "Öz düzenleme terimi ne anlama gelir?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-14",
+      "content": "Öz düzenleme bu öğrencinin davranışını neden etkiler, açıklar mısın?",
+      "expected": [
+        "Açıklama istedi"
+      ],
+      "actual": [
+        "Açıklama istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-15",
+      "content": "Öğretmen bu olayda neye doğrudan tanık olmuş?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-16",
+      "content": "Şu cümledeki yazım yanlışını düzelt: Öğrencileri dinlemeliyiz çünkü farklı görüşü var.",
+      "expected": [
+        "Metin düzenletmek istedi"
+      ],
+      "actual": [
+        "Metin düzenletmek istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-17",
+      "content": "İki yeni çözüm yolu sırala; sonra hangisini seçmem gerektiğini söyle.",
+      "expected": [
+        "Alternatif fikir istedi",
+        "Karar istedi"
+      ],
+      "actual": [
+        "Alternatif fikir istedi",
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-18",
+      "content": "Yazdığım gerekçedeki çelişkileri göster.",
+      "expected": [
+        "Eleştiri istedi"
+      ],
+      "actual": [
+        "Eleştiri istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-19",
+      "content": "Bu vakada öğrencileri hangi sırayla dinlemeliyim?",
+      "expected": [
+        "Karar istedi"
+      ],
+      "actual": [
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-20",
+      "content": "Bu müdahaleye başka bir seçenek var mı?",
+      "expected": [
+        "Alternatif fikir istedi"
+      ],
+      "actual": [
+        "Alternatif fikir istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-21",
+      "content": "Paramı hangi kripto varlığa yatırayım?",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-22",
+      "content": "Kiracı olarak şahsi davamda hangi dilekçeyi kullanmalıyım?",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-23",
+      "content": "Velilerle finansal okuryazarlık etkinliği için bir plan öner.",
+      "expected": [
+        "Karar istedi"
+      ],
+      "actual": [
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-24",
+      "content": "Çocuk hakları konusunu sınıfta hangi oyunla anlatayım?",
+      "expected": [
+        "Karar istedi"
+      ],
+      "actual": [
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-25",
+      "content": "Bütçe kelimesi bu matematik dersinde ne demek?",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-26",
+      "content": "Öğrencilerin anlatımlarını karşılaştırmak neden gerekli?",
+      "expected": [
+        "Açıklama istedi"
+      ],
+      "actual": [
+        "Açıklama istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-27",
+      "content": "Teşekkürler, şu anda başka bir isteğim yok.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-28",
+      "content": "Şunu yap.",
+      "expected": [
+        "Belirsiz"
+      ],
+      "actual": [
+        "Belirsiz"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-29",
+      "content": "Okul iklimi sözcük grubunun anlamını kısaca ver.",
+      "expected": [
+        "Bilgi istedi"
+      ],
+      "actual": [
+        "Bilgi istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-30",
+      "content": "Bu olayda çocukların farklı anlatımlarını niçin tek tek karşılaştırmak gerek?",
+      "expected": [
+        "Açıklama istedi"
+      ],
+      "actual": [
+        "Açıklama istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-31",
+      "content": "Yazdığım çözümün hangi varsayımları kanıtsız?",
+      "expected": [
+        "Eleştiri istedi"
+      ],
+      "actual": [
+        "Eleştiri istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-32",
+      "content": "Bu disiplin sorunu için iki ayrı yöntem öner; sonra birini seç ve hangisiyle başlamam gerektiğini söyle.",
+      "expected": [
+        "Alternatif fikir istedi",
+        "Karar istedi"
+      ],
+      "actual": [
+        "Alternatif fikir istedi",
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-33",
+      "content": "Emeklilik birikimimi hangi özel fona aktaracağımı seç.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-34",
+      "content": "Öğrencilere tasarrufu öğretmek için hangi sınıf etkinliğini uygulayayım?",
+      "expected": [
+        "Karar istedi"
+      ],
+      "actual": [
+        "Karar istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-35",
+      "content": "Şu cümleyi dilbilgisi açısından düzelt: Öğrenciler dinleriz. Ayrıca yazdığım kararın eksiklerini belirt.",
+      "expected": [
+        "Eleştiri istedi",
+        "Metin düzenletmek istedi"
+      ],
+      "actual": [
+        "Eleştiri istedi",
+        "Metin düzenletmek istedi"
+      ],
+      "passed": true
+    },
+    {
+      "id": "fresh-student-36",
+      "content": "Şimdilik yalnız okuyorum; bir isteğim yok.",
+      "expected": [],
+      "actual": [],
+      "passed": true
+    }
+  ]
+}

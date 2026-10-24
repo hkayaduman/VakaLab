@@ -46,13 +46,13 @@ const check=(ok,name)=>{if(!ok)throw new Error(name);console.log(`PASS VALIDATIO
     for(const name of ['case','profile','initial','ai','final','reflection']){await page.locator('[data-section="'+name+'"]').click();check(await page.locator('#submit').count()===0,'no final-submit control under '+name);check(await page.locator('#validation-summary').count()===0,'no global missing-fields box under '+name);}
     check(await page.locator('[data-section]').count()===7,'seven tabs with dedicated final-submit tab');await inConfirm();
     check(await submitDisabled(),'submit stays disabled after initial lock with final fields empty');
-    check(await page.locator('#validation-summary [data-missing-field]').count()===5,'only submit tab has a single linked list of five missing requirements');
+    check(await page.locator('#validation-summary [data-missing-field]').count()===6,'only submit tab has a single linked list of six missing requirements');
     // A user changing disabled in DevTools must still be stopped before confirmation.
     await page.locator('#submit').evaluate(e=>e.disabled=false);await page.locator('#submit').click();
     await page.locator('#final_decision[aria-invalid="true"]').waitFor();check(await page.locator('#validation-summary').count()===0,'following validation to final fields does not carry summary along');check(dialogs===1&&await page.locator('#work-confirm').count()===0,'forced early submit is blocked before confirmation');
     check(await page.locator('#final_decision').evaluate(e=>document.activeElement===e),'forced early submit directs to first missing final field');
 
-    await page.locator('#final_decision').fill('SENTETİK karar');await page.locator('#final_reason').fill('SENTETİK gerekçe');await page.locator('#final_confidence').selectOption('0');await page.locator('#final_severity').selectOption('0');
+    await page.locator('#final_decision').fill('SENTETİK karar');await page.locator('#final_reason').fill('SENTETİK gerekçe');await page.locator('#final_confidence').selectOption('0');await page.locator('#final_difficulty').selectOption('0');await page.locator('#final_severity').selectOption('0');
     check(await submitDisabled(),'complete final assessment still requires reflection');
     await inConfirm();check(await page.locator('#validation-summary [data-missing-field]').count()===1,'submit-only list updates to the remaining reflection');await page.locator('#validation-summary [data-missing-field="reflection"]').click();check(await page.locator('#validation-summary').count()===0,'reflection has no global missing-fields box after following link');await page.locator('#reflection').fill('   ');
     await page.waitForFunction(()=>!dirty&&!saving);check(await submitDisabled(),'whitespace-only reflection does not enable submission');
@@ -64,8 +64,8 @@ const check=(ok,name)=>{if(!ok)throw new Error(name);console.log(`PASS VALIDATIO
     await page.locator('#final_reason').fill('SENTETİK gerekçe');await page.waitForFunction(()=>canSubmit());
     const rejected=await page.evaluate(async()=>{
         const before=await api('view',undefined,{app_id:work.application.id}),results=[];
-        for(const field of ['final_decision','final_reason','final_confidence','final_severity','reflection']){
-            const draft=JSON.parse(before.application.draft);draft[field]=['final_confidence','final_severity'].includes(field)?null:'   ';
+        for(const field of ['final_decision','final_reason','final_confidence','final_difficulty','final_severity','reflection']){
+            const draft=JSON.parse(before.application.draft);draft[field]=['final_confidence','final_difficulty','final_severity'].includes(field)?null:'   ';
             try{await api('submit',{app_id:work.application.id,revision:Number(before.application.revision),draft});results.push(200);}catch(e){results.push(e.status);}
         }
         const after=await api('view',undefined,{app_id:work.application.id});

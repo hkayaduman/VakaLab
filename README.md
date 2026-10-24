@@ -1,5 +1,7 @@
 # VakaLab
 
+**23 Ekim 2026 gerçek AI yerel denemesi:** OpenRouter/GPT-5 Nano sentetik sohbet, profil ve tek soru puanlama bağlantısı doğrulandı. Destekleyen modeller için `ai.structured_outputs=true` ve yerel `ai.timeout=90` kullanıldı. Bu denemede eklenen JSON şeması/yorum korumaları henüz GitHub'a gönderilmedi. Tam UI/gerçek rubrik/hosting kabulü bekliyor; ayrıntılar TEST_RESULTS.md.
+
 **GitHub teslimi · 23 Ekim 2026:** Aşağıdaki yerel hazırlık değişiklikleri, PHP güvenlik/8.4.27 kanıtları ve eski teslim düzeltmesi `ee31172` commit'iyle `origin/main` dalına gönderildi. Önceki “henüz commit/push edilmedi” kayıtları teslim öncesi durumu anlatır. Hosting dağıtımı yapılmadı; gerçek AI/hosting/kurum kabulü açık.
 
 0.2.18 yerel güncelleme: Beş bölümlü değerlendirme ve tek güncel öğrenci raporu. Rapor alanı yalnız Öğrenci raporunu hazırla / Word / Excel / Öğrenciye göster düğmeleridir; geçmiş listeleri gösterilmez. Yeniden inceleme tamamlanınca aynı rapor güncellenir, öğrenciye tekrar açılması gerekir. Vaka veri toplama kapanış kuralı korunur. Yeni akış için Ctrl+F5; ayrıntılar CONTEXT.md.

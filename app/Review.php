@@ -13,7 +13,10 @@ final class Review {
     public function current(string $rid,int $step): ?array {return (new Analysis($this->app))->currentStep($rid,$step);}
     public static function text(mixed $text): string {
         demand(is_string($text)&&mb_strlen(trim($text))>=10&&mb_strlen($text)<=2500,'Yorumu 10–2500 karakter arasında yazın');
+        demand(!is_array(json_decode($text,true)),'Yorum düz metin olmalı; JSON nesnesi veya dizisi olamaz');
+        demand(!preg_match('/^\s*(?:["\x27][^"\x27\r\n]+["\x27]\s*:|```)/u',$text),'Yorum düz metin olmalı; kod bloğu veya kodlanmış alan içeremez');
         demand(!preg_match('/\b(LLM|GPT|JSON|mock|prompt)\b/iu',$text),'Yorumda teknik üretim bilgisi bulunamaz');
+        demand(!preg_match('/\b(final_collected|final_confidence|final_difficulty|final_severity)\b/iu',$text),'Yorumda teknik alan adı bulunamaz');
         return trim($text);
     }
     public static function bounds(array $rubric): array {
@@ -21,8 +24,8 @@ final class Review {
         return ['min'=>round($min/$weight,4),'max'=>round($max/$weight,4)];
     }
     public function profile(array $draft): array {
-        $fields=[['knowledge',null,'Ön bilgi'],['confidence','final_confidence','Güven'],['difficulty',null,'Algılanan zorluk'],['severity','final_severity','Algılanan ciddiyet']];$rows=[];
-        foreach($fields as [$initial,$final,$title]){$a=$draft[$initial]??null;$b=$final?($draft[$final]??null):null;$rows[]=['id'=>$initial,'title'=>$title,'initial'=>$a,'final'=>$b,'final_collected'=>$final!==null,'change'=>is_numeric($a)&&is_numeric($b)?$b-$a:null];}
+        $fields=[['knowledge',null,'Ön bilgi'],['confidence','final_confidence','Güven'],['difficulty','final_difficulty','Algılanan zorluk'],['severity','final_severity','Algılanan ciddiyet']];$rows=[];
+        foreach($fields as [$initial,$final,$title]){$a=$draft[$initial]??null;$b=$final?($draft[$final]??null):null;$rows[]=['id'=>$initial,'title'=>$title,'initial'=>$a,'final'=>$b,'final_collected'=>$final!==null&&array_key_exists($final,$draft),'change'=>is_numeric($a)&&is_numeric($b)?$b-$a:null];}
         return $rows;
     }
     public function payload(array $run,int $step): array {
@@ -47,8 +50,8 @@ final class Review {
         $questions=[];$bounds=self::bounds($payload['rubric']);
         foreach($payload['questions'] as $id=>$q){
             $request=['task'=>'question_score','review_version'=>2,'step'=>$payload['step'],'case'=>$payload['case'],'rubric'=>$payload['rubric'],'rubric_version'=>$payload['rubric_version'],'question'=>$q['title'],'sources'=>[$id=>$q['answer']],'instruction'=>'Yalnız bu sorunun yanıtını rubriğe göre değerlendir. Kararın gerekçelendirilmesini sorunun kapsamına göre incele. Her ölçüt için score/level/source/quote/reason döndür. Ayrıca feedback alanında bu puanın nedenini ve öğrencinin yanıtını nasıl geliştirebileceğini açık Türkçe yaz. Başka sorunun yanıtını bu sorunun yerine kullanma.','expected'=>['scores'=>['dimension_id'=>['score'=>'number in rubric range','level'=>'rubric level','source'=>$id,'quote'=>'exact excerpt','reason'=>'scoring explanation']],'feedback'=>'Turkish explanation of score and concrete improvement guidance']];
-            $out=(new Ai($this->app->config))->call($request,true);$score=Rules::scores($out,$payload['rubric'],$request['sources']);
-            $questions[$id]=['title'=>$q['title'],'score'=>$score,'min'=>$bounds['min'],'max'=>$bounds['max'],'feedback'=>self::text($out['feedback']??null),'criteria'=>$out['scores'],'input'=>$request];
+            try{$out=(new Ai($this->app->config))->call($request,true);$score=Rules::scores($out,$payload['rubric'],$request['sources']);$feedback=self::text($out['feedback']??null);}catch(Fault $e){throw new Fault('Soru '.$id.': '.$e->getMessage(),$e->getCode());}
+            $questions[$id]=['title'=>$q['title'],'score'=>$score,'min'=>$bounds['min'],'max'=>$bounds['max'],'feedback'=>$feedback,'criteria'=>$out['scores'],'input'=>$request];
         }
         return ['review_version'=>2,'questions'=>$questions];
     }
@@ -63,9 +66,10 @@ final class Review {
             $index=array_search($step,self::ORDER,true);if($index>0)demand((bool)$this->current($rid,self::ORDER[$index-1]),'Önce önceki bölümün hazırlanması gerekiyor',409);
             if($step===8)$this->assemble($run);
             $attempt=(int)($db->one('SELECT MAX(attempt) n FROM analysis_steps WHERE run_id=? AND step=?',[$rid,$step])['n']??0)+1;
-            $s=['id'=>uid(),'run_id'=>$rid,'step'=>$step,'attempt'=>$attempt,'status'=>'running','input'=>js($this->payload($run,$step)),'output'=>'{}','model'=>in_array($step,[1,5,8],true)?'system':$this->app->config['ai']['model'],'directive'=>'review-v2','created_at'=>now()];
+            $s=['id'=>uid(),'run_id'=>$rid,'step'=>$step,'attempt'=>$attempt,'status'=>'running','input'=>js($this->payload($run,$step)),'output'=>'{}','model'=>in_array($step,[1,5,8],true)?'system':$this->app->config['ai']['model'],'directive'=>Ai::REVIEW_DIRECTIVE,'created_at'=>now()];
             $db->insert('analysis_steps',$s);$db->audit($u['id'],'analysis_step',$s['id'],'',['run'=>$rid,'step'=>$step,'review_version'=>2]);return $s;
         });
+        ApiRuntime::trackStep($db,$s['id']);
         try{
             $payload=obj($s['input']);
             if($step===1){$a=$db->one('SELECT * FROM applications WHERE id=?',[$run['app_id']]);$d=obj($a['draft']);Rules::initial($d);foreach(['final_decision','final_reason','reflection'] as $key)demand(trim($d[$key]??'')!=='','Teslim edilmiş yanıt eksik');$out=['review_version'=>2,'integrity'=>'submitted'];}
@@ -74,7 +78,7 @@ final class Review {
             elseif($step===8)$out=$this->assemble($run);
             else $out=$this->scoreQuestions($payload);
             $db->tx(function()use($db,$s,$out,$run,$repeat){$fresh=$db->one('SELECT status FROM analysis_steps WHERE id=?'.($db->sqlite()?'':' FOR UPDATE'),[$s['id']]);demand($fresh['status']==='running','Bu sonuç artık geçerli değil',409);$db->q("UPDATE analysis_steps SET status='completed',output=? WHERE id=?",[js($out),$s['id']]);if($repeat)$db->q('UPDATE reports SET approved_at=NULL,published_at=NULL WHERE app_id=?',[$run['app_id']]);});
-        }catch(Throwable $e){$db->q("UPDATE analysis_steps SET status='failed',error='invalid_or_failed_output' WHERE id=? AND status='running'",[$s['id']]);}
+        }catch(Throwable $e){$db->q("UPDATE analysis_steps SET status='failed',error='invalid_or_failed_output' WHERE id=? AND status='running'",[$s['id']]);$db->audit($u['id'],'analysis_step_failed',$s['id'],'',['run'=>$rid,'step'=>$step,'validation_error'=>$e instanceof Fault?mb_substr($e->getMessage(),0,400):get_class($e)]);}
         if($step===8&&$db->one("SELECT id FROM analysis_steps WHERE id=? AND status='completed'",[$s['id']])){
             $report=$db->one('SELECT body FROM reports WHERE app_id=? ORDER BY version DESC LIMIT 1',[$run['app_id']]);
             if($report&&(obj($report['body'])['review_version']??1)===2)(new Analysis($this->app))->report($u,'create',['run_id'=>$run['id']]);

@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/../app/bootstrap.php';
+ApiRuntime::start();
 header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store');header('X-Content-Type-Options: nosniff');header('Referrer-Policy: same-origin');
 try{
     $config=cfg();demand($config['env']!=='production'||$config['https'],'Üretimde HTTPS zorunlu',503);
@@ -29,7 +30,7 @@ try{
         case 'step':$result=(new Analysis($app))->step($u,$p['run_id'],(int)$p['step'],!empty($p['repeat']));break;
         case 'decision':$result=(new Analysis($app))->decide($u,$p['step_id'],$p);break;
         case 'report':$result=(new Analysis($app))->report($u,$p['action'],$p);break;
-        case 'message_labels':$result=(new MessageLabels($app))->generate($u,$p['app_id']??'');break;
+        case 'message_labels':$targetRole=$p['target_role']??'user';demand(is_string($targetRole)&&in_array($targetRole,['user','assistant'],true),'Mesaj grubu geçersiz');$result=(new MessageLabels($app))->generate($u,$p['app_id']??'',$targetRole);break;
         case 'report_data':$result=(new Export($app))->reportData($u,$_GET['id']??'',!empty($_GET['student_view']));break;
         case 'download':
             $ex=new Export($app);$format=$_GET['format']??'json';$rids=explode(',',$_GET['report_ids']??'');$report=($rids[0]??'')!=='';$data=[];

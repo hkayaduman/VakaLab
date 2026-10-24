@@ -1,0 +1,3 @@
+Error: reply clears exactly submitted draft including trailing newline
+    at check (D:\VakaLab\tests\chat-draft-browser.cjs:10:58)
+    at D:\VakaLab\tests\chat-draft-browser.cjs:25:2

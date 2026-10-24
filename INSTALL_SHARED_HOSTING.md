@@ -63,6 +63,10 @@ config/example.php → config/local.php kopyalayın. DSN, DB kullanıcı/parola,
 
 Üretim: env=production, gerçek compatible sağlayıcı/model/HTTPS endpoint/key. Gerçek onam/rubrik kurumsal doğrulamayı bekler. Mock production'da çağrı yapamaz. AI anahtarı yalnız sunucu config'inde; farklı bir sağlayıcı protokolü gerekiyorsa Ai adapter'ı eklenmelidir.
 
+OpenRouter/GPT-5 Nano yerel bağlantısı 23 Ekim 2026'da sentetik sohbet, profil ve tek soru puanlamasıyla doğrulandı. `provider=compatible`, `endpoint=https://openrouter.ai/api/v1/chat/completions`, `model=openai/gpt-5-nano`, `structured_outputs=true` kullanılır; anahtar yalnız özel local.php içinde tutulur. Destekleyen endpointlere yönlendirme için uygulama katı şema isteklerinde OpenRouter'a `provider.require_parameters=true` gönderir. Profil ve v2 soru puanlaması JSON Schema kullanır; diğer/tarihsel görevler mevcut JSON nesnesi sözleşmesini korur. Yerelde 45 saniyelik sınır puanlamada yetersiz kaldı; local.php içinde `ai.timeout=90` ile doğrulandı. Hosting PHP/proxy süreleri ayrıca uyumlu olmalı. JSON biçiminin doğru olması bilimsel puanlama kalitesini doğrulamaz.
+
+Windows yerel PHP'de CA dosyası tanımlı değilse TLS doğrulaması başarısız olabilir. Yerel testte Windows güvenilen köklerinden bir CA paketi oluşturulup `.tools/php/php.ini` içindeki `curl.cainfo` / `openssl.cafile` ayarlandı; SSL doğrulaması kapatılmadı. Bu Windows'a özel yolları sunucuya taşımayın; hostingin geçerli CA yapılandırmasını kullanın. Açık yerel PHP sunucusu php.ini değişikliğinden sonra yeniden başlatılmalıdır.
+
 ## 4. İlk araştırmacı ve kurulum kilidi
 
 Web kurucusu veya web seed endpointi yok; CLI PHP_SAPI kontrolüyle kapalı. İlk hesap:
@@ -104,3 +108,8 @@ Yerel MariaDB smoke restore testi yapılır; gerçek hosting yedeği ve yedek sa
 ## 7. Güncelleme ve rollback
 
 Önce bakım bildirimi ve güncel özel yedek; aynı DB'nin ayrı kopyasında migration/regresyon. Kod + vendor + composer.lock birlikte sürümlenir. Henüz yalnız migration 001 vardır; sonraki sürüm geçmişi ezmeyen yeni migration eklemelidir. Değişen dosyaları yükleyin, config'i koruyun. Hata olursa önceki kod paketine dönün; yeni şema eski kodla uyumsuzsa **ayrı geri yüklenmiş DB** üzerinde doğrulayın. Otomatik destructive down migration yok. Veri toplama sırasında seed/reset çalıştırmayın.
+
+
+### Öğrenci etiketleri için konu kapsamı (24 Ekim 2026)
+
+Yeni veritabanı kolonu gerekmez; alan definitions.body JSON içinde topic_scope olarak saklanır. Sunucudaki mevcut öğrenci etiketleri için Rubrikler ve etiketler ekranından grup ve konu kapsamını seçip yeni sürüm kaydedin. Kapsam seçilmeden öğrenci etiketlemesi başlamaz. Yerel SQLite test veritabanını veya yedeklerini üretime yüklemeyin.
