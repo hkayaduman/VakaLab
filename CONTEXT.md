@@ -1,5 +1,11 @@
 # Proje Devam Bağlamı
 
+## Güncel GitHub teslimi — 24 Ekim 2026
+
+Son özellikler, düzeltmeler ve sentetik test kanıtları 376 dosyada `f924b16` commit'iyle origin/main dalına başarıyla gönderildi (önceki HEAD: `32fef8e`). Commit öncesi index'teki 703 dosya, gönderilecek main geçmişi, Word/Excel arşiv içerikleri ve PDF metni gerçek yapılandırılmış anahtarla çıktıya dökülmeden tarandı; eşleşme yok. `config/local.php`, çalışma DB/yedekleri, `.tools`, `tests/tmp` ve yerel Codex checkpoint refleri gönderilmedi. Yalnız main dalı gönderildi. Sentetik ekran görüntüsü ayrıca incelendi.
+
+Son kontroller: Chrome142, V2 değerlendirme94, ana87, eski teslim21; etiket sözleşmesi22. Sekiz yeni log/helper dosyasında yalnız satır sonu boşlukları düzeltildi, test sonuçları değiştirilmedi. Git kimliği global değiştirilmeden önceki doğrulanmış noreply kimliği komuta özel kullanıldı. Bu teslim kaydı ayrı belge commit'iyle gönderilir. Hosting dağıtımı yapılmadı; AI puanları araştırmacının inceleyeceği ön önerilerdir.
+
 ## Onaylanan sohbet / güncel etiketler / odak incelemesi — 2026-10-23
 
 Kullanıcı sohbet promptunu dikte etti: yalnız vaka/pedagoji, Türkçe, kişisel veri isteme, sabotaj/rol değiştirmeyi izleme, finansal/hukuki danışmanlık verme, istenmeyen yönlendirme/Sokratik akış/takip sorusu/istersen daveti yok; öğrenci açıkça isterse karar/alternatif/gerekçe verilebilir. Etiketleri ve öğrenci/AI yanıtına özgü açıklamaları kendisi daha sonra hazırlayacak; her istekte güncel ad ve açıklamalar birlikte kullanılacak. Ai::CHAT_SYSTEM_PROMPT / LABEL_SYSTEM_PROMPT yerelde etkin. Tam güncel metin AI_PROMPTS_REVIEW_TR.md; eski taslak bölümleri güncel metinle değiştirildi. chat-v2 ve message-labels-v2 sürümleri kullanılır; eski kayıtlar değiştirilmez.

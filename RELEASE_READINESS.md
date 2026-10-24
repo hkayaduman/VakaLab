@@ -1,6 +1,6 @@
 # Güncel durum — 24 Ekim 2026
 
-Yerel geliştirme ve kullanıcı denemeleri tamamlanan bölüm için GitHub teslimi hazırlanıyor. Son değişiklikler: sade ön değerlendirme promptları, öğrenci öncelikli güncel tanım/kapsam etiketlemesi, nihai algılanan zorluk, PHP süre kesilmesi kurtarması ve öğrenci raporu görünürlüğünü geri alma. AI puanları araştırmacının inceleyeceği ön önerilerdir; otomatik akademik doğruluk onayı verilmez. Ayrı test hostingi, hedef Disco importu ve kurumun rubrik/kod kitabı/onam kabulü sonraki işlerdir.
+Son geliştirmeler f924b16 ile origin/main dalına gönderildi. Bu teslim hosting yayını değildir. Son değişiklikler: sade ön değerlendirme promptları, öğrenci öncelikli güncel tanım/kapsam etiketlemesi, nihai algılanan zorluk, PHP süre kesilmesi kurtarması ve öğrenci raporu görünürlüğünü geri alma. AI puanları araştırmacının inceleyeceği ön önerilerdir; otomatik akademik doğruluk onayı verilmez. Ayrı test hostingi, hedef Disco importu ve kurumun rubrik/kod kitabı/onam kabulü sonraki işlerdir.
 
 Son ilgili kontroller: Chrome142, V2 değerlendirme94, ana87, eski teslim21; süre ve etiketleme kapsamları TEST_RESULTS.md içinde. Gerçek OpenRouter GPT-5 Nano sentetik test kanıtları test-evidence altında korunur. DOCX paket/metin doğrulandı; bu bilgisayarda LibreOffice olmadığından son Word görsel kontrolü tamamlanamadı. PDF üç sayfa görsel incelendi.
 
