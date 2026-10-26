@@ -1,0 +1,6 @@
+PASS PRESENCE BROWSER 1 cancelling keeps mixed journey open
+PASS PRESENCE BROWSER 2 no telemetry after successful submission despite later tab and section changes
+PASS PRESENCE BROWSER 3 two home/reopen cycles produce exactly two case-away intervals
+Error: only real other-tab departure produces app-outside interval
+    at check (D:\VakaLab\tests\journey-browser.cjs:14:72)
+    at D:\VakaLab\tests\journey-browser.cjs:42:90

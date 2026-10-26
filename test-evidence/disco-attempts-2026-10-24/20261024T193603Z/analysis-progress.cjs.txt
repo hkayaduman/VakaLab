@@ -1,0 +1,3 @@
+PASS RECALCULATE STATE 5 checks: latest result, new review required, stale merge, fresh merge.
+PASS ANALYSIS 12 checks: all steps, sequencing, running lock, failed retry, successful retry, decision gate, complete run, run isolation.
+PASS SEQUENCE 10 checks: separate serial calls, failure stop, resume without repeats, human review gate, completion, navigation pause.

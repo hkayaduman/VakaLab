@@ -5,6 +5,9 @@ final class Db {
     public function __construct(array $c) {
         $this->pdo = new PDO($c['dsn'],$c['db_user']??null,$c['db_password']??null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
         if ($this->sqlite()) $this->pdo->exec('PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;');
+        // Scoring can make several provider calls before the next database query.
+        // Keep this connection alive without changing the hosting server's global limit.
+        else $this->pdo->exec('SET SESSION wait_timeout = 600');
     }
     public function sqlite(): bool { return $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite'; }
     public function q(string $sql,array $p=[]): PDOStatement { $s=$this->pdo->prepare($sql);$s->execute($p);return $s; }

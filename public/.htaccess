@@ -1,5 +1,12 @@
 Options -Indexes
 DirectoryIndex index.php
+Require all granted
 <FilesMatch "^\.">
 Require all denied
 </FilesMatch>
+
+<IfModule LiteSpeed>
+    RewriteEngine On
+    RewriteCond %{QUERY_STRING} (^|&)op=(step|holistic)(&|$)
+    RewriteRule ^api\.php$ - [E=noconntimeout:1]
+</IfModule>

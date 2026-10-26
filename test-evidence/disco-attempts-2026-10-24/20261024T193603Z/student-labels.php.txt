@@ -1,0 +1,34 @@
+PASS STUDENT LABELS 1 student task targets only student messages
+PASS STUDENT LABELS 2 student task contains only current student labels
+PASS STUDENT LABELS 3 first student message cannot use a subsequent AI response
+PASS STUDENT LABELS 4 a later student target retains only its own preceding conversation
+PASS STUDENT LABELS 5 prior context stays flat without recursive targets
+PASS STUDENT LABELS 6 context and target payloads omit private fields
+PASS STUDENT LABELS 7 wire retains full descriptions once without duplicate body text
+PASS STUDENT LABELS 8 current description examples are extracted with inclusion and exclusion kept distinct
+PASS STUDENT LABELS 9 editing the description removes old example hints
+PASS STUDENT LABELS 10 provider receives short message and label codes
+PASS STUDENT LABELS 11 transport codes restore exact persistent IDs and topic metadata
+PASS STUDENT LABELS 12 unknown transport label code is rejected
+PASS STUDENT LABELS 13 schema requires a boolean decision for every eligible label
+PASS STUDENT LABELS 14 multiple true decisions produce a unique label set
+PASS STUDENT LABELS 15 all false decisions preserve explicit no-match
+PASS STUDENT LABELS 16 omitted label decision is rejected
+PASS STUDENT LABELS 17 string false cannot become a selected label
+PASS STUDENT LABELS 18 foreign role decision is rejected
+PASS STUDENT LABELS 19 context-only message in decision output is rejected
+PASS STUDENT LABELS 20 outside topic cannot select pedagogy-only labels even when model says true
+PASS STUDENT LABELS 21 researcher can explicitly permit an outside-topic label
+PASS STUDENT LABELS 22 both-topic label remains usable for outside messages
+PASS STUDENT LABELS 23 missing topic decision is rejected
+PASS STUDENT LABELS 24 unsupported topic decision is rejected
+PASS STUDENT LABELS 25 student label authoring requires explicit topic scope
+PASS STUDENT LABELS 26 student generation persists only student target metadata
+PASS STUDENT LABELS 27 unprocessed AI answer is not marked labeled or empty
+PASS STUDENT LABELS 28 optional AI generation is a separate scope
+PASS STUDENT LABELS 29 student cache survives an intervening AI batch
+PASS STUDENT LABELS 30 empty researcher decision remains authoritative
+PASS STUDENT LABELS 31 changed AI context invalidates student cache
+PASS STUDENT LABELS 32 multiple chunks preserve every student target without touching AI messages
+PASS STUDENT LABELS 33 student and AI cache identities differ
+TOTAL STUDENT LABELS 33 checks passed; isolated SQLite/mock.

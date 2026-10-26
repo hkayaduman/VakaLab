@@ -7,7 +7,7 @@ try{
     $config=cfg();demand($config['env']!=='production'||$config['https'],'Üretimde HTTPS zorunlu',503);
     $db=new Db($config);$auth=new Auth($db);$auth->session();$op=$_GET['op']??'me';$p=[];
     if($_SERVER['REQUEST_METHOD']==='POST'){$auth->csrf();demand((int)($_SERVER['CONTENT_LENGTH']??0)<=1048576,'İstek çok büyük',413);$p=obj(file_get_contents('php://input'));}
-    $writes=['login','logout','start','save','initial','submit','chat','events','onboarding','admin','new_run','step','decision','report','message_labels'];
+    $writes=['login','logout','start','save','initial','submit','chat','events','onboarding','admin','new_run','step','decision','report','message_labels','holistic'];
     if(in_array($op,$writes,true))demand($_SERVER['REQUEST_METHOD']==='POST','POST gerekli',405);
     if($op==='token'){$result=['csrf'=>$_SESSION['csrf']];}
     elseif($op==='login'){$u=$auth->login($p['login']??'',$p['password']??'');$result=['role'=>$u['role'],'csrf'=>$_SESSION['csrf']];}
@@ -18,7 +18,7 @@ try{
         switch($op){
         case 'me':$result=['id'=>$u['id'],'login'=>$u['login'],'name'=>$u['name'],'role'=>$u['role'],'metadata'=>array_intersect_key(obj($u['metadata']),array_flip(['program','year'])),'test'=>(bool)$u['test'],'config'=>array_intersect_key($config,array_flip(['timezone','autosave_ms','heartbeat_ms','idle_ms','consent_text'])),'mock'=>$config['ai']['provider']==='mock'];break;
         case 'onboarding':demand($u['role']==='student','Öğrenci gerekli',403);$meta=obj($u['metadata']);foreach(['program','year'] as $k)$meta[$k]=substr((string)($p[$k]??''),0,3000);$db->q('UPDATE users SET metadata=? WHERE id=?',[js($meta),$u['id']]);$db->audit($u['id'],'onboarding',$u['id']);$result=['ok'=>true];break;
-        case 'cases':$result=$db->all("SELECT c.id,c.title,c.position,c.practice,c.status,c.collection_closed_at,s.allow_late,a.id app_id,a.state,a.last_section FROM cases c JOIN assignments s ON s.case_id=c.id AND s.user_id=? AND s.active=1 LEFT JOIN applications a ON a.case_id=c.id AND a.user_id=s.user_id WHERE c.stop_access=0 AND (c.status='active' OR (c.status='closed' AND a.id IS NOT NULL)) ORDER BY c.position",[$u['id']]);break;
+        case 'cases':$result=$db->all("SELECT c.id,c.title,c.position,c.practice,c.status,c.collection_closed_at,s.allow_late,a.id app_id,a.attempt_no,a.state,a.last_section FROM cases c JOIN assignments s ON s.case_id=c.id AND s.user_id=? AND s.active=1 LEFT JOIN applications a ON a.case_id=c.id AND a.user_id=s.user_id AND a.attempt_no=(SELECT MAX(ax.attempt_no) FROM applications ax WHERE ax.case_id=c.id AND ax.user_id=s.user_id) WHERE c.stop_access=0 AND (c.status='active' OR (c.status='closed' AND a.id IS NOT NULL)) ORDER BY c.position",[$u['id']]);break;
         case 'start':$result=$app->start($u,$p['case_id']);break;
         case 'view':$result=$app->view($u,$id);break;
         case 'save':case 'initial':case 'submit':$result=$app->save($u,$id,$p,$op);break;
@@ -30,6 +30,7 @@ try{
         case 'step':$result=(new Analysis($app))->step($u,$p['run_id'],(int)$p['step'],!empty($p['repeat']));break;
         case 'decision':$result=(new Analysis($app))->decide($u,$p['step_id'],$p);break;
         case 'report':$result=(new Analysis($app))->report($u,$p['action'],$p);break;
+        case 'holistic':$result=(new HolisticReview($app))->handle($u,$p);break;
         case 'message_labels':$targetRole=$p['target_role']??'user';demand(is_string($targetRole)&&in_array($targetRole,['user','assistant'],true),'Mesaj grubu geçersiz');$result=(new MessageLabels($app))->generate($u,$p['app_id']??'',$targetRole);break;
         case 'report_data':$result=(new Export($app))->reportData($u,$_GET['id']??'',!empty($_GET['student_view']));break;
         case 'download':

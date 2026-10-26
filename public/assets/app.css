@@ -45,3 +45,8 @@ button.field-link{padding:4px 2px;border:0;border-radius:2px;background:transpar
 .report-visibility{margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}.report-visibility p{margin:10px 0}.visibility-status{display:inline-block;border:1px solid;border-radius:6px;padding:7px 12px;font-weight:700}.visibility-status.is-visible{background:var(--mint);color:var(--green);border-color:#8db5a2}.visibility-status.is-hidden{background:#edf1f1;color:#44595c;border-color:#bdcccd}
 
 .report-visibility button:disabled{background:#edf1f1;color:#718184;border-color:var(--line);opacity:1}.report-visibility [data-hide-report]:not(:disabled){background:#fff3ef;color:var(--red);border-color:#d9b3a8}
+
+.holistic-workspace #holistic-report{min-height:320px}.holistic-workspace fieldset{min-width:0}.holistic-workspace .prose{white-space:pre-wrap}
+
+.holistic-workspace fieldset{border:0;padding:0;margin:0;min-inline-size:0}.holistic-workspace fieldset>button{margin-bottom:1rem}
+.question-review{border:1px solid var(--line,#dce4de);border-radius:14px;padding:clamp(16px,3vw,28px);margin:24px 0;background:#fff;min-width:0}.question-review .question-answer{padding:16px;border-left:4px solid #246b55;background:#f3f7f4;margin-bottom:24px;overflow-wrap:anywhere}.question-review textarea{min-height:120px}.question-review h3{overflow-wrap:anywhere}.holistic-workspace #holistic-report{min-height:140px}

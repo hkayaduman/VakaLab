@@ -1,5 +1,9 @@
 # Öğrenci Paneli İşlevsel Şartnamesi
 
+0.3.1 (26 Ekim 2026): Tek öğrenci raporunda her başlangıç/nihai/yansıtma sorusu, öğrencinin o soruya verdiği yanıt, yanıta özel geri bildirim ve rubriğe dayalı soru puanı birlikte görünür. Rubrik ölçütlerinin puan ve gerekçeleri de ilgili sorunun altındadır. Profil karşılaştırması raporda kalır. Araştırmacı onayı ve ayrıca öğrenciye gösterme işlemi gerekir.
+
+Güncel rapor kararı (0.3.0, 26 Ekim 2026): Araştırmacının ayrıca onaylayıp gösterdiği tek bütüncül değerlendirme raporu, rubrik ölçüt puanları, ağırlıklı toplam ve başlangıç–nihai profil karşılaştırması öğrenciye sunulur. Rapor AI taslağından veya araştırmacının doğrudan yazdığı metinden hazırlanabilir. Öğrencinin vaka çözme, ilk yanıtı kesinleştirme, sohbet ve son teslim akışı değişmez.
+
 Güncel karar 0.2.0: Vaka bazında veri toplama açılır/kapanır; kapalı vakalar salt okunur görüntülenir. Araştırmacı seçili öğrenciye ek süre verebilir veya kaldırabilir. Teslim edilmiş yanıtlar ve başlangıç kilidi açılmaz. Başka vakalar bu işlemden etkilenmez.
 
 Sürüm: 1.0 : konuşmada kabul edilen kararların birleştirilmiş hali.
@@ -228,3 +232,6 @@ Genel Eksik alanları tamamlayın listesi yalnız Son teslim sekmesinde bulunur.
 
 ## 0.2.5 — Son teslim sonrası izleme
 Sekme ziyaretleri son teslimin sunucuda başarıyla kaydedilmesine kadar ölçülür. Başarısız teslim girişimi takibi bitirmez. Başarılı teslimden sonra öğrenci salt okunur yanıt/raporları dolaşabilir; yeni gezinme/süre kaydı araştırma sürecine eklenmez. Kapanışı alınamayan son ziyaret için süre tahmin edilmez.
+
+## 0.2.29 — Ayrı yeni denemeler
+Araştırmacı teslim edilmiş son denemeden gerekçeyle yeni deneme açabilir. Öğrenci aynı vaka metnini boş profil ve yanıtlarla baştan doldurur. Vakalarım son denemeyi açar; Deneme düğmeleri önceki teslimleri salt okunur gösterir. Eski yanıtlar yeni denemeye kopyalanmaz. Kapalı veri toplamada yalnız ilgili öğrenciye ek süre verilir.

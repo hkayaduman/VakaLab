@@ -1,0 +1,27 @@
+PASS HOLISTIC BROWSER 1 assessment endpoint rejects GET writes
+PASS HOLISTIC BROWSER 2 assessment endpoint rejects missing CSRF token
+PASS HOLISTIC BROWSER 3 single report editor replaces the old five-section workflow
+PASS HOLISTIC BROWSER 4 no approval before a report exists
+PASS HOLISTIC BROWSER 5 manual report saves without an AI assessment request
+PASS HOLISTIC BROWSER 6 manual zero scores are retained
+PASS HOLISTIC BROWSER 7 profile comparison remains visible without an AI call
+PASS HOLISTIC BROWSER 8 approval remains separate from publication and collection gate
+PASS HOLISTIC BROWSER 9 report preview escapes pasted HTML
+PASS HOLISTIC BROWSER 10 AI result appears without F5 even when its POST reply is lost
+PASS HOLISTIC BROWSER 11 duplicate generate and manual save are blocked during pending request
+PASS HOLISTIC BROWSER 12 completed AI generation is not resent by observer
+PASS HOLISTIC BROWSER 13 one current report is updated and requires fresh approval
+PASS HOLISTIC BROWSER 14 unsaved edits cannot be approved
+PASS HOLISTIC BROWSER 15 researcher can edit AI report and criterion scores without another AI call
+PASS HOLISTIC BROWSER 16 explicit show publishes approved report in closed case
+PASS HOLISTIC BROWSER 17 holistic docx download
+PASS HOLISTIC BROWSER 18 holistic pdf download
+PASS HOLISTIC BROWSER 19 holistic xlsx download
+PASS HOLISTIC BROWSER 20 report publication can be withdrawn and restored
+PASS HOLISTIC BROWSER 21 invalid AI output preserves saved researcher report
+PASS HOLISTIC BROWSER 22 single report editor fits 1440px
+PASS HOLISTIC BROWSER 23 single report editor fits 768px
+PASS HOLISTIC BROWSER 24 single report editor fits 390px
+PASS HOLISTIC BROWSER 25 status observer stops after leaving the work
+PASS HOLISTIC BROWSER 26 no browser JavaScript errors:
+TOTAL HOLISTIC BROWSER 26 checks passed; local mock provider only.

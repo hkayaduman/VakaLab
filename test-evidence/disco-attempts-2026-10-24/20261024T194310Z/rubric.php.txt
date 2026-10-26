@@ -1,0 +1,22 @@
+PASS RUBRIC 1 valid rubric and fractional weight accepted without mutating input
+PASS RUBRIC 2 blank instructions rejected at server boundary
+PASS RUBRIC 3 missing dimensions rejected at server boundary
+PASS RUBRIC 4 blank dimension name rejected at server boundary
+PASS RUBRIC 5 zero weight rejected at server boundary
+PASS RUBRIC 6 inverted score range rejected at server boundary
+PASS RUBRIC 7 level outside range rejected at server boundary
+PASS RUBRIC 8 duplicate level names rejected at server boundary
+PASS RUBRIC 9 empty level description rejected at server boundary
+PASS RUBRIC 10 nonnumeric level score rejected at server boundary
+PASS RUBRIC 11 missing levels rejected at server boundary
+PASS RUBRIC 12 duplicate stable dimension identifiers rejected at server boundary
+PASS RUBRIC 13 infinite weight rejected at server boundary
+PASS RUBRIC 14 nonfinite maximum rejected at server boundary
+PASS RUBRIC 15 matching level score accepted
+PASS RUBRIC 16 mismatched score rejected
+PASS RUBRIC 17 empty reason rejected
+PASS RUBRIC 18 whitespace reason rejected
+PASS RUBRIC 19 nontext reason rejected
+PASS RUBRIC 20 nonfinite score rejected
+PASS RUBRIC 21 unknown level rejected
+TOTAL RUBRIC 21 checks passed. Pure domain validation; no database/config access.

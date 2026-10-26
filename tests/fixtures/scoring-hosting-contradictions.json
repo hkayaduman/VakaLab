@@ -1,0 +1,248 @@
+{
+  "problem": {
+    "request": {
+      "task": "question_score",
+      "review_version": 2,
+      "step": 3,
+      "case": {
+        "id": "de2f254dc92de0c8f1a1f5e6272496d6",
+        "body": "Bu, hosting bağlantısını denemek için hazırlanmış kurgusal bir vakadır.\n\nBir öğretmen, grup çalışması sırasında bir öğrencinin sürekli sözünün kesildiğini ve giderek etkinliğe katılmaktan vazgeçtiğini fark eder. Diğer öğrenciler, çalışmayı daha hızlı bitirmek istediklerini söyler.\n\nÖğretmen bu durumda nasıl hareket etmelidir? Sorunu, olası nedenlerini ve çözüm önerinizi gerekçeleriyle açıklayın.",
+        "instructions": "Vakayı okuyun, başlangıç değerlendirmenizi tamamlayın ve kesinleştirin. AI sohbetinde çözüm seçeneklerini tartışın. Ardından nihai değerlendirmenizi ve yansıtmanızı yazıp teslim edin. Gerçek kişisel bilgi kullanmayın."
+      },
+      "rubric": {
+        "text": "Bu rubrik yalnız teknik hosting testi içindir. Her yanıtı kendi sorusu kapsamında, vaka ile ilişkisi ve gerekçelendirmesi açısından değerlendirin. Yalnız yanıtta bulunan kanıtları kullanın; yazılmayan bilgi veya niyet varsaymayın.",
+        "dimensions": [
+          {
+            "id": "dimension_e3430889cf6c4a17b4e0d1538b5a8633",
+            "name": "Vakaya uygunluk ve gerekçelendirme",
+            "min": 0,
+            "max": 4,
+            "weight": 1,
+            "levels": [
+              {
+                "name": "İlgisiz",
+                "score": 0,
+                "description": "Yanıt, soruyla veya vakayla ilişkili anlamlı içerik sunmaz."
+              },
+              {
+                "name": "Sınırlı",
+                "score": 1,
+                "description": "Soruya değinir ancak genel ifadelerle kalır; vakayla bağlantısı belirsizdir."
+              },
+              {
+                "name": "Gelişiyor",
+                "score": 2,
+                "description": "Soruyu yanıtlar ve vakayla açık bağlantı kurar; açıklaması sınırlıdır."
+              },
+              {
+                "name": "Yeterli",
+                "score": 3,
+                "description": "Soruya uygun, vakadaki somut bilgilere dayalı ve açıklanmış bir yanıt verir."
+              },
+              {
+                "name": "Güçlü",
+                "score": 4,
+                "description": "Soruya doğrudan yanıt verir; ilgili vaka bilgilerini tutarlı biçimde kullanır ve görüşünü ayrıntılı açıklar."
+              }
+            ]
+          }
+        ]
+      },
+      "rubric_version": "e845c3a26bd85de2f0382b7a88f74731",
+      "question": "Bu vakadaki temel problemi nasıl değerlendiriyorsunuz?",
+      "sources": {
+        "problem": "Bir öğrencinin sözünün sürekli kesilmesi, grup çalışmasına eşit katılımını engelliyor. Öğrencinin geri çekilmesi öğrenmesini ve gruba aidiyetini olumsuz etkileyebilir."
+      },
+      "instruction": "Yalnız bu sorunun yanıtını rubriğe göre değerlendir. Kararın gerekçelendirilmesini sorunun kapsamına göre incele. Her ölçüt için score/level/source/quote/reason döndür. Ayrıca feedback alanında bu puanın nedenini ve öğrencinin yanıtını nasıl geliştirebileceğini açık Türkçe yaz. Başka sorunun yanıtını bu sorunun yerine kullanma.",
+      "expected": {
+        "scores": {
+          "dimension_id": {
+            "score": "number in rubric range",
+            "level": "rubric level",
+            "source": "problem",
+            "quote": "exact excerpt",
+            "reason": "scoring explanation"
+          }
+        },
+        "feedback": "Turkish explanation of score and concrete improvement guidance"
+      }
+    },
+    "output": {
+      "scores": {
+        "dimension_e3430889cf6c4a17b4e0d1538b5a8633": {
+          "source": "problem",
+          "quote": "Bir öğrencinin sözünün sürekli kesilmesi, grup çalışmasına eşit katılımını engelliyor.",
+          "reason": "Yanıt vakayla ilgili herhangi bir içerik sunmuyor; temel problem tanımlama ve gerekçelendirme ile çözüm önerileri eksik.",
+          "level": "İlgisiz",
+          "score": 0,
+          "feedback": "Yanıt bu vaka için geçerli içerik içermiyor. Vakada temel problem olarak ifadeye geçecek net bir analiz yok. Lütfen şu yapıyı kullanarak yeniden yazın: 1) Temel problemi net ifade edin (ör. Bir öğrencinin sürekli sözünün kesilmesi nedeniyle grup çalışmasına eşit katılım sağlanamıyor). 2) Vakadan en az iki olası nedeni belirtin. 3) Somut çözümler ve uygulanabilir adımlar yazın (ör. sohbet kuralları, konuşma sırası için tur yöntemi, müdahale zamanlaması). 4) Başarı göstergeleri ve kısa/uzun vadeli değerlendirme planı ekleyin. 5) Sohbet bağlamında iletişimi nasıl yöneteceğinizi açıklayın."
+        }
+      },
+      "feedback": "Yanıt bu vaka için geçerli içerik içermiyor. Vakada temel problem olarak ifadeye geçecek net bir analiz yok. Lütfen şu yapıyı kullanarak yeniden yazın: 1) Temel problemi net ifade edin (ör. Bir öğrencinin sürekli sözünün kesilmesi nedeniyle grup çalışmasına eşit katılım sağlanamıyor). 2) Vakadan en az iki olası nedeni belirtin. 3) Somut çözümler ve uygulanabilir adımlar yazın (ör. sohbet kuralları, konuşma sırası için tur yöntemi, müdahale zamanlaması). 4) Başarı göstergeleri ve kısa/uzun vadeli değerlendirme planı ekleyin. 5) Sohbet bağlamında iletişimi nasıl yöneteceğinizi açıklayın."
+    }
+  },
+  "decision": {
+    "request": {
+      "task": "question_score",
+      "review_version": 2,
+      "step": 3,
+      "case": {
+        "id": "de2f254dc92de0c8f1a1f5e6272496d6",
+        "body": "Bu, hosting bağlantısını denemek için hazırlanmış kurgusal bir vakadır.\n\nBir öğretmen, grup çalışması sırasında bir öğrencinin sürekli sözünün kesildiğini ve giderek etkinliğe katılmaktan vazgeçtiğini fark eder. Diğer öğrenciler, çalışmayı daha hızlı bitirmek istediklerini söyler.\n\nÖğretmen bu durumda nasıl hareket etmelidir? Sorunu, olası nedenlerini ve çözüm önerinizi gerekçeleriyle açıklayın.",
+        "instructions": "Vakayı okuyun, başlangıç değerlendirmenizi tamamlayın ve kesinleştirin. AI sohbetinde çözüm seçeneklerini tartışın. Ardından nihai değerlendirmenizi ve yansıtmanızı yazıp teslim edin. Gerçek kişisel bilgi kullanmayın."
+      },
+      "rubric": {
+        "text": "Bu rubrik yalnız teknik hosting testi içindir. Her yanıtı kendi sorusu kapsamında, vaka ile ilişkisi ve gerekçelendirmesi açısından değerlendirin. Yalnız yanıtta bulunan kanıtları kullanın; yazılmayan bilgi veya niyet varsaymayın.",
+        "dimensions": [
+          {
+            "id": "dimension_e3430889cf6c4a17b4e0d1538b5a8633",
+            "name": "Vakaya uygunluk ve gerekçelendirme",
+            "min": 0,
+            "max": 4,
+            "weight": 1,
+            "levels": [
+              {
+                "name": "İlgisiz",
+                "score": 0,
+                "description": "Yanıt, soruyla veya vakayla ilişkili anlamlı içerik sunmaz."
+              },
+              {
+                "name": "Sınırlı",
+                "score": 1,
+                "description": "Soruya değinir ancak genel ifadelerle kalır; vakayla bağlantısı belirsizdir."
+              },
+              {
+                "name": "Gelişiyor",
+                "score": 2,
+                "description": "Soruyu yanıtlar ve vakayla açık bağlantı kurar; açıklaması sınırlıdır."
+              },
+              {
+                "name": "Yeterli",
+                "score": 3,
+                "description": "Soruya uygun, vakadaki somut bilgilere dayalı ve açıklanmış bir yanıt verir."
+              },
+              {
+                "name": "Güçlü",
+                "score": 4,
+                "description": "Soruya doğrudan yanıt verir; ilgili vaka bilgilerini tutarlı biçimde kullanır ve görüşünü ayrıntılı açıklar."
+              }
+            ]
+          }
+        ]
+      },
+      "rubric_version": "e845c3a26bd85de2f0382b7a88f74731",
+      "question": "Kararınız nedir?",
+      "sources": {
+        "decision": "Grup çalışmasını kısa süre durdurup sırayla konuşma kuralı koyarım. Her öğrenciye görev ve söz hakkı verir, katılımı gözlemlerim."
+      },
+      "instruction": "Yalnız bu sorunun yanıtını rubriğe göre değerlendir. Kararın gerekçelendirilmesini sorunun kapsamına göre incele. Her ölçüt için score/level/source/quote/reason döndür. Ayrıca feedback alanında bu puanın nedenini ve öğrencinin yanıtını nasıl geliştirebileceğini açık Türkçe yaz. Başka sorunun yanıtını bu sorunun yerine kullanma.",
+      "expected": {
+        "scores": {
+          "dimension_id": {
+            "score": "number in rubric range",
+            "level": "rubric level",
+            "source": "decision",
+            "quote": "exact excerpt",
+            "reason": "scoring explanation"
+          }
+        },
+        "feedback": "Turkish explanation of score and concrete improvement guidance"
+      }
+    },
+    "output": {
+      "scores": {
+        "dimension_e3430889cf6c4a17b4e0d1538b5a8633": {
+          "source": "decision",
+          "quote": "Her öğrenciye görev ve söz hakkı verir, katılımı gözlemlerim.",
+          "reason": "Yanıt verilmedi; vaka için net bir karar veya gerekçe sunulmadı. Sağlıkla ilişkili kanıtlar yok, dolayısıyla vakayla bağlantılı bir karar ve gerekçe gösterilemiyor.",
+          "level": "İlgisiz",
+          "score": 0,
+          "feedback": "Yanıt verilmedi. Kararınızı ve gerekçenizi vaka ile açıkça ilişkilendirerek yazın. Örneğin: 'Grup çalışmasını kısa süre durdururum, sırayla konuşma kuralı koyarım; her öğrenciye görev ve söz hakkı verir, katılımı gözlerim.' Sohbet içinde öğrenci katılımını destekleyen somut adımlar önerebilirsiniz ve bu adımları uygulanabilir biçimde açıklayın."
+        }
+      },
+      "feedback": "Yanıt verilmedi. Kararınızı ve gerekçenizi vaka ile açıkça ilişkilendirerek yazın. Örneğin: 'Grup çalışmasını kısa süre durdururum, sırayla konuşma kuralı koyarım; her öğrenciye görev ve söz hakkı verir, katılımı gözlerim.' Sohbet içinde öğrenci katılımını destekleyen somut adımlar önerebilirsiniz ve bu adımları uygulanabilir biçimde açıklayın."
+    }
+  },
+  "reason": {
+    "request": {
+      "task": "question_score",
+      "review_version": 2,
+      "step": 3,
+      "case": {
+        "id": "de2f254dc92de0c8f1a1f5e6272496d6",
+        "body": "Bu, hosting bağlantısını denemek için hazırlanmış kurgusal bir vakadır.\n\nBir öğretmen, grup çalışması sırasında bir öğrencinin sürekli sözünün kesildiğini ve giderek etkinliğe katılmaktan vazgeçtiğini fark eder. Diğer öğrenciler, çalışmayı daha hızlı bitirmek istediklerini söyler.\n\nÖğretmen bu durumda nasıl hareket etmelidir? Sorunu, olası nedenlerini ve çözüm önerinizi gerekçeleriyle açıklayın.",
+        "instructions": "Vakayı okuyun, başlangıç değerlendirmenizi tamamlayın ve kesinleştirin. AI sohbetinde çözüm seçeneklerini tartışın. Ardından nihai değerlendirmenizi ve yansıtmanızı yazıp teslim edin. Gerçek kişisel bilgi kullanmayın."
+      },
+      "rubric": {
+        "text": "Bu rubrik yalnız teknik hosting testi içindir. Her yanıtı kendi sorusu kapsamında, vaka ile ilişkisi ve gerekçelendirmesi açısından değerlendirin. Yalnız yanıtta bulunan kanıtları kullanın; yazılmayan bilgi veya niyet varsaymayın.",
+        "dimensions": [
+          {
+            "id": "dimension_e3430889cf6c4a17b4e0d1538b5a8633",
+            "name": "Vakaya uygunluk ve gerekçelendirme",
+            "min": 0,
+            "max": 4,
+            "weight": 1,
+            "levels": [
+              {
+                "name": "İlgisiz",
+                "score": 0,
+                "description": "Yanıt, soruyla veya vakayla ilişkili anlamlı içerik sunmaz."
+              },
+              {
+                "name": "Sınırlı",
+                "score": 1,
+                "description": "Soruya değinir ancak genel ifadelerle kalır; vakayla bağlantısı belirsizdir."
+              },
+              {
+                "name": "Gelişiyor",
+                "score": 2,
+                "description": "Soruyu yanıtlar ve vakayla açık bağlantı kurar; açıklaması sınırlıdır."
+              },
+              {
+                "name": "Yeterli",
+                "score": 3,
+                "description": "Soruya uygun, vakadaki somut bilgilere dayalı ve açıklanmış bir yanıt verir."
+              },
+              {
+                "name": "Güçlü",
+                "score": 4,
+                "description": "Soruya doğrudan yanıt verir; ilgili vaka bilgilerini tutarlı biçimde kullanır ve görüşünü ayrıntılı açıklar."
+              }
+            ]
+          }
+        ]
+      },
+      "rubric_version": "e845c3a26bd85de2f0382b7a88f74731",
+      "question": "Bu kararı neden veriyorsunuz?",
+      "sources": {
+        "reason": "Çalışmayı hızlı bitirmek, bir öğrencinin dışlanmasını haklı çıkarmaz. Söz hakkı ve görev paylaşımı, öğrenciyi arkadaşları önünde suçlamadan katılımını destekleyebilir."
+      },
+      "instruction": "Yalnız bu sorunun yanıtını rubriğe göre değerlendir. Kararın gerekçelendirilmesini sorunun kapsamına göre incele. Her ölçüt için score/level/source/quote/reason döndür. Ayrıca feedback alanında bu puanın nedenini ve öğrencinin yanıtını nasıl geliştirebileceğini açık Türkçe yaz. Başka sorunun yanıtını bu sorunun yerine kullanma.",
+      "expected": {
+        "scores": {
+          "dimension_id": {
+            "score": "number in rubric range",
+            "level": "rubric level",
+            "source": "reason",
+            "quote": "exact excerpt",
+            "reason": "scoring explanation"
+          }
+        },
+        "feedback": "Turkish explanation of score and concrete improvement guidance"
+      }
+    },
+    "output": {
+      "scores": {
+        "dimension_e3430889cf6c4a17b4e0d1538b5a8633": {
+          "source": "reason",
+          "quote": "Söz hakkı ve görev paylaşımı, öğrenciyi arkadaşları önünde suçlamadan katılımını destekleyebilir.",
+          "reason": "Yanıt için somut kanıt yok; öğrenci yanıtı paylaşılmadığı için vakaya ilişkin gerekçelendirme ve uygunluk değerlendirmesi yapılamıyor.",
+          "level": "İlgisiz",
+          "score": 0,
+          "feedback": "Bu değerlendirme için öğrenci yanıtı verilmediğinden kanıtlı bir puanlama yapılamıyor. Lütfen yanıtı paylaş. Geliştirme önerileri: - Sohbet halinde her öğrencinin söz hakkını güvenli ve adil şekilde kullanmasını sağlayacak kurallar oluştur (örn. el kaldırma, belirli süreli konuşmalar). - Grup içi rol dağılımları ve paylaşımla ilgili somut adımlar belirle. - Olası nedenleri vakayla ilişkilendirerek, öğretmenin hangi adımları atacağını açık adımlarla yaz."
+        }
+      },
+      "feedback": "Bu değerlendirmenin için öğrenci yanıtı paylaşılmadığından kanıtlı bir puanlama yapılamıyor. Lütfen yanıtı gönder. Geliştirme önerileri: - Sohbet halinde her öğrencinin söz hakkını güvenli ve adil şekilde kullanmasını sağlayacak kurallar oluştur (örn. el kaldırma, belirli süreli konuşmalar). - Grup içi rol dağılımları ve paylaşımla ilgili somut adımlar belirle. - Olası nedenleri vakayla ilişkilendirerek, öğretmenin hangi adımları atacağını açık adımlarla yaz."
+    }
+  }
+}

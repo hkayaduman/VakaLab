@@ -1,0 +1,29 @@
+PASS PROCESS 1 student cannot trigger research labeling
+PASS PROCESS 2 other workspace cannot label messages
+PASS PROCESS 3 analysis step6 labels reused without another generation
+PASS PROCESS 4 all conversation messages covered including empty selection
+PASS PROCESS 5 generation metadata preserved
+PASS PROCESS 6 assistant not mislabeled as student request
+PASS PROCESS 7 unchanged input uses cached labels
+PASS PROCESS 8 unreviewed AI labels are effective and marked AI
+PASS PROCESS 9 explicit no-match distinguished from not analyzed
+PASS PROCESS 10 researcher correction wins without deleting AI suggestion
+PASS PROCESS 11 Disco has one point event for each message
+PASS PROCESS 12 Disco uses researcher current labels
+PASS PROCESS 13 Disco preserves separate AI and researcher labels
+PASS PROCESS 14 message point event uses recorded server timestamp
+PASS PROCESS 15 Disco excludes message content and login
+PASS PROCESS 16 explicit empty researcher review overrides AI
+PASS PROCESS 17 Disco honors removal instead of falling back to AI
+PASS PROCESS 18 unknown label rejected
+PASS PROCESS 19 omitted message rejected
+PASS PROCESS 20 non-string label rejected
+PASS PROCESS 21 invalid provider output fails clearly
+PASS PROCESS 22 failed generation does not add partial labels
+PASS PROCESS 23 labeling preserves applications
+PASS PROCESS 24 labeling preserves reports
+PASS PROCESS 25 labeling preserves snapshots
+PASS PROCESS 26 labeling preserves draft_revisions
+PASS PROCESS 27 labeling preserves messages
+PASS PROCESS 28 labeling preserves events
+TOTAL PROCESS 28 checks passed. Isolated SQLite/mock; real provider quality not tested.

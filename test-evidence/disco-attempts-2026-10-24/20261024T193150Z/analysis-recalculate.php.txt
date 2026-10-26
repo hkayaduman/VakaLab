@@ -1,0 +1,22 @@
+PASS 1 student cannot recalculate
+PASS 2 completed step needs explicit recalculate
+PASS 3 technical checks cannot be repeated as AI review
+PASS 4 invalid repeat is recorded as failed
+PASS 5 failed repeat retains previous successful result
+PASS 6 only selected step gets a new successful attempt
+PASS 7 all other calculation and AI steps unchanged
+PASS 8 previous human decisions preserved without auto acceptance
+PASS 9 new result requires its own human decision
+PASS 10 cannot approve superseded AI result
+PASS 11 merge is rebuilt after new human decision
+PASS 12 merge uses new decision
+PASS 13 same decisions cannot produce duplicate merge
+PASS 14 reviewed score reaches student report
+PASS 15 exact card feedback reaches student report without regeneration
+PASS 16 student report has no internal authorship metadata
+PASS 17 all previous report snapshots unchanged
+PASS 18 original AI output unchanged
+PASS 19 report creation waits for running recalculation
+PASS 20 decision waits for running calculation
+PASS 21 parallel recalculation is rejected
+TOTAL RECALCULATE 21 checks passed. Isolated SQLite/mock; no working database used.

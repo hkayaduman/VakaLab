@@ -1,0 +1,7 @@
+PASS 1440px paragraph: wraps, full text, page fits, local scroll
+PASS 1440px unbroken: wraps, full text, page fits, local scroll
+PASS 768px paragraph: wraps, full text, page fits, local scroll
+PASS 768px unbroken: wraps, full text, page fits, local scroll
+PASS 390px paragraph: wraps, full text, page fits, local scroll
+PASS 390px unbroken: wraps, full text, page fits, local scroll
+TOTAL TABLE LAYOUT 30 checks passed. Synthetic DOM only; no database access.

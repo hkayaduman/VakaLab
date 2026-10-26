@@ -41,7 +41,7 @@ function editReviewV2(s,v,appId){
             dimensions(q).forEach((d,j)=>{const prefix='review-v2-'+i+'-'+j,level=d.levels.find(l=>l.name===getValue(prefix+'-level')),reason=getValue(prefix+'-reason');demandUi(reason.trim()!=='','Puanlama gerekçesini doldurun.');criteria[d.id]={...criteria[d.id],level:level.name,score:Number(level.score),reason,source:getValue(prefix+'-source'),quote:getValue(prefix+'-quote')};});
             return [id,{criteria,feedback:getValue('review-v2-feedback-'+i)}];
         }))};
-        await api('decision',{step_id:s.id,action:'edit',body,reason:'Araştırmacı bu bölümün yorumunu veya puanını düzenleyerek kabul etti.'});document.querySelector('dialog #dialog-close')?.click();await finishReview(s.run_id,appId);
+        await api('decision',{step_id:s.id,action:'edit',body,reason:'Araştırmacı bu bölümün yorumunu veya puanını düzenleyerek kabul etti.'});await finishReview(s.run_id,appId);dialog.close();
     });
     questions.forEach(([,q],i)=>{
         const input=dialog.querySelector('#review-v2-score-'+i);input.readOnly=true;input.step='any';

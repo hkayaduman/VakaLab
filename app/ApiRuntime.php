@@ -28,7 +28,7 @@ final class ApiRuntime {
         }catch(Throwable){error_log('VakaLab interrupted analysis cleanup failed');}
         if(!headers_sent()){
             http_response_code(500);header('Content-Type: application/json; charset=utf-8');
-            echo js(['error'=>$timeout?'Sunucu işlem süresi doldu. Analize devam et ile yeniden deneyebilirsiniz.':'Sunucu işlemi kesildi. Durumu yenileyip yeniden deneyebilirsiniz.']);
+            echo js(['error'=>$timeout?'Sunucu işlem süresi doldu. İşlem durumunu kontrol edip yeniden deneyebilirsiniz.':'Sunucu işlemi kesildi. İşlem durumunu kontrol edip yeniden deneyebilirsiniz.']);
         }
     }
 }

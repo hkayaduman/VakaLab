@@ -55,4 +55,30 @@ async function runSequentialAnalysis(runId, {load, execute, update = async()=>{}
     }
     return {status:'completed'};
 }
-if (typeof module !== 'undefined') module.exports = {analysisProgress,reviewProgress,runSequentialAnalysis};
+function analysisViewVersion(view) {
+    const rows=(values,keys)=>(values||[]).map(row=>keys.map(key=>row[key]??null)).sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+    return JSON.stringify([rows(view.analysis_runs,['id','review_version']),rows(view.steps,['id','run_id','step','attempt','status','error']),rows(view.decisions,['id','step_id']),rows(view.reports,['id','run_id','version','approved_at','published_at'])]);
+}
+// Observe existing work only. Never execute or retry an AI request here.
+function observeAnalysis({load,isCurrent,hasWork,onChange,initial,interval=2000}) {
+    let stopped=false,timer,version=analysisViewVersion(initial),pending=false;
+    const schedule=()=>{if(!stopped)timer=setTimeout(tick,interval);};
+    const stop=()=>{stopped=true;clearTimeout(timer);};
+    async function tick(){
+        if(stopped||!isCurrent()){stop();return;}
+        try{
+            const view=await load();
+            if(stopped||!isCurrent()){stop();return;}
+            const next=analysisViewVersion(view);
+            if(next!==version){pending=(await onChange(view))===false;if(!pending)version=next;}
+            if(!pending&&!hasWork(view)){stop();return;}
+        }catch{
+            // A temporary read failure must not repeat a paid operation.
+            if(!isCurrent()){stop();return;}
+        }
+        schedule();
+    }
+    schedule();
+    return {stop};
+}
+if (typeof module !== 'undefined') module.exports = {analysisProgress,reviewProgress,runSequentialAnalysis,analysisViewVersion,observeAnalysis};

@@ -62,6 +62,7 @@ final class StudentReport {
         return ['total'=>round($total,4),'max'=>round($max,4)];
     }
     public static function blocks(array $r): array {
+        if(($r['report']['format']??'')==='student-v3')return HolisticReview::blocks($r);
         $d=$r['report'];$b=[];$p=function($s)use(&$b){$b[]=['type'=>'paragraph','text'=>$s];};$h=function($s)use(&$b){$b[]=['type'=>'heading','text'=>$s];};
         $score=fn($s,$m)=>$s===null?'Puanlanmadı':$s.' / '.$m;
         $p($d['case_title'].' · '.$d['participant'].(($d['format']??'')==='student-v2'?'':' · Rapor sürümü '.$r['version']));

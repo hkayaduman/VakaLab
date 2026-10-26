@@ -1,5 +1,24 @@
 # Gerçek test sonuçları — 2026-10-20
 
+## Soru bazında tek rapor 0.3.1 — 2026-10-26
+
+- `tests/holistic-review.php`: SQLite ve ayrı yerel MariaDB 11.4.12 üzerinde **63 kontrol** geçti. Tek AI çağrısı, manuel yolda sıfır çağrı, altı sorunun tam soru/yanıt/geri bildirim/puan eşleşmeleri, başka soru yanıtından kanıt alınmasının reddi, dolu yanıta yok denmesinin reddi, soru/toplam ağırlıkları, ayrı onay/yayın ve eski rapor uyumluluğu doğrulandı. Word içinde her soru/yanıt/geri bildirimin bulunması ve Excel'de aynı satırda kalması da denetlendi; PDF üretimi geçti.
+- `tests/holistic-contract.php`: 10 kontrol. Tek kullanıcı veri iletisi, bütün soru/yanıtlar, tam rubrik, profil, her sorunun zorunlu olduğu çıktı şeması ve yalnız kendi yanıtına izin veren kanıt kaynakları doğrulandı.
+- `tests/holistic-browser.cjs`: **36 kontrol**. Her sorunun tam öğrenci yanıtı, altı ayrı geri bildirim/puan alanı, manuel kayıt, tek sorunun geri bildirimini düzenlerken diğerinin korunması, öğrenci önizlemesinde aynı altı bölüm ve profil, indirmeler, kaybolan POST yanıtından sonra F5 olmadan güncelleme, tek üretim isteği ve üç ekran genişliği geçti. JavaScript hatası yok.
+- Mevcut temel PHP 87, v2 değerlendirme 96 ve soru-yanıt çelişkisi 26 regresyon kontrolü geçti. PHP/JS sözdizimi ve diff boşluk denetimi geçti. MySQL çalıştırıcısındaki mevcut bağlantı, temel, deneme, Disco ve ayrı yedek geri yükleme kontrolleri de geçti.
+
+Sonuçlar `test-evidence/question-report-2026-10-26` içindedir. Harici AI çağrısı yapılmadı; canlı hosting güncellemesi ve yeni sözleşmenin gerçek sağlayıcı kabulü henüz yapılmadı. Üretim verisi/config değiştirilmedi. Yeni SQL geçişi yoktur.
+
+## Tek rapor sözleşmesi 0.3.0 — 2026-10-26
+
+- `tests/holistic-review.php`: SQLite ve ayrı yerel MariaDB üzerinde 40 kontrol. Tek AI çağrısı sağlayıcı sayacıyla, manuel yol sıfır çağrıyla doğrulandı. Tam soru/yanıt eşleşmesi, sahiplik, eşzamanlı ikinci üretim, revizyon kontrolü, gerçek sıfır puan, ağırlıklı toplam, yayın kapısı, hatalı çıktıdan sonra eski raporun korunması, Word/PDF/XLSX ve eski endpointlerin v3 raporunu değiştirememesi kapsanır.
+- `tests/holistic-contract.php`: 10 kontrol. Gerçek Ai adapter'ının ilettiği tek kullanıcı iletisinde vaka, tam rubrik, altı soru/yanıt ve profil; şemada izinli ölçüt/düzey/puan/kaynak listeleri; mock çıktı doğrulaması.
+- `tests/holistic-browser.cjs`: yerel PHP + Chrome ile 26 kontrol. Manuel kayıt, düzenleme, onay/yayın ayrımı, indirmeler, 1440/768/390 piksel genişlikler, HTML kaçışları, CSRF/GET koruması, kaybolan POST yanıtından sonra F5 olmadan sonuç görünmesi ve ikinci AI isteğinin gönderilmemesi geçti.
+- Temel PHP 87, v2 uyumluluğu 96, mevcut soru-yanıt koruması 26 kontrol; gözlemci 5 senaryo grubu ve analiz ilerleme/sıralama 27 kontrol geçti. PHP/JS sözdizimi kontrolleri geçti.
+- `tests/mysql_checks.py`: ayrı MariaDB 11.4.12'de yeni 40 kontrol yanında temel 87, yeni deneme 38, Disco 35 ve bağlantı boşta kalma 6 kontrol geçti; ayrı geri yüklenen DB'de 8 tablo sayısı eşleşti.
+
+Yeni testler harici sağlayıcıya istek yapmaz; canlı veri veya konfigürasyon değiştirilmedi. Gerçek AI içerik kalitesi ve hosting üzerindeki yeni sürüm kabulü henüz doğrulanmadı. Eski ayrı kartlara bağlı tarayıcı testi `tests/legacy-review-v2-browser.fixture` olarak saklandı; varsayılan yeni arayüz testi `tests/holistic-browser.cjs` oldu.
+
 ## Onaylanan promptlar, güncel etiket sözleşmesi ve odak incelemesi — 2026-10-23
 
 Sohbet chat-v2, etiketleme message-labels-v2 etkinleştirildi; metinler AI_PROMPTS_REVIEW_TR.md içinde uygulamadaki sabitlerden aynen çıkarılmıştır. Vaka bağlamı ile user/assistant API rolleri ayrıldı; konuşmada rol yükseltmesi reddedilir. Her etiket isteğinde güncel ad, description ve ayrıştırılmış body kullanılır; yeni/değişmiş tanım/model/prompt cache'i geçersiz kılar. Audit tanım snapshotını tutar. Sağlayıcı yanıtı beklenirken tanım seti değişirse eski sonuç kaydedilmez. Etiket JSON şeması yalnız mevcut mesaj/etiket kimliklerine izin verir. Hiçbir doğrulama etiketin anlamsal doğruluğunu garanti etmez.
@@ -539,3 +558,28 @@ Kullanıcı isteğiyle V2 rapor kartına ayrı Göstermeyi geri al düğmesi ekl
 Yetkili araştırmacının report/hide işlemi yalnız published_at değerini temizler. Rapor onayı, içeriği ve kimliği korunur; işlem audit kaydına yazılır. Öğrenci rapor listesi ve indirme erişimi kapanır. Aynı rapor mevcut veri toplama ve güncel değerlendirme kapılarıyla yeniden gösterilebilir. Öğrenci bu işlemi yapamaz. Mevcut çalışma raporlarının görünürlüğü otomatik değiştirilmedi.
 
 Kontroller: V2 değerlendirme94, ana87, eski teslim21, tam Chrome142 geçti. Testler göster→geri al→yeniden göster, düğmelerin karşılıklı etkinliği, durum etiketleri, öğrenci erişiminin kapanması, içerik/onay korunması, tekrarlı geri alma ve audit kaydını kapsar. Son masaüstü kapalı ve mobil açık ekran görüntüleri görsel incelendi. Cache sürümü app/review/CSS0.2.28. Gerçek sağlayıcı çağrısı veya GitHub gönderimi yok. Kullanıcı Ctrl+F5 ile yenileyebilir.
+# 2026-10-24 — Yeni deneme (0.2.29)
+
+- `tests/new-attempt.php`: SQLite 39, MariaDB 11.4.12 üzerinde 38 kontrol. Dolu şema 002→003 geçişi, eski kayıtların korunması, yetki/gerekçe, boş yeni deneme, aynı vaka sürümü, tekrar istek güvenliği, ikinci teslim ve üçüncü deneme doğrulandı. MariaDB yedek/geri yüklemede sekiz tablo sayısı eşleşti.
+- `tests/new-attempt-browser.cjs`: Chrome masaüstü/mobil 13 kontrol. Araştırmacı açılışı, gerekçe doğrulaması, deneme geçişleri, eski yanıtın salt okunur olması, yeni yanıtın kaydı, tek vaka kartı ve mobil taşma kontrolü geçti. Gerçek AI kullanılmadı.
+- Mevcut testler: `tests/run.php` 87, `tests/researcher-ui.cjs` 50, `tests/legacy-submission.php` 21, `tests/review-v2.php` 94 kontrol geçti. PHP dosya okunabilirliği ve Chrome için Windows sandbox dışındaki ayrı sentetik test ortamı kullanıldı.
+- Yerel SQLite: `bin/upgrade-sqlite.php` özel yedeği doğruladı; 22 tablonun eski sütunları ve kayıtları aynı kaldı. Migration tekrarında değişiklik yok. Yerel öğrenci adına yeni deneme açılmadı; canlı sağlayıcı isteği gönderilmedi.
+
+## 24 Ekim 2026 — Disco deneme numarası / 0.2.30
+
+Disco visits/events CSV dosyalarında bütün satırlar, kesinleştirme/teslim kayıtları ve boş başlıklar Deneme numarası içerir. İki deneme aynı Participant/Vaka ID, farklı Case ID ile ayrı süreçlerdir; aradaki bekleme süreye eklenmez. SQLite ve MariaDB üzerinde 35'er Disco kontrolü, gerçek HTTP indirmesinde her iki kimlik ve sütun doğrulandı. Tam koşuda bulunan değerlendirme düzenleyicisinin erken kapanma yarışı düzeltildi; eski test metinleri/verileri güncellendi. Odak testi, bağımsız DOM gözlemlerini başlangıç/bitişlerle karşılaştırır; üretim süre kuralları değişmedi.
+
+Son tam koşu 20261024T194310Z: 38/38 yerel paket, 78/78 sözdizimi/diff, toplam 116/116 başarılı. Önceki başarısız koşular korunur. Kanıt ve kapsam: test-evidence/disco-attempts-2026-10-24/RESULTS_TR.md. Altı canlı sağlayıcı testi başarılı sayılmadı: harici veri aktarımı ve ücret için açık onay gerektiğinden başlatma komutu otomatik onay denetimince reddedildi. Gerçek AI çağrısı veya bu turda çalışma veritabanı değişikliği yapılmadı.
+
+## 26 Ekim 2026 — shared hosting MySQL boş bağlantı süresi
+
+Canlı günlükte uzun değerlendirme sonrası PDOException görüldü; phpMyAdmin ekranında global wait_timeout ve interactive_timeout 60 saniye. Sürücü hata numarası kaydedilmediğinden canlı PDOException'ın kesin alt nedeni henüz doğrulanmadı. Db bağlantısı artık SET SESSION wait_timeout = GREATEST(@@SESSION.wait_timeout, 600) uygular. Global sunucu ayarını değiştirmez, daha uzun mevcut oturum süresini düşürmez; SQLite dalı korunur.
+
+Yeni tests/db-idle-timeout.php yalnız geçici loopback vakalab_test_ veritabanında çalışır. Kısa global süreyi yalnız bu izole testte 2 saniyeye ayarlar ve finally içinde geri yükler. Korumasız bağlantının 3 saniye beklemede 2006/2013 ile kapanması, uygulama bağlantısının açık kalması, global değerin korunması ve bekleme sonrası transaction içinde yazma dahil 6/6 kontrol geçti. mysql_checks.py bu testi de çalıştırır. MariaDB 11.4.12 ana 87/87, yeni deneme 38/38, Disco 35/35 ve ayrı yedeğin geri yüklenmesinde 8 tablo sayısı eşleşti. SQLite ana 87/87 geçti. PHP syntax ve diff kontrolü geçti.
+
+İlk sandbox denemesinde yerel MariaDB loopback erişimi 10013 ile engellendi; SQLite dosya dışa aktarımında okuma hatası oluştu. Otomatik incelemeden geçen sandbox dışı tekrarlar başarılıdır. Gerçek sağlayıcı çağrısı veya canlı veritabanına bu testlerden erişim yok. Canlıya kullanıcı tarafından app/Db.php yüklenmesi ve yeniden değerlendirme doğrulaması bekleniyor. Hazır tek dosya storage/releases/mysql-idle-timeout-fix/Db.php; SHA-256 A673B47DF81C019E0DF81CFE8D2BA40D9623DE3DA96A28A1C9BC7888A98A5C13.
+
+26 Ekim hosting takip: İlk GREATEST ifadesi içeren dosya yüklendikten sonra başlangıç API isteği hata verdi; doğrudan sürücü kodu yok. Kullanıcının phpMyAdmin bağlantısında SET SESSION wait_timeout = 600 ve SELECT sonucu 600 başarılı. Uygulama dosyası aynı sabit tamsayı ifadesini kullanacak şekilde revize edildi; artık mevcut daha uzun oturum değerini koruma iddiası geçerli değil. PHP syntax geçti. Bu son ifadenin canlı uygulama DB kullanıcısıyla doğrulaması bekleniyor; önceki yerel test başarıları ilk sürüme aittir.
+
+## 26 Ekim 2026 — review-v2.4 yanıt varlığı ve puanlama girdisi
+Açık öğrenci yanıtı alanı, soru kapsamlı prompt ve dar yanıt-yok çelişki doğrulaması eklendi. Yeni canlı model başarısı iddia edilmez. scoring-presence26, review-v2 96, ana87, eski teslim21, sohbet9, etiket22 geçti. Kapsam/sınırlar: test-evidence/scoring-answer-2026-10-26/RESULTS_TR.md. Canlıda yalnız Ai.php ve Review.php yüklenmesi, başlangıç bölümünün yeniden hesaplanması ve araştırmacı incelemesi bekleniyor.

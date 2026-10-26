@@ -1,5 +1,17 @@
 # Araştırmacı Paneli İşlevsel Şartnamesi
 
+## Güncel uygulama kararı — 0.3.1 · 26 Ekim 2026
+
+Aşağıdaki 0.3.0 genel puanlama kararı bu bölümle güncellenmiştir. Vaka, seçilen tam rubrik ve altı soru/yanıt eşleşmesi yine tek AI değerlendirme isteğinde gönderilir; tek rapor oluşturulur. Ancak bu rapor içinde **her soru ayrı** değerlendirilir: bölüm, sorunun tam metni, öğrencinin kendi tam yanıtı, bu yanıta özel geri bildirim, her rubrik ölçütünün düzeyi/puanı/gerekçesi ve soru toplamı birlikte görünür. Başka sorunun yanıtı o sorunun puan kanıtı olamaz. Araştırmacı aynı alanları manuel doldurabilir veya AI çıktısını düzenleyebilir. Genel not alanı isteğe bağlıdır. Toplam, soru başına ağırlıklı puanların toplamıdır; ölçüt ve ağırlıklar seçilen rubrikten gelir. Profil karşılaştırması puansız olarak ayrıca korunur.
+
+Öğrenciye gösterilen ve indirilen tek rapor da bu düzeni kullanır. Onay/yayın ayrımı ve veri toplama kapanış koşulu değişmez. Eski genel raporlar önizlenebilir; soru puanları kendiliğinden türetilmez. Yeni AI isteği veya her soru için manuel kayıt ile güncel rapor yeni düzene geçirilir.
+
+## Güncel uygulama kararı — 0.3.0 · 26 Ekim 2026
+
+Bu bölüm aşağıdaki tarihsel ayrı-adım değerlendirme tasarımının yerini alır. Öğrenci-vaka dosyasında tek rapor alanı bulunur. Araştırmacı rubriği seçer; AI ile rapor ve puanları hazırla düğmesi vaka, rubrik, başlangıç/nihai/yansıtma soruları ve her sorunun kendi yanıtını tek istekte gönderir. AI bütün yanıtları birlikte ele alıp her rubrik ölçütünü bir kez puanlar ve tek rapor yazar. Puan gerekçeleri raporun ölçüt alanlarında yer alır; ağırlıklı toplam sunucuda hesaplanır.
+
+Araştırmacı AI kullanmadan metni yazabilir ve her ölçütün düzeyini seçebilir. AI ile hazırlanmış metin ve düzeyler aynı alanda düzenlenebilir. Taslak kaydı, rapor onayı ve öğrenciye gösterme ayrı işlemlerdir. Her değişiklik yeni onay gerektirir; öğrenciye gösterme veri toplamanın kapanmasını da gerektirir. Profil karşılaştırması AI çağrısı olmadan başlangıç/nihai değerleriyle gösterilir. Hazırlanan sonuç otomatik görünür; F5 gerekmez. Kaydedilmemiş metin durum güncellemesiyle ezilmez. Güncel rapor tek kayıttır; geçmiş üretim girdileri/çıktıları ve işlemler denetim kayıtlarında tutulur. Eski ayrı-adım kayıtları silinmez.
+
 Güncel karar 0.2.0: Her araştırmacının ayrı çalışma alanı vardır; ortak araştırmacı/vaka üyeliği yoktur. Kullanıcılar → + Kullanıcı ekle ile yeni araştırmacı oluşturulabilir; yeni hesap boş alanla başlar. Tüm ekran ve API işlemleri sahiplik kapsamındadır. Atama öğrenci checkboxları/Tümünü seç ile atomik toplu yapılır. Veri indirme Tüm vakalar veya seçili vaka, Excel/JSON ve Disco CSV düğmeleriyle sunulur. Veri toplama vakanın kendi kartından açılır/kapanır.
 
 Sürüm: 1.0. Durum: Kabul edilmiş tasarımın geliştirme girdisi; çalışan uygulama değildir.
@@ -264,3 +276,6 @@ AI konuşması ve mesaj etiketleri → AI ile mesajları etiketle otomatik öner
 Bölüm geçişleri ve ziyaret süreleri tüm yedi sekmeyi kapsar. Giriş sonraki sekme/çıkış/başarılı kesinleştirmeye kadar sürer; yeniden ziyaret ayrı satırdır. Vaka 10:00 → Profil 10:02, vaka ziyaretinde 120 saniyedir. Son teslimin başarıyla kaydından sonrası takip edilmez. Geçen süre, görünür/odak ölçümünden ayrıdır; arka plan bekleyişini içerebilir. Açık uç tahmin edilmez.
 
 Disco: geçişler ve süreler kapanan ziyaretlerin başlangıç/bitiş ve Duration Seconds alanlarını, sıra ve önceki/sonraki etkinliği içerir. Disco: ayrıntılı olaylar ve AI ise soru amaçları ve yanıt beklemeleri gibi alt olayları ayrıca verir. Her AI soru/yanıtını ayrı sekme ziyareti gibi zamanlamaz; AI sekmesinin toplam ziyareti ile alt olayların anlamı ayrıdır. Yeni kayıtlar request_key ile doğru ziyarete bağlanır. Dosyalardaki kalite/sekme çakışması bilgileri analizde korunmalıdır. Gerçek Disco import doğrulaması hâlâ bekliyor.
+
+## 0.2.29 — Yeni deneme aç
+Öğrenci çalışması → Yeni deneme aç → Gerekçe → Yeni deneme aç. İşlem yalnız teslim edilmiş son denemede kullanılabilir; tamamlanmamış yeni deneme varken başka deneme oluşturulmaz. Eski teslim, sohbet, süre, değerlendirme ve rapor kayıtları korunur. Deneme düğmeleri tüm kayıtları ayrı açar. Aynı vaka sürümü kullanılır. Veri toplama kapalıysa öğrenciye kişisel ek süre açılır; rapor gösterimi için ek süre daha sonra kapatılmalıdır. Eski kayıtlar otomatik analiz dışı yapılmaz; analize hangi denemelerin alınacağını araştırmacı belirler.

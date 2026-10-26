@@ -11,6 +11,11 @@ foreach([[0,'ai'],[120,'final']] as $i=>[$seconds,$section])$events[]=['key'=>ui
 (new Telemetry($app))->ingest($u,$a['id'],['events'=>$events],'review-v2-fixture');
 $run=$analysis->newRun($r,$a['id'],'test-rubric-v1',2);$rid=$run['id'];verifyV2(Review::version($db,$rid)===2,'new contract recorded without schema change');
 $steps=[];foreach([1,2,3,5,4,6] as $step){$steps[$step]=$analysis->step($r,$rid,$step);verifyV2($steps[$step]['status']==='completed','prepared section '.$step);}
+$savedInitial=$steps[3]['output'];$contradictory=obj($savedInitial);$contradictory['questions']['decision']['feedback']='Yanıt verilmedi. Kararınızı tekrar yazın.';
+$db->q('UPDATE analysis_steps SET output=? WHERE id=?',[js($contradictory),$steps[3]['id']]);
+denyV2(fn()=>$analysis->decide($r,$steps[3]['id'],['action'=>'accept']),'historical missing-answer contradiction cannot be accepted');
+verifyV2((int)$db->one('SELECT COUNT(*) n FROM decisions WHERE step_id=?',[$steps[3]['id']])['n']===0,'rejected contradiction leaves no approval decision');
+$db->q('UPDATE analysis_steps SET output=? WHERE id=?',[$savedInitial,$steps[3]['id']]);
 $profile=obj($steps[2]['output']);verifyV2(isset($profile['feedback'],$profile['profile'])&&!isset($profile['score'],$profile['scores']),'profile has comparison and feedback without score');
 verifyV2($profile['profile'][2]['initial']===6&&$profile['profile'][2]['final']===4&&$profile['profile'][2]['change']===-2&&$profile['profile'][2]['final_collected'],'final perceived difficulty reaches profile comparison with exact difference');
 verifyV2(Ai::responseFormat(['task'=>'profile_comparison'])===['type'=>'json_object'],'structured output remains opt-in for existing compatible providers');

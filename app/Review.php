@@ -23,6 +23,22 @@ final class Review {
         $min=$max=$weight=0.0;foreach($rubric['dimensions'] as $d){$min+=(float)$d['min']*(float)$d['weight'];$max+=(float)$d['max']*(float)$d['weight'];$weight+=(float)$d['weight'];}
         return ['min'=>round($min/$weight,4),'max'=>round($max/$weight,4)];
     }
+    public static function questionResult(array $out,array $request): array {
+        $score=Rules::scores($out,$request['rubric'],$request['sources']);
+        $feedback=self::text($out['feedback']??null);
+        $texts=[$feedback];
+        foreach($out['scores'] as $criterion){$texts[]=$criterion['reason'];if(isset($criterion['feedback']))$texts[]=$criterion['feedback'];}
+        self::answerPresence($texts,$request['sources']);
+        return ['score'=>$score,'feedback'=>$feedback];
+    }
+    public static function answerPresence(array $texts,array $sources): void {
+        // This narrowly checks a factual absence claim, not semantic score quality.
+        // A low or zero score remains valid for an unrelated or weak answer.
+        if(count(array_filter($sources,fn($text)=>is_string($text)&&trim($text)!=='')))foreach($texts as $text){
+            $absent=preg_match('/(?:^|[.!?;:]\s*|\böğrenci(?:nin)?\s+)(?:yanıt(?:ı|ınız)?|cevap(?:ı|ınız)?)\s+(?:hiç\s+)?(?:verilmedi[\p{L}]*|paylaşılmadı[\p{L}]*|sunulmadı[\p{L}]*|yok(?:tur)?|bulunmuyor)\b/iu',trim($text));
+            demand(!$absent,'Dolu öğrenci yanıtı için yanıt verilmediğini söyleyen çelişkili puanlama reddedildi; araştırmacı incelemesi gerekli',502);
+        }
+    }
     public function profile(array $draft): array {
         $fields=[['knowledge',null,'Ön bilgi'],['confidence','final_confidence','Güven'],['difficulty','final_difficulty','Algılanan zorluk'],['severity','final_severity','Algılanan ciddiyet']];$rows=[];
         foreach($fields as [$initial,$final,$title]){$a=$draft[$initial]??null;$b=$final?($draft[$final]??null):null;$rows[]=['id'=>$initial,'title'=>$title,'initial'=>$a,'final'=>$b,'final_collected'=>$final!==null&&array_key_exists($final,$draft),'change'=>is_numeric($a)&&is_numeric($b)?$b-$a:null];}
@@ -50,7 +66,7 @@ final class Review {
         $questions=[];$bounds=self::bounds($payload['rubric']);
         foreach($payload['questions'] as $id=>$q){
             $request=['task'=>'question_score','review_version'=>2,'step'=>$payload['step'],'case'=>$payload['case'],'rubric'=>$payload['rubric'],'rubric_version'=>$payload['rubric_version'],'question'=>$q['title'],'sources'=>[$id=>$q['answer']],'instruction'=>'Yalnız bu sorunun yanıtını rubriğe göre değerlendir. Kararın gerekçelendirilmesini sorunun kapsamına göre incele. Her ölçüt için score/level/source/quote/reason döndür. Ayrıca feedback alanında bu puanın nedenini ve öğrencinin yanıtını nasıl geliştirebileceğini açık Türkçe yaz. Başka sorunun yanıtını bu sorunun yerine kullanma.','expected'=>['scores'=>['dimension_id'=>['score'=>'number in rubric range','level'=>'rubric level','source'=>$id,'quote'=>'exact excerpt','reason'=>'scoring explanation']],'feedback'=>'Turkish explanation of score and concrete improvement guidance']];
-            try{$out=(new Ai($this->app->config))->call($request,true);$score=Rules::scores($out,$payload['rubric'],$request['sources']);$feedback=self::text($out['feedback']??null);}catch(Fault $e){throw new Fault('Soru '.$id.': '.$e->getMessage(),$e->getCode());}
+            try{$out=(new Ai($this->app->config))->call($request,true);$checked=self::questionResult($out,$request);$score=$checked['score'];$feedback=$checked['feedback'];}catch(Fault $e){throw new Fault('Soru '.$id.': '.$e->getMessage(),$e->getCode());}
             $questions[$id]=['title'=>$q['title'],'score'=>$score,'min'=>$bounds['min'],'max'=>$bounds['max'],'feedback'=>$feedback,'criteria'=>$out['scores'],'input'=>$request];
         }
         return ['review_version'=>2,'questions'=>$questions];
@@ -104,6 +120,7 @@ final class Review {
             $body['questions'][$id]['score']=Rules::scores(['scores'=>$q['criteria']],$q['input']['rubric'],$q['input']['sources']);
             $body['questions'][$id]['feedback']=self::text($q['feedback']);
         }
+        if(in_array($action,['accept','edit'],true)&&$step!==2)foreach($body['questions'] as $q)self::questionResult(['scores'=>$q['criteria'],'feedback'=>$q['feedback']],$q['input']);
         $decision=['id'=>uid(),'step_id'=>$s['id'],'actor'=>$u['id'],'action'=>$action,'body'=>js($body),'reason'=>trim($p['reason']??'')?:'Araştırmacı bölüm kararını kaydetti.','created_at'=>now()];
         $db->tx(function()use($db,$s,$decision,$u,$step){$db->one('SELECT id FROM analysis_runs WHERE id=?'.($db->sqlite()?'':' FOR UPDATE'),[$s['run_id']]);demand(!$db->one("SELECT id FROM analysis_steps WHERE run_id=? AND status='running'",[$s['run_id']]),'Değerlendirme hazırlanıyor',409);demand($this->current($s['run_id'],$step)['id']===$s['id'],'Yeni sonucu inceleyin',409);$db->insert('decisions',$decision);$run=$db->one('SELECT app_id FROM analysis_runs WHERE id=?',[$s['run_id']]);$db->q('UPDATE reports SET approved_at=NULL,published_at=NULL WHERE app_id=?',[$run['app_id']]);$db->audit($u['id'],'decision',$decision['id'],$decision['reason']);});return $decision;
     }

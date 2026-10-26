@@ -21,6 +21,7 @@ final class Analysis {
         return [];
     }
     public function step(array $u,string $rid,int $step,bool $repeat=false): array {
+        Auth::researcher($u);Scope::run($this->app->db,$u,$rid);demand(Review::version($this->app->db,$rid)<3,'Bu rapor için tek değerlendirme akışını kullanın',409);
         Auth::researcher($u);$versionRun=Scope::run($this->app->db,$u,$rid);if(Review::version($this->app->db,$rid)===2)return (new Review($this->app))->step($u,$versionRun,$step,$repeat);demand($step>=1&&$step<=8,'Adım geçersiz');$db=$this->app->db;
         $s=$db->tx(function()use($db,$rid,$step,$u,$repeat){$run=$db->one('SELECT * FROM analysis_runs WHERE id=?'.($db->sqlite()?'':' FOR UPDATE'),[$rid]);demand((bool)$run,'Analiz yok',404);
             demand(!$db->one("SELECT id FROM analysis_steps WHERE run_id=? AND status='running'",[$rid]),'Analiz adımı sürüyor',409);
@@ -49,6 +50,7 @@ final class Analysis {
         return $db->one('SELECT * FROM analysis_steps WHERE id=?',[$s['id']]);
     }
     public function decide(array $u,string $sid,array $p): array {
+        Auth::researcher($u);$owned=Scope::step($this->app->db,$u,$sid);demand(Review::version($this->app->db,$owned['run_id'])<3,'Bu rapor için tek değerlendirme akışını kullanın',409);
         Auth::researcher($u);$versionStep=Scope::step($this->app->db,$u,$sid);if(Review::version($this->app->db,$versionStep['run_id'])===2)return (new Review($this->app))->decide($u,$versionStep,$p);$db=$this->app->db;$s=$db->one("SELECT * FROM analysis_steps WHERE id=? AND status='completed'",[$sid]);demand($s&&(int)$s['step']>=3&&(int)$s['step']<=7,'İncelenecek adım yok');
         $action=$p['action']??'';demand(in_array($action,['accept','edit','reject','uncertain'],true),'Karar geçersiz');demand(trim($p['reason']??'')!=='','Karar gerekçesi gerekli');
         $body=$action==='accept'?obj($s['output']):($action==='edit'?($p['body']??[]):[]);
@@ -65,6 +67,9 @@ final class Analysis {
         return ['run'=>$run['id'],'participant'=>$user['login'],'case_title'=>$case['title'],'rubric_name'=>$rubric['name'],'rubric_version'=>$run['rubric_id'],'rubric_number'=>$rubric['version'],'dimensions'=>obj($rubric['body'])['dimensions'],'profile'=>array_intersect_key($draft,array_flip(['knowledge','confidence','difficulty','severity'])),'limitations'=>'Tam yanıt aktarımı: ilk parça zamanı ölçülmedi. Görünürlük okuma/düşünme kanıtı değildir. AI süreç süresi öğrenci süresine eklenmez. Teknik uyarı sayısı: '.count(obj($integrity['output'])['warnings']),'parts'=>$parts,'confidence'=>obj($profile['output']),'initial_mean'=>$totals[3],'final_mean'=>$totals[4],'difference'=>$totals[3]!==null&&$totals[4]!==null?round($totals[4]-$totals[3],4):null,'notice'=>'AI destekli ön değerlendirme araştırmacı tarafından incelendi. Kararsız/reddedilmiş alanlar onaylı toplam sayılmaz.'];
     }
     public function report(array $u,string $op,array $p): array {
+        Auth::researcher($u);
+        if($op==='create'){$owned=Scope::run($this->app->db,$u,$p['run_id']??'');demand(Review::version($this->app->db,$owned['id'])<3,'Bu rapor için tek değerlendirme akışını kullanın',409);}
+        else{$owned=$this->app->db->one('SELECT * FROM reports WHERE id=?',[$p['id']??'']);demand((bool)$owned,'Rapor yok',404);Scope::application($this->app->db,$u,$owned['app_id']);demand((obj($owned['body'])['review_version']??1)<3,'Bu rapor için tek değerlendirme akışını kullanın',409);}
         Auth::researcher($u);$db=$this->app->db;$prepared=null;$fingerprint=null;
         if($op==='create'){
             Scope::run($db,$u,$p['run_id']);$run=$db->one('SELECT * FROM analysis_runs WHERE id=?',[$p['run_id']]);

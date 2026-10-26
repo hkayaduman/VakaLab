@@ -1,0 +1,1 @@
+TOTAL API RUNTIME: per-call deadline reset, fatal JSON, timeout JSON, owned-step recovery and completed-result preservation passed. Isolated PHP HTTP/SQLite; no provider call.

@@ -1,5 +1,17 @@
 # Shared hosting kurulumu
 
+## 0.3.1 · Soru bazında tek rapor güncellemesi
+
+Mevcut 0.3.0 kurulumu için `storage/releases/vakalab-soru-raporu-0.3.1.zip` paketini `/domains/vakalab.techdocsolution.com/vakalab` içine yükleyip aynı dizine çıkarın. app/public dosyaları birlikte güncellenir; config/local.php, vendor ve storage korunur. SQL/seed/migration gerekmez (mevcut 001–003). Site kökü yine `vakalab/public` kalır. Güncellemeden sonra uygulamayı bir kez yenileyin. Her sorunun tam yanıtı ve ayrı geri bildirim/puan alanları görünmeli. Eski genel raporun soru puanları otomatik çıkarılmaz: AI ile bir kez yeni rapor hazırlayın veya her soruyu manuel değerlendirin. Yeni rapor daha sonra F5 gerektirmeden görünür. Öğrenci raporu ve indirmeler de aynı soru düzenini ve profil karşılaştırmasını içerir. Diğer onay/yayın kuralları korunur. Ayrıntılar `TEK_RAPOR_GUNCELLEME.md` içindedir.
+
+## Mevcut hosting için 0.3.0 kod güncellemesi · 26 Ekim 2026
+
+Tek AI isteği/tek rapor güncellemesi mevcut şema 001–003 üzerinde çalışır; yeniden SQL içe aktarma veya seed gerekmez. Güncelleme öncesi uygulama kodunu ve veritabanını public dışında yedekleyin. `storage/releases/vakalab-tek-rapor-0.3.0.zip` paketini DirectAdmin'de `/domains/vakalab.techdocsolution.com/vakalab` dizinine yükleyip aynı dizine çıkarın; `app` ve `public` mevcut klasörlerle birleşmeli, dosyalar değişmelidir. Pakette config, öğrenci verisi, storage içeriği veya vendor yoktur. Mevcut `config/local.php` ve vendor korunur. Site kökü yine `vakalab/public` kalır.
+
+Paketi tek seferde tamamlayın; ardından uygulama sekmesini bir kez açın/yenileyin. Öğrenci-vaka dosyasında “Değerlendirme ve rapor”, tek metin editörü ve rubrik düzeyleri görünmeli. AI ile rapor ve puanları hazırla düğmesi tek değerlendirme isteği yapar; sonuç sonrasında F5 gerektirmez. Alternatif olarak metin ve düzeyleri elle seçip taslak kaydedin. Önce raporu onaylayın; öğrenciye gösterme ayrı düğmedir ve veri toplama kapalı olmalıdır. Önceki ayrı-adım raporları otomatik dönüştürülmez; yeni alanda yeni bir bütüncül rapor hazırlayın.
+
+Yerel sentetik testler ve MariaDB doğrulandı. Gerçek sağlayıcıyla bu yeni sözleşmenin canlı kabulü, dosyalar sunucuya yüklendikten sonra hosting deneme vakasında yapılmalıdır. Yeni istek sürerken tekrar düğmeye basmak ikinci çağrı yapmaz; başarısız sağlayıcı çağrısı otomatik tekrarlanmaz.
+
 0.2.0 güncellemesi: Mevcut DB için önce özel yedek alın; `php bin/console.php migrate` migration 002 uygular. SQLite yerel geçişinde `php bin/upgrade-sqlite.php` özel yedek + eski tüm sütunların hash karşılaştırmasını yapar. MySQL DDL atomik değildir; yarım kalmış 002 otomatik tekrar edilmez, ayrı DB kopyasında incelenir. SSH yoksa 002.sql sonrası mevcut users(student)/cases/definitions kayıtlarının owner_id alanını mevcut ilk araştırmacı kimliğiyle doldurun ve schema_migrations içine 2 kaydını yalnız başarılı doğrulama sonrası ekleyin; eski global kapanış varsa ilgili cases.collection_closed_at alanlarına taşıyın. Birden çok eski araştırmacı varsa sahiplik eşlemesini dağıtımdan önce açıkça doğrulayın. Taze SSH'siz kurulumda da 001 + 002 birlikte gerekir; yalnız 001 güncel kod için yeterli değildir.
 
 Durum: 23 Ekim 2026'da yerel PHP 8.3.35 → 8.3.36 güvenlik güncellemesi yapıldı; MariaDB 11.4.12 ve SQLite ile denendi. Gerçek hosting, gerçek API, HTTPS/proxy ve hosting yedeği henüz denenmedi. Kullanıcı kabulü olmadan araştırmaya başlanmamalı.
@@ -113,3 +125,6 @@ Yerel MariaDB smoke restore testi yapılır; gerçek hosting yedeği ve yedek sa
 ### Öğrenci etiketleri için konu kapsamı (24 Ekim 2026)
 
 Yeni veritabanı kolonu gerekmez; alan definitions.body JSON içinde topic_scope olarak saklanır. Sunucudaki mevcut öğrenci etiketleri için Rubrikler ve etiketler ekranından grup ve konu kapsamını seçip yeni sürüm kaydedin. Kapsam seçilmeden öğrenci etiketlemesi başlamaz. Yerel SQLite test veritabanını veya yedeklerini üretime yüklemeyin.
+
+## 0.2.29 — Şema 003 zorunlu
+Bu sürüm için 001/002 yanında Migration::run içindeki 003 de uygulanmalıdır. Önce özel yedek alın; CLI ile php bin/console.php migrate çalıştırın. Yerel SQLite için php bin/upgrade-sqlite.php yedeği ve eski sütunların korunmasını doğrular. MySQL tarafında uygulama tablosuna attempt_no eklenir, eski öğrenci/vaka benzersiz indeksi öğrenci/vaka/deneme indeksiyle tek ALTER işleminde değiştirilir. Önceki SSH'siz 001/002 talimatları bu sürüm için yeterli değildir; Migration::run ile eşdeğer geçiş ve şema 3 kaydı gerekir. Öğrenci başına tek vaka kaydı varsayan eski kod sürümüne geri dönüş yapılmamalıdır.

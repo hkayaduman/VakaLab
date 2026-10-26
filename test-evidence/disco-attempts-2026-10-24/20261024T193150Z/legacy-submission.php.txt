@@ -1,0 +1,22 @@
+PASS LEGACY 1 historical v1 submission passes integrity without later-added field
+PASS LEGACY 2 historical missing measurements explicitly reported as uncollected
+PASS LEGACY 3 historical v1 analysis completes step 2
+PASS LEGACY 4 historical v1 analysis completes step 3
+PASS LEGACY 5 historical v1 analysis completes step 4
+PASS LEGACY 6 historical v1 analysis completes step 5
+PASS LEGACY 7 historical v1 analysis completes step 6
+PASS LEGACY 8 historical v1 analysis completes step 7
+PASS LEGACY 9 historical v1 analysis completes step 8
+PASS LEGACY 10 historical v1 report can be prepared
+PASS LEGACY 11 historical submission remains compatible with v2
+PASS LEGACY 12 uncollected severity stays unknown in profile
+PASS LEGACY 13 uncollected historical difficulty is not imputed
+PASS LEGACY 14 analysis preserves historical draft revision state and submission lock
+PASS LEGACY 15 immutable submission snapshots unchanged
+PASS LEGACY 16 new submission still requires final severity
+PASS LEGACY 17 failed new submission does not become submitted
+PASS LEGACY 18 historical integrity rejects missing final confidence
+PASS LEGACY 19 historical integrity rejects out of range final confidence
+PASS LEGACY 20 historical integrity rejects fraction final confidence
+PASS LEGACY 21 historical integrity rejects empty final answer
+TOTAL LEGACY 21 checks passed. Isolated in-memory SQLite and mock AI only.

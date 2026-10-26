@@ -254,7 +254,7 @@ def main():
             outsider.denied('admin',403,'foreign research note denied',{'action':'note','app_id':aid,'body':'test','reason':'test'})
             outsider.denied('admin',403,'foreign exclusion denied',{'action':'exclude','id':aid,'excluded':True,'reason':'test'})
             outsider.denied('admin',403,'foreign rubric deletion denied',{'action':'delete_definition','id':'test-rubric-v1'})
-            outsider.denied('admin',403,'foreign rubric version denied',{'action':'definition','family':'label','parent_id':'test-label-0','name':'invalid','body':{}})
+            outsider.denied('admin',403,'foreign rubric version denied',{'action':'definition','family':'label','parent_id':'test-label-0','name':'invalid','body':{'target_role':'user','topic_scope':'pedagogical','description':'Synthetic valid label body; foreign parent must still be denied.'}})
             selected=researcher.ok('download',format='json',case_id=cid,all_data=1)
             check(selected['applications'] and all(row['case_id']==cid for row in selected['applications']),'selected-case full export includes only that case')
             check([row['id'] for row in selected['cases']]==[cid] and all(row['case_id']==cid for row in selected['case_versions']),'full export includes selected case text and complete version history')
@@ -276,7 +276,7 @@ def main():
             for row in event_rows:
                 time.strptime(row['Start Timestamp'][:19],'%Y-%m-%d %H:%M:%S')
             check(True,'Disco timestamps parse and preserve milliseconds')
-            label=admin('definition',family='label',name='SENTETİK silinecek etiket',body={'description':'test'})['id']
+            label=admin('definition',family='label',name='SENTETİK silinecek etiket',body={'target_role':'user','topic_scope':'pedagogical','description':'test'})['id']
             admin('delete_definition',id=label)
             check(db.execute('SELECT deleted_at FROM definitions WHERE id=?',(label,)).fetchone()[0] is not None,'definition removed from new choices without destroying history')
             historical=fingerprint()

@@ -1,0 +1,21 @@
+PASS V2 BROWSER 1 history panels removed
+PASS V2 BROWSER 2 invalid profile feedback stops the sequence
+PASS V2 BROWSER 3 sections prepared serially in requested order
+PASS V2 BROWSER 4 exactly five simple sections
+PASS V2 BROWSER 5 profile only has comparison and editable feedback
+PASS V2 BROWSER 6 profile shows missing final fields and real confidence change
+PASS V2 BROWSER 7 chat only displays statistics without score, comment or decisions
+PASS V2 BROWSER 8 section 3 scores each answer separately
+PASS V2 BROWSER 9 section 4 scores each answer separately
+PASS V2 BROWSER 10 section 6 scores each answer separately
+PASS V2 BROWSER 11 report waits for four human reviews
+PASS V2 BROWSER 12 profile comment can be rejected without score
+PASS V2 BROWSER 13 profile edit contains only a comment
+PASS V2 BROWSER 14 accepted AI evaluation remains editable 3
+PASS V2 BROWSER 15 reopened editor retains latest researcher evaluation 3
+PASS V2 BROWSER 16 accepted AI evaluation remains editable 4
+PASS V2 BROWSER 17 reopened editor retains latest researcher evaluation 4
+PASS V2 BROWSER 18 accepted AI evaluation remains editable 6
+Error: reopened editor retains latest researcher evaluation 6
+    at check (D:\VakaLab\tests\review-v2-browser.cjs:9:59)
+    at D:\VakaLab\tests\review-v2-browser.cjs:37:4

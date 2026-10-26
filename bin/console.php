@@ -15,7 +15,7 @@ try{
     }
     $c=cfg();$db=new Db($c);
     if($cmd==='migrate'){
-        Migration::run($db);echo "Migration 001/002 hazır; mevcut kayıtlar korunur.\n";
+        Migration::run($db);echo "Migration 001/002/003 hazır; mevcut kayıtlar korunur.\n";
     }elseif($cmd==='seed'){
         demand($c['env']==='test','Seed yalnız test ortamında çalışır');demand(str_contains($c['dsn'],'_test')||str_starts_with($c['dsn'],'sqlite:'),'Test DB adı _test içermeli');
         $password=getenv('VAKALAB_SEED_PASSWORD')?:'';demand(strlen($password)>=12,'VAKALAB_SEED_PASSWORD en az 12 karakter olmalı');

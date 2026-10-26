@@ -1,0 +1,7 @@
+PASS PRESENCE BROWSER 1 browser screenshot while focused does not itself fabricate an outside interval
+PASS PRESENCE BROWSER 2 real tab switch creates one outside interval
+PASS PRESENCE BROWSER 3 time in another tab is measured as outside
+PASS PRESENCE BROWSER 4 locked AI visit resumes separately after return
+Error: readable departure and return events persisted by server
+    at check (D:\VakaLab\tests\presence-browser.cjs:14:72)
+    at D:\VakaLab\tests\presence-browser.cjs:46:2

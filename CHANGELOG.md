@@ -1,5 +1,29 @@
 # Değişiklik günlüğü
 
+## 0.3.1 — 2026-10-26 — Tek rapor içinde soru bazında değerlendirme
+
+Tek AI isteği ve tek güncel rapor korunur. Rapor artık altı sorunun her birinde sorunun tam metni, o soruya verilen tam öğrenci yanıtı, soruya özel geri bildirim, rubrik ölçüt düzey/puan/gerekçeleri ve soru puanını birlikte gösterir. Genel değerlendirme isteğe bağlı ek not alanıdır. Her sorunun ağırlıklı puanı ayrı hesaplanır; genel toplam soru puanlarının toplamıdır. AI yanıtının tüm soruları içermesi zorunludur ve her ölçütün kanıtı yalnız ilgili sorunun yanıtından doğrulanır. Dolu yanıtın yok sayıldığı çelişkili puanlama reddedilir.
+
+Araştırmacı her sorunun geri bildirimini ve puanlarını AI kullanmadan yazabilir veya AI taslağını düzenleyebilir. Öğrenci önizlemesi ve Word/PDF/Excel aynı soru–yanıt–geri bildirim–puan yapısını ve profil karşılaştırmasını içerir. Eski genel raporlar silinmez veya otomatik soru puanlarına çevrilmez; eski düzen uyarısı gösterilir. Yeni rapor hazırlama/kayıt işlemi mevcut güncel raporu yeni düzenle günceller ve yeniden onay gerektirir. Şema 001–003 yeterlidir; yeni SQL yoktur.
+
+## 0.3.0 — 2026-10-26 — Tek değerlendirme, tek rapor
+
+Ayrı değerlendirme kartlarının yerini tek rapor editörü ve rubrik ölçüt puanları aldı. Vaka, seçilmiş rubriğin tüm düzeyleri, altı sorunun bölüm/soru/yanıt eşleşmesi ve yerelde hesaplanan profil karşılaştırması tek AI değerlendirme isteğinde gönderilir. Her ölçüt bir kez puanlanır; toplam uygulama tarafından rubrik ağırlıklarıyla hesaplanır. AI olmadan araştırmacı raporu ve düzey seçimi kaydedilebilir; AI taslağı da aynı editörde değiştirilebilir. Onay ve öğrenciye gösterme ayrıdır. Düzenleme eski onayı/yayını kaldırır. Güncel raporun kimliği korunur, revizyon numarası artar; üretim girdileri ve çıktıları işlem kayıtlarında kalır.
+
+Salt okuma durum gözlemcisi, yanıt bağlantısı kaybolsa bile sunucuda tamamlanan raporu F5 olmadan gösterir; AI isteğini otomatik tekrarlamaz. Eski v1/v2 kayıtları korunur. Word/PDF/XLSX tek rapor, ölçüt puanları ve profil karşılaştırmasını içerir. Yeni şema geçişi yoktur; mevcut 001–003 kurulumu kullanılır. Yerel mock/çağrı sayacı ve ayrı MariaDB testleri geçti; bu sözleşmeyle gerçek sağlayıcı ve canlı hosting kabulü ayrıca yapılmalıdır.
+
+## 0.2.30 — 2026-10-24 — Disco deneme numarası
+
+Geçiş/süre ve ayrıntılı olay Disco CSV'lerinde tüm satırlara ve boş dosya başlıklarına Deneme numarası eklendi. Case ID her denemede farklı, Participant ve Vaka ID aynı kalır. Yeni 35 kontrol iki denemenin tüm satırlarını, bireysel/toplu indirmeyi, sıra/komşuluk bağlantılarını, teslim sınırlarını, günler arası beklemenin süreye katılmamasını ve dışa aktarımın eski veriyi değiştirmemesini doğrular. Tarayıcı testi iki CSV'nin gerçek HTTP indirmesini de kapsar.
+
+Tam regresyonda değerlendirme düzenleyicisinin sunucu kaydından sonra güncel görünüm yüklenmeden kapanabildiği yarış düzeltildi. Eski odak olayı metinleri, rapor göster/geri al düğmesi beklentileri ve rol/kapsamı eksik etiket test verileri güncel sözleşmeye uyarlandı. Üretim yetki veya süre kuralları değiştirilmedi. Tüm yerel paketler tests/run-regression.py ile ayrı veri tabanlarında baştan çalıştırılabilir; canlı sağlayıcı kontrolleri bu çalıştırıcının dışında, açık onaya bağlıdır.
+
+## 0.2.29 — 2026-10-24 — Yeni deneme aç
+
+Araştırmacı, teslim edilmiş son denemeden gerekçeyle ayrı bir deneme açabilir. Yeni deneme aynı vaka sürümünde boş profil/yanıtlarla başlar; önceki teslim, sohbet, süre, analiz ve rapor kayıtları korunur. Öğrenci ve araştırmacı denemeler arasında geçebilir. Vakalarım ve araştırmacı özeti son denemeyi seçer. Kapalı veri toplamada yalnız ilgili öğrenciye ek süre açılır. Tekrarlanan istek yeni kayıt çoğaltmaz; tamamlanmamış deneme yeniden başlatılamaz. Dışa aktarımda deneme numarası bulunur.
+
+Migration 003 öğrenci/vaka benzersizliğini öğrenci/vaka/deneme numarasıyla değiştirir. SQLite yedekli yerel geçişte 22 tablonun eski sütunları ve kayıtları birebir doğrulandı; öğrenci adına yeni deneme açılmadı. Testler: SQLite 39, MariaDB 38, yeni deneme tarayıcı 13, mevcut araştırmacı arayüzü 50, temel regresyon 87 kontrol (ayrı sentetik veriler).
+
 ## 2026-10-23 — İlk gerçek OpenRouter/GPT-5 Nano denemesi
 
 Profil ve v2 soru değerlendirmesinde opt-in katı JSON Schema; OpenRouter'da destekleyen endpointlere require_parameters ile yönlendirme; öğrenci yorumunda kodlanmış JSON reddi ve daha açık metin/eksik ölçüm talimatları eklendi. Varsayılan sağlayıcı sözleşmesi korunur. Yerel Windows CA kurulumu ve 90 sn timeout ile üç sentetik gerçek sağlayıcı senaryosu doğrulandı; erken biçim/kalite/timeout hataları ayrı saklandı. 228 sentetik PHP regresyonu ve PHP8.4'te 74 v2 kontrolü geçti. Çalışma DB'si değişmedi; henüz commit/push yok. Gerçek rubrik ve tam UI kabulü ayrı bekler.

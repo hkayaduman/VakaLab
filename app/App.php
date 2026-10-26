@@ -15,7 +15,7 @@ final class App {
         return $this->db->tx(function()use($u,$case){
             // Lock the assignment even before an application exists (MySQL race prevention).
             $s=$this->db->one('SELECT * FROM assignments WHERE user_id=? AND case_id=?'.($this->db->sqlite()?'':' FOR UPDATE'),[$u['id'],$case]);demand($s&&(bool)$s['active'],'Vaka atanmadı',403);
-            $c=$this->db->one('SELECT * FROM cases WHERE id=?',[$case]);$existing=$this->db->one('SELECT * FROM applications WHERE user_id=? AND case_id=?',[$u['id'],$case]);
+            $c=$this->db->one('SELECT * FROM cases WHERE id=?',[$case]);$existing=$this->db->one('SELECT * FROM applications WHERE user_id=? AND case_id=? ORDER BY attempt_no DESC LIMIT 1',[$u['id'],$case]);
             if($existing)return $this->access($u,$existing['id']);
             demand($c&&$c['status']==='active'&&!$c['stop_access'],'Yeni başlangıç kapalı',403);demand(!Scope::collectionClosed($c+$s),'Bu vakada veri toplama kapalı',409);
             $a=['id'=>uid(),'user_id'=>$u['id'],'case_id'=>$case,'version_id'=>$c['current_version'],'state'=>'initial','revision'=>0,'draft'=>js(Rules::draft([])),'created_at'=>now()];$this->db->insert('applications',$a);return $this->db->one('SELECT * FROM applications WHERE id=?',[$a['id']]);
@@ -25,8 +25,9 @@ final class App {
         $a=$this->access($u,$id);$v=$this->db->one('SELECT * FROM case_versions WHERE id=?',[$a['version_id']]);
         $result=['application'=>$a,'version'=>['id'=>$v['id'],'version'=>$v['version'],'body'=>$v['body'],'instructions'=>$v['instructions']], 'messages'=>$this->db->all('SELECT id,seq,role,content,status,created_at FROM messages WHERE app_id=? ORDER BY seq',[$id]),'snapshots'=>$this->db->all('SELECT * FROM snapshots WHERE app_id=?',[$id])];
         if($u['role']==='researcher'){
-            foreach(['events','draft_revisions','ai_requests','analysis_runs','reports','research_notes'] as $t)$result[$t]=$this->db->all('SELECT * FROM '.$t.' WHERE app_id=?',[$id]);
+            foreach(['events','draft_revisions','ai_requests','analysis_runs','reports','research_notes'] as $t)$result[$t]=$this->db->all('SELECT * FROM '.$t.' WHERE app_id=?'.($t==='analysis_runs'?' ORDER BY created_at,id':''),[$id]);
             foreach($result['analysis_runs'] as &$reviewRun)$reviewRun['review_version']=Review::version($this->db,$reviewRun['id']);unset($reviewRun);
+            $result['review_questions']=[];$reviewDraft=obj($a['draft']);foreach(Review::QUESTIONS as $step=>$questions)foreach($questions as $key=>$title)$result['review_questions'][]=['source_id'=>$key,'section'=>[3=>'Başlangıç değerlendirmesi',4=>'Nihai değerlendirme',6=>'Yansıtma'][$step],'question'=>$title,'answer'=>$reviewDraft[$key]??''];
             $result['labels']=$this->db->all('SELECT l.* FROM message_labels l JOIN messages m ON m.id=l.message_id WHERE m.app_id=?',[$id]);
             $result['label_reviews']=$this->db->all('SELECT l.* FROM label_reviews l JOIN messages m ON m.id=l.message_id WHERE m.app_id=? ORDER BY l.created_at',[$id]);
             $result['steps']=$this->db->all('SELECT s.* FROM analysis_steps s JOIN analysis_runs r ON r.id=s.run_id WHERE r.app_id=? ORDER BY s.created_at,s.step,s.attempt',[$id]);
@@ -35,9 +36,10 @@ final class App {
         }else{$result['requests']=$this->db->all('SELECT id,client_key,status,started_at,completed_at,error FROM ai_requests WHERE app_id=? ORDER BY started_at',[$id]);$result['reports']=$this->db->all('SELECT id,version,published_at FROM reports WHERE app_id=? AND approved_at IS NOT NULL AND published_at IS NOT NULL AND EXISTS(SELECT 1 FROM cases c JOIN assignments ass ON ass.case_id=c.id AND ass.user_id=? WHERE c.id=? AND c.collection_closed_at IS NOT NULL AND ass.allow_late=0)',[$id,$u['id'],$a['case_id']]);}
         if($u['role']!=='researcher'){
             $latest=$this->db->one('SELECT id,body FROM reports WHERE app_id=? ORDER BY version DESC LIMIT 1',[$id]);
-            if($latest&&(obj($latest['body'])['review_version']??1)===2)$result['reports']=array_values(array_filter($result['reports'],fn($r)=>$r['id']===$latest['id']));
+            if($latest&&(obj($latest['body'])['review_version']??1)>=2)$result['reports']=array_values(array_filter($result['reports'],fn($r)=>$r['id']===$latest['id']));
         }
-        if($u['role']!=='researcher')$result['application']=array_intersect_key($a,array_flip(['id','user_id','case_id','version_id','case_title','state','revision','draft','active_request','initial_at','submitted_at','last_section','last_activity','created_at','collection_closed_at','allow_late']));
+        $result['attempts']=$this->db->all('SELECT id,attempt_no,state,submitted_at FROM applications WHERE user_id=? AND case_id=? ORDER BY attempt_no DESC',[$a['user_id'],$a['case_id']]);
+        if($u['role']!=='researcher')$result['application']=array_intersect_key($a,array_flip(['id','user_id','case_id','version_id','case_title','attempt_no','state','revision','draft','active_request','initial_at','submitted_at','last_section','last_activity','created_at','collection_closed_at','allow_late']));
         return $result;
     }
     public function save(array $u,string $id,array $p,string $action='save'): array {

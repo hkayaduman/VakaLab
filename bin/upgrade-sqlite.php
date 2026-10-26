@@ -20,7 +20,7 @@ try{
     echo "Private SQLite backup verified.\n";
     Migration::run($db);
     foreach($baseline as $name=>$old){$rows=$db->all('SELECT '.implode(',',$old['columns']).' FROM '.$name.' ORDER BY 1');demand(hash('sha256',js($rows))===$old['hash'],'Geçiş sonrası eski alanlar değişti; özel yedeği koruyun');}
-    echo 'MIGRATION 002 OK: original columns and records identical in '.count($baseline)." tables; seed/reset/collection changes not performed.\n";
+    echo 'MIGRATION 003 OK: original columns and records identical in '.count($baseline)." tables; seed/reset/collection changes not performed.\n";
     $once=$db->all('SELECT * FROM schema_migrations ORDER BY version');Migration::run($db);demand($once===$db->all('SELECT * FROM schema_migrations ORDER BY version'),'Migration tekrarında değişiklik');
     echo "REPEAT MIGRATION OK: no changes.\n";
 }catch(Throwable $e){fwrite(STDERR,$e instanceof Fault?$e->getMessage().PHP_EOL:'Geçiş tamamlanamadı: '.get_class($e).PHP_EOL);exit(1);}

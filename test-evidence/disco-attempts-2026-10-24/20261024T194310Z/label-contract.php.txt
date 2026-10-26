@@ -1,0 +1,23 @@
+PASS LABEL CONTRACT 1 batch records active prompt version and exact label definitions
+PASS LABEL CONTRACT 2 batch metadata preserves name, description and original definition body
+PASS LABEL CONTRACT 3 unchanged current definitions reuse cache
+PASS LABEL CONTRACT 4 editing description invalidates cache and sends updated definition
+PASS LABEL CONTRACT 5 editing name invalidates cache and sends current name
+PASS LABEL CONTRACT 6 new assistant-response label is included in next request
+PASS LABEL CONTRACT 7 known assistant label is valid for assistant message; no forced student-only tagging
+PASS LABEL CONTRACT 8 strict label response covers exact message IDs only
+PASS LABEL CONTRACT 9 strict label response allows only current provided label IDs for assistant too
+PASS LABEL CONTRACT 10 assistant-only label is rejected on a student message
+PASS LABEL CONTRACT 11 student-only label is rejected on an assistant message
+PASS LABEL CONTRACT 12 manual API also rejects wrong-group label
+PASS LABEL CONTRACT 13 creating a label requires an explicit group
+PASS LABEL CONTRACT 14 schema requires empty list when no matching role candidates exist
+PASS LABEL CONTRACT 15 legacy ungrouped definitions are never guessed from label names
+PASS LABEL CONTRACT 16 changing target group invalidates the labeling cache
+PASS LABEL CONTRACT 17 rejected manual selection leaves no partial review
+PASS LABEL CONTRACT 18 legacy analysis labeling has one existing batch before cache reuse
+PASS LABEL CONTRACT 19 legacy analysis sends the same complete current definition structure
+PASS LABEL CONTRACT 20 label updates never rewrite student or AI messages
+PASS LABEL CONTRACT 21 adding a label while AI response is pending rejects the stale result
+PASS LABEL CONTRACT 22 stale response cannot persist partial or old-definition labels
+TOTAL LABEL CONTRACT 22 checks passed. Isolated SQLite/mock only.

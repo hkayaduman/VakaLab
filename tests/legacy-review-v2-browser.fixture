@@ -50,7 +50,7 @@ let browser,count=0;const check=(ok,label)=>{if(!ok)throw new Error(label);conso
  check(data.report.format==='student-v2'&&Object.keys(data.report.sections).join(',')==='initial,final,reflection','new report has separately scored reflection');
  check(data.report.overall_feedback===profileFeedback&&data.report.sections.initial.criteria[0].score===2&&data.report.sections.final.criteria[0].score===4&&data.report.sections.reflection.criteria[0].score===2,'exact reviewed comments and question scores reach report without further AI generation');
  check(!('chat_statistics' in data.report)&&!('parts' in data.report)&&data.report.total===null,'report has no chat opinion, internal decisions or invented aggregate');
- check(await review.locator('.review-report button').allTextContents().then(labels=>labels.join('|')==='Öğrenci raporunu hazırla|Word|Excel|Öğrenciye göster'),'only four requested report buttons');
+ check(await review.locator('.review-report button').allTextContents().then(labels=>labels.join('|')==='Öğrenci raporunu hazırla|Word|Excel|Öğrenciye göster|Göstermeyi geri al'),'report actions include show and withdrawal buttons');
  check(!(await review.innerText()).includes('Önceki yorumlar')&&await page.locator('.legacy-review-history').count()===0,'no comment or evaluation history');
  check(await review.locator('[data-show-report]').isDisabled(),'show button explains collection must close first');
  for(const format of ['docx','xlsx']){const response=await context.request.get(url+`api.php?op=download&format=${format}&student_view=1&report_ids=${reportId}`),bytes=await response.body();check(response.status()===200&&(format==='pdf'?bytes.subarray(0,5).toString()==='%PDF-':bytes.subarray(0,2).toString()==='PK'),`student v2 ${format} downloads`);fs.writeFileSync(path.join(tmp,'review-v2-report.'+format),bytes);}
@@ -63,7 +63,7 @@ let browser,count=0;const check=(ok,label)=>{if(!ok)throw new Error(label);conso
  await reflection.locator('[data-v2-edit]').click();await selectQuestionScore(page,4);await page.locator('#review-v2-feedback-0').fill('Yeni yansıtma yorumunuz kararınızı somut kanıtlarla açıklamanızı öneriyor.');await page.locator('#commit').click();await page.locator('dialog').waitFor({state:'detached'});await page.waitForFunction(()=>!document.querySelector('[data-current-report]')?.disabled);
  const replacement=await page.evaluate(id=>api('report_data',undefined,{id,student_view:1}),oldId);check(replacement.report.sections.reflection.criteria[0].score===4,'accepted recalculation automatically updates the same report');
  await page.evaluate(async()=>{await api('admin',{action:'collection',case_id:currentAnalysisView.application.case_id,closed:true,reason:'Synthetic current report browser fixture.'});await processView(currentAnalysisView.application.id);});
- await review.locator('[data-show-report]:enabled').waitFor();await review.locator('[data-show-report]').click();await review.locator('[data-show-report]').filter({hasText:'Öğrenciye gösteriliyor'}).waitFor();check(true,'single show button approves and publishes the current report');
+ await review.locator('[data-show-report]:enabled').waitFor();await review.locator('[data-show-report]').click();await review.locator('[data-report-visibility].is-visible').waitFor();check(await review.locator('[data-show-report]').isDisabled()&&await review.locator('[data-hide-report]').isEnabled(),'show button approves and publishes current report with withdrawal available');
  await reflection.locator('[data-v2-edit]').click();await selectQuestionScore(page,2);
  await page.locator('#review-v2-0-0-reason').fill('  ');await page.locator('#commit').click();
  check(await page.locator('dialog').isVisible(),'blank scoring reason keeps the editor open');
@@ -72,7 +72,33 @@ let browser,count=0;const check=(ok,label)=>{if(!ok)throw new Error(label);conso
  const editedAfterPublication=await page.evaluate(id=>api('report_data',undefined,{id,student_view:1}),oldId);
  check(editedAfterPublication.report.sections.reflection.criteria[0].score===2,'accepted evaluation can be edited again after report publication');
  await review.locator('[data-show-report]:enabled').waitFor();check(true,'editing withdraws prior publication and requires showing the updated report again');
- for(const width of [1440,390]){await page.setViewportSize({width,height:1000});check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`four report actions fit ${width}px`);}
+ for(const width of [1440,390]){await page.setViewportSize({width,height:1000});check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`report actions fit ${width}px`);}
  await review.locator('.review-report').screenshot({path:path.join(tmp,'review-v2-current-report.png')});
+ // The server finishes, but the POST response is withheld and then lost. A read
+ // observer must show the new result without reload or another scoring request.
+ await page.setViewportSize({width:1440,height:1000});
+ let backendFinished,releaseReply;const backendDone=new Promise(resolve=>backendFinished=resolve),replyGate=new Promise(resolve=>releaseReply=resolve);
+ let repeatRequests=0;
+ await page.route('**/api.php?op=step',async route=>{
+   const body=route.request().postDataJSON();
+   if(body.step!==2||!body.repeat)return route.continue();
+   repeatRequests++;await route.fetch();backendFinished();await replyGate;await route.abort('failed');
+ });
+ const priorStep=await profile.locator('[data-v2-repeat]').getAttribute('data-v2-repeat');
+ await profile.locator('[data-v2-repeat]').click();await backendDone;
+ const answerDetail=reflection.locator('details').first();await answerDetail.evaluate(el=>el.open=true);
+ await answerDetail.scrollIntoViewIfNeeded();const priorScroll=await page.evaluate(()=>scrollY);
+ try{
+   await page.waitForFunction(prior=>document.querySelector('[data-review-section="2"] [data-v2-repeat]')?.dataset.v2Repeat!==prior,priorStep,{timeout:10000});
+   check(true,'finished result appears automatically while POST response is still pending');
+   check(await reflection.locator('details').first().getAttribute('open')!==null,'automatic refresh preserves expanded answer details');
+   check(Math.abs((await page.evaluate(()=>scrollY))-priorScroll)<4,'automatic refresh preserves reading position');
+   check(await profile.locator('[data-v2-repeat]').isDisabled()&&await page.locator('#new-run').isDisabled(),'second scoring and new evaluation disabled while original request is pending');
+ }finally{releaseReply();}
+ await page.waitForFunction(()=>activeAnalysisSequence===null);await profile.locator('[data-v2-repeat]:enabled').waitFor();
+ check(repeatRequests===1,'lost POST reply does not repeat the paid scoring request');
+ await page.unroute('**/api.php?op=step');
+ await page.locator('#admin-back').click();await page.waitForTimeout(2200);
+ check(await page.locator('#process-data').count()===0,'observer does not reopen work after navigating away');
  check(errors.length===0,'no browser JavaScript errors: '+errors.join('; '));console.log(`TOTAL V2 BROWSER ${count} checks passed. Isolated SQLite/mock; no physical-device or real-provider acceptance.`);
 }finally{if(browser)await browser.close();server.kill();fs.closeSync(log);}})().catch(e=>{console.error(e);process.exitCode=1;});

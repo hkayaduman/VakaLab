@@ -19,7 +19,13 @@ try:
     name='vakalab_test_'+tag
     subprocess.run(client+['-e',f'CREATE DATABASE {name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'],check=True,capture_output=True)
     env=os.environ|{'VAKALAB_TEST_DSN':f'mysql:host=127.0.0.1;port={port};dbname={name};charset=utf8mb4','VAKALAB_TEST_USER':'root','VAKALAB_TEST_PASSWORD':password}
+    subprocess.run([php,'tests/db-idle-timeout.php'],cwd=root,env=env,check=True)
     subprocess.run([php,'tests/run.php'],cwd=root,env=env,check=True)
+    for suffix,script in [('attempts','tests/new-attempt.php'),('disco','tests/disco-attempts.php'),('holistic','tests/holistic-review.php')]:
+        extra_name=name+'_'+suffix
+        subprocess.run(client+['-e',f'CREATE DATABASE {extra_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'],check=True,capture_output=True)
+        extra_env=env|{'VAKALAB_TEST_DSN':f'mysql:host=127.0.0.1;port={port};dbname={extra_name};charset=utf8mb4'}
+        subprocess.run([php,script],cwd=root,env=extra_env,check=True)
     dump=data/'backup.sql'
     with open(dump,'wb') as out:subprocess.run([str(home/'bin/mariadb-dump.exe'),f'--defaults-extra-file={client_config}','--skip-ssl','--single-transaction',name],stdout=out,check=True)
     restore=name+'_restore';subprocess.run(client+['-e',f'CREATE DATABASE {restore} CHARACTER SET utf8mb4'],check=True,capture_output=True)

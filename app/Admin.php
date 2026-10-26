@@ -7,7 +7,7 @@ final class Admin {
         $cases=$db->all('SELECT c.*,v.body,v.instructions,v.notes,v.version FROM cases c JOIN case_versions v ON v.id=c.current_version WHERE c.owner_id=? ORDER BY position',[$u['id']]);
         $cids=array_column($cases,'id');$inCase=fn($row)=>in_array($row['case_id'],$cids,true);
         $assignments=array_values(array_filter($db->all('SELECT * FROM assignments'),$inCase));
-        $apps=array_values(array_filter($db->all('SELECT id,user_id,case_id,version_id,state,initial_at,submitted_at,last_section,last_activity,active_request,excluded FROM applications'),$inCase));
+        $apps=array_values(array_filter($db->all('SELECT id,user_id,case_id,version_id,attempt_no,state,initial_at,submitted_at,last_section,last_activity,active_request,excluded FROM applications ORDER BY attempt_no DESC'),$inCase));
         $aids=array_column($apps,'id');$inApp=fn($row)=>in_array($row['app_id'],$aids,true);
         $users=$db->all('SELECT id,login,name,role,status,metadata,test,owner_id FROM users ORDER BY login');
         $users=array_values(array_filter($users,fn($row)=>$row['owner_id']===$u['id']||$row['id']===$u['id']));
@@ -25,9 +25,24 @@ final class Admin {
             'definitions'=>$defs,'audit'=>array_slice(array_values(array_filter($db->all('SELECT * FROM audit ORDER BY created_at DESC'),fn($row)=>$row['actor']===$u['id']||in_array($row['target'],$targets,true))),0,100)];
     }
     public function mutate(array $u,string $op,array $p): array {
-        Auth::researcher($u);$db=$this->app->db;$reason=trim($p['reason']??'');if(in_array($op,['labels','note','exclude','resolve_request','resolve_analysis'],true))demand($reason!=='','İşlem gerekçesi gerekli');
+        Auth::researcher($u);$db=$this->app->db;$reason=trim($p['reason']??'');if(in_array($op,['new_attempt','labels','note','exclude','resolve_request','resolve_analysis'],true))demand($reason!=='','İşlem gerekçesi gerekli');
         return $db->tx(function()use($db,$u,$op,$p,$reason){$id=$p['id']??uid();
             switch($op){
+            case 'new_attempt':
+                $previous=Scope::application($db,$u,$p['app_id']);
+                $assignment=$db->one('SELECT * FROM assignments WHERE user_id=? AND case_id=?'.($db->sqlite()?'':' FOR UPDATE'),[$previous['user_id'],$previous['case_id']]);
+                demand($assignment&&(bool)$assignment['active'],'Önce öğrencinin vaka atamasını etkinleştirin',409);
+                $case=Scope::owned($db,$u,'cases',$previous['case_id']);
+                demand(in_array($case['status'],['active','closed'],true)&&!$case['stop_access'],'Vaka erişime kapalı',409);
+                $latest=$db->one('SELECT * FROM applications WHERE user_id=? AND case_id=? ORDER BY attempt_no DESC LIMIT 1',[$previous['user_id'],$previous['case_id']]);
+                // Retrying the same operation returns the already-created successor.
+                if($latest['id']!==$previous['id'])return ['id'=>$latest['id'],'attempt_no'=>(int)$latest['attempt_no']];
+                demand($previous['state']==='submitted'&&(bool)$previous['submitted_at']&&!$previous['active_request'],'Yalnız teslim edilmiş çalışma için yeni deneme açılabilir',409);
+                $id=uid();$number=(int)$previous['attempt_no']+1;
+                $db->insert('applications',['id'=>$id,'user_id'=>$previous['user_id'],'case_id'=>$previous['case_id'],'version_id'=>$previous['version_id'],'attempt_no'=>$number,'state'=>'initial','revision'=>0,'draft'=>js(Rules::draft([])),'created_at'=>now()]);
+                if($case['collection_closed_at'])$db->q('UPDATE assignments SET allow_late=1 WHERE id=?',[$assignment['id']]);
+                $db->audit($u['id'],$op,$id,$reason,['app_id'=>$id,'previous_app_id'=>$previous['id'],'case_id'=>$previous['case_id'],'user_id'=>$previous['user_id'],'attempt_no'=>$number,'late_access'=>(bool)$case['collection_closed_at']]);
+                return ['id'=>$id,'attempt_no'=>$number];
             case 'participant':
                 $old=$db->one('SELECT * FROM users WHERE id=?',[$id]);if($old)Scope::owned($db,$u,'users',$id);$role=$old['role']??($p['role']??'student');demand(in_array($role,['student','researcher'],true),'Hesap türü geçersiz');
                 $login=trim($p['login']??'');demand($login!==''&&strlen($login)<=100,'Öğrenci numarası gerekli');$status=$p['status']??'active';demand(in_array($status,['active','frozen','archived'],true),'Hesap durumu geçersiz');

@@ -1,0 +1,11 @@
+PASS 1 one instruction and one data message
+PASS 2 case and complete rubric preserved
+PASS 3 all questions paired with exact full answers in wire payload
+PASS 4 locally calculated profile sent in same request
+PASS 5 no private field or duplicate answer map transmitted
+PASS 6 single narrative report plus criterion scores contract
+PASS 7 rubric levels and points constrain output
+PASS 8 evidence can point only to a supplied answer
+PASS 9 real mock adapter supports holistic contract
+PASS 10 mock zero score and genuine source quote validate
+TOTAL HOLISTIC CONTRACT 10 checks passed; no external calls.

@@ -1,0 +1,1 @@
+PASS TIME 10 checks: Istanbul, rollover, UTC, DST, missing/invalid values, raw data preserved.
