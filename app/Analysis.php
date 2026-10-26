@@ -66,6 +66,16 @@ final class Analysis {
         $app=$db->one('SELECT * FROM applications WHERE id=?',[$run['app_id']]);$draft=obj($app['draft']);$user=$db->one('SELECT login FROM users WHERE id=?',[$app['user_id']]);$case=$db->one('SELECT title FROM cases WHERE id=?',[$app['case_id']]);$rubric=$db->one('SELECT name,version,body FROM definitions WHERE id=?',[$run['rubric_id']]);$integrity=$db->one("SELECT output FROM analysis_steps WHERE run_id=? AND step=1 AND status='completed'",[$run['id']]);
         return ['run'=>$run['id'],'participant'=>$user['login'],'case_title'=>$case['title'],'rubric_name'=>$rubric['name'],'rubric_version'=>$run['rubric_id'],'rubric_number'=>$rubric['version'],'dimensions'=>obj($rubric['body'])['dimensions'],'profile'=>array_intersect_key($draft,array_flip(['knowledge','confidence','difficulty','severity'])),'limitations'=>'Tam yanıt aktarımı: ilk parça zamanı ölçülmedi. Görünürlük okuma/düşünme kanıtı değildir. AI süreç süresi öğrenci süresine eklenmez. Teknik uyarı sayısı: '.count(obj($integrity['output'])['warnings']),'parts'=>$parts,'confidence'=>obj($profile['output']),'initial_mean'=>$totals[3],'final_mean'=>$totals[4],'difference'=>$totals[3]!==null&&$totals[4]!==null?round($totals[4]-$totals[3],4):null,'notice'=>'AI destekli ön değerlendirme araştırmacı tarafından incelendi. Kararsız/reddedilmiş alanlar onaylı toplam sayılmaz.'];
     }
+    private function currentReviewReport(array $r): array {
+        $db=$this->app->db;
+        $run=$db->one('SELECT * FROM analysis_runs WHERE id=?'.($db->sqlite()?'':' FOR UPDATE'),[$r['run_id']]);
+        $a=$db->lock($r['app_id']);
+        $latest=$db->one('SELECT id FROM reports WHERE app_id=? ORDER BY version DESC LIMIT 1',[$r['app_id']]);demand($latest['id']===$r['id'],'Güncel raporu kullanın',409);
+        foreach($db->all('SELECT id FROM analysis_runs WHERE app_id=? ORDER BY created_at DESC,id DESC',[$r['app_id']]) as $candidate)if(Review::version($db,$candidate['id'])>=2){demand($candidate['id']===$run['id'],'Güncel değerlendirmeyi tamamlayın',409);break;}
+        demand(!$db->one("SELECT id FROM analysis_steps WHERE run_id=? AND status='running'",[$run['id']]),'Değerlendirme hazırlanıyor',409);
+        $body=$this->assemble($run);demand(array_column($body['parts'],'decision_id')===array_column(obj($r['body'])['parts'],'decision_id'),'Raporu güncel değerlendirmeyle hazırlayın',409);
+        return $a;
+    }
     public function report(array $u,string $op,array $p): array {
         Auth::researcher($u);
         if($op==='create'){$owned=Scope::run($this->app->db,$u,$p['run_id']??'');demand(Review::version($this->app->db,$owned['id'])<3,'Bu rapor için tek değerlendirme akışını kullanın',409);}
@@ -95,6 +105,7 @@ final class Analysis {
                     }else $db->insert('reports',$r);
                 }else $db->insert('reports',$r);}
             else{$r=$db->one('SELECT * FROM reports WHERE id=?'.($db->sqlite()?'':' FOR UPDATE'),[$p['id']]);demand((bool)$r,'Rapor yok');Scope::application($db,$u,$r['app_id']);
+                if(in_array($op,['approve','publish'],true)&&(obj($r['body'])['review_version']??1)===2)$this->currentReviewReport($r);
                 if($op==='edit_feedback'){
                     demand(!$r['approved_at']&&!$r['published_at'],'Onaylanmış rapor değiştirilemez; yeni rapor hazırlayın',409);
                     $a=$db->lock($r['app_id']);$body=obj($r['body']);$student=StudentReport::projection($body,obj($a['draft']));
@@ -108,10 +119,7 @@ final class Analysis {
                 }
                 elseif($op==='show'){
                     demand((obj($r['body'])['review_version']??1)===2,'Güncel değerlendirme raporu gerekli');
-                    $latest=$db->one('SELECT id FROM reports WHERE app_id=? ORDER BY version DESC LIMIT 1',[$r['app_id']]);demand($latest['id']===$r['id'],'Güncel raporu kullanın',409);
-                    $run=$db->one('SELECT * FROM analysis_runs WHERE id=?',[$r['run_id']]);$a=$db->lock($r['app_id']);$runs=$db->all('SELECT id FROM analysis_runs WHERE app_id=? ORDER BY created_at DESC,id DESC',[$r['app_id']]);foreach($runs as $candidate)if(Review::version($db,$candidate['id'])===2){demand($candidate['id']===$run['id'],'Güncel değerlendirmeyi tamamlayın',409);break;}
-                    demand(!$db->one("SELECT id FROM analysis_steps WHERE run_id=? AND status='running'",[$run['id']]),'Değerlendirme hazırlanıyor',409);
-                    $body=$this->assemble($run);demand(array_column($body['parts'],'decision_id')===array_column(obj($r['body'])['parts'],'decision_id'),'Raporu güncel değerlendirmeyle hazırlayın',409);
+                    $a=$this->currentReviewReport($r);
                     $c=$db->one('SELECT collection_closed_at FROM cases WHERE id=?',[$a['case_id']]);$ass=$db->one('SELECT allow_late FROM assignments WHERE user_id=? AND case_id=?',[$a['user_id'],$a['case_id']]);demand(Scope::collectionClosed($c+$ass),'Öğrenciye göstermek için bu vakada veri toplamayı kapatın',409);
                     $db->q('UPDATE reports SET approved_at=?,published_at=? WHERE id=?',[now(),now(),$r['id']]);
                 }

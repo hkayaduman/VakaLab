@@ -1,5 +1,11 @@
 # Değişiklik günlüğü
 
+## 0.3.2 — 2026-10-26 — İnceleme düzeltmeleri ve sekme/süre doğrulaması
+
+Öğrenciye dönen başlangıç, kayıt, başlangıç kesinleştirme ve teslim yanıtları aynı izin listesinden geçer; özel analiz dışı bırakma gerekçesi ve araştırmacı alanları gönderilmez. Ağ belirsizliğinde sohbet istek kimliği gönderilen metinle birlikte korunur; değişen mesaj yeni kimlik alır, sunucu aynı kimliğin farklı metinle kullanımını 409 ile reddeder. Başarısız sohbeti yeniden denemenin geç yanıtı başka vakanın mesaj veya bekleme durumunu değiştirmez; açık vakadaki yeniden deneme yanıt gelişi de süre çizelgesine kaydedilir.
+
+V2 raporlarında gösterme, onay ve yayın aynı güncel rapor/değerlendirme/karar denetimini kullanır. Eski kararları içeren rapor bu yollardan yeniden açılamaz. Kodlanmış dışa aktarım etiket üretim geçmişindeki serbest tanım metinlerini çıkarır; seçimler, kapsam ve zaman geçmişi korunur. Şema değişikliği yoktur. Güncel arayüz testi v3 rapor ekranına uyarlandı; hata tekrarlarını kapsayan SQLite/MariaDB ve tarayıcı testleri ile yedi bölümün sürelerini bağımsız tarayıcı saatiyle karşılaştıran test eklendi. Ayrıntılı sonuçlar TEST_RESULTS.md içindedir.
+
 ## 0.3.1 — 2026-10-26 — Tek rapor içinde soru bazında değerlendirme
 
 Tek AI isteği ve tek güncel rapor korunur. Rapor artık altı sorunun her birinde sorunun tam metni, o soruya verilen tam öğrenci yanıtı, soruya özel geri bildirim, rubrik ölçüt düzey/puan/gerekçeleri ve soru puanını birlikte gösterir. Genel değerlendirme isteğe bağlı ek not alanıdır. Her sorunun ağırlıklı puanı ayrı hesaplanır; genel toplam soru puanlarının toplamıdır. AI yanıtının tüm soruları içermesi zorunludur ve her ölçütün kanıtı yalnız ilgili sorunun yanıtından doğrulanır. Dolu yanıtın yok sayıldığı çelişkili puanlama reddedilir.

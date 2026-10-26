@@ -1,0 +1,12 @@
+PASS LABEL GROUPS 1 label form offers explicit student and AI groups
+PASS LABEL GROUPS 2 AI group persisted by server
+PASS LABEL GROUPS 3 edit form preserves group
+PASS LABEL GROUPS 4 student message chooser contains only student labels
+PASS LABEL GROUPS 5 student chooser excludes AI label
+PASS LABEL GROUPS 6 AI chooser contains only AI label
+PASS LABEL GROUPS 7 AI chooser includes its own label
+PASS LABEL GROUPS 8 scope selector offers pedagogy, outside and both with an empty option
+PASS LABEL GROUPS 9 researcher-selected outside scope is persisted
+PASS LABEL GROUPS 10 scope selection survives editing
+PASS LABEL GROUPS 11 no browser runtime errors
+TOTAL LABEL GROUPS 11 checks passed; isolated synthetic database.

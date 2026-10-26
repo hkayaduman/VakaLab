@@ -1,0 +1,43 @@
+const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
+const {spawn,spawnSync}=require('node:child_process'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'..'),tmp=path.join(root,'tests/tmp'),tag=crypto.randomUUID(),config=path.join(tmp,`chat_recovery_${tag}.php`),db=path.join(tmp,`chat_recovery_${tag}.sqlite`),password=crypto.randomUUID();
+fs.mkdirSync(tmp,{recursive:true});
+const mode=value=>fs.writeFileSync(config,`<?php $c=require __DIR__.'/../../config/example.php';$c['dsn']='sqlite:${db.replaceAll('\\','/')}';$c['db_user']='';$c['db_password']='';$c['https']=false;$c['ai']['mode']='${value}';return $c;`);
+mode('normal');const php=process.env.PHP_BIN||path.join(root,'.tools/php/php.exe'),env={...process.env,VAKALAB_CONFIG:config,VAKALAB_SEED_PASSWORD:password};
+for(const command of ['migrate','seed']){const p=spawnSync(php,['bin/console.php',command],{cwd:root,env,encoding:'utf8',windowsHide:true});if(p.status!==0)throw Error(p.stdout+p.stderr);}
+const port=18896,url=`http://127.0.0.1:${port}/`,server=spawn(php,['-S',`127.0.0.1:${port}`,'-t','public'],{cwd:root,env,stdio:'ignore',windowsHide:true});
+let browser,n=0;const check=(ok,name)=>{if(!ok)throw Error(name);console.log(`PASS CHAT RECOVERY ${++n} ${name}`);};
+(async()=>{try{
+ for(let i=0;i<100;i++){try{if((await fetch(url)).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
+ browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN});const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(url);await page.locator('#login').fill('TEST-OGR-05');await page.locator('#password').fill(password);await page.getByRole('button',{name:'Giriş yap'}).click();await page.locator('[data-case="test-case-1"]').click();await page.locator('[data-section="ai"]').click();
+ const firstId=await page.evaluate(()=>work.application.id);
+ const send=async text=>{await page.locator('#question').fill(text);await page.locator('#send').click();await page.waitForFunction(()=>!busy&&work.draft.question==='');await page.evaluate(()=>save());};
+ const loseReply=async text=>{await page.route('**/api.php?op=chat',async route=>{await route.fetch();await route.abort('failed');},{times:1});await page.locator('#question').fill(text);await page.locator('#send').click();await page.waitForFunction(()=>!busy&&document.querySelector('#notice').textContent.includes('Ağ belirsizliğinde'));};
+ await loseReply('FIRST SENT QUESTION');const firstKey=await page.evaluate(()=>sessionStorage.getItem(recoveryKey()+':request'));
+ check(await page.locator('#question').inputValue()==='FIRST SENT QUESTION','lost reply preserves message draft');
+ await send('SECOND DIFFERENT QUESTION');
+ const messages=await page.evaluate(()=>work.messages);
+ check(messages.filter(m=>m.content==='SECOND DIFFERENT QUESTION').length===1,'changed message after lost reply really reaches server once');
+ check(messages.filter(m=>m.content==='FIRST SENT QUESTION').length===1,'original completed message is retained once');
+ check(await page.evaluate(k=>work.requests.find(r=>r.client_key===k)?.id!==work.requests.at(-1)?.id,firstKey),'changed message uses a new request identity');
+ await loseReply('UNCHANGED RETRY QUESTION');await send('UNCHANGED RETRY QUESTION');
+ check(await page.evaluate(()=>work.messages.filter(m=>m.content==='UNCHANGED RETRY QUESTION').length===1),'same message after lost reply remains idempotent');
+ check(await page.evaluate(()=>!sessionStorage.getItem(recoveryKey()+':request')&&!sessionStorage.getItem(recoveryKey()+':request:text')),'completed send removes pending key and text');
+ await page.route('**/api.php?op=chat',route=>route.abort('failed'),{times:1});await page.locator('#question').fill('NEVER REACHED SERVER');await page.locator('#send').click();await page.waitForFunction(()=>!busy&&document.querySelector('#notice').textContent.includes('Ağ belirsizliğinde'));
+ await send('EDITED BEFORE DELIVERY');check(await page.evaluate(()=>!work.messages.some(m=>m.content==='NEVER REACHED SERVER')&&work.messages.some(m=>m.content==='EDITED BEFORE DELIVERY')),'editing after pre-delivery failure sends only the actual new text');
+ mode('error');await page.locator('#question').fill('FAILED QUESTION TO RETRY');await page.locator('#send').click();await page.locator('[data-retry-request]').waitFor();
+ mode('normal');let release;const gate=new Promise(r=>release=r);let entered;const hit=new Promise(r=>entered=r);
+ await page.route('**/api.php?op=chat',async route=>{const response=await route.fetch();entered();await gate;await route.fulfill({response});},{times:1});
+ await page.locator('[data-retry-request]').click();await page.locator('#work-confirm-accept').click();await hit;
+ await page.locator('#back').click();await page.locator('[data-case="test-case-3"]').click();await page.waitForFunction(()=>work?.application.case_id==='test-case-3');const nextId=await page.evaluate(()=>work.application.id);
+ const retryDone=page.waitForResponse(r=>r.url().includes('op=chat'));release();await retryDone;await page.evaluate(()=>new Promise(r=>setTimeout(r,100)));
+ check(await page.evaluate(id=>work.application.id===id&&work.messages.length===0&&!busy,nextId),'late retry cannot change another case messages or busy state');
+ await page.locator('#back').click();await page.locator('[data-case="test-case-1"]').click();await page.waitForFunction(()=>work?.application.case_id==='test-case-1');await page.locator('[data-section="ai"]').click();
+ check(await page.evaluate(()=>work.messages.filter(m=>m.content==='FAILED QUESTION TO RETRY').length===1),'retry preserves exactly one original user message');
+ const restored=await page.evaluate(id=>api('view',undefined,{app_id:id}),firstId);check(restored.requests.at(-1).status==='completed'&&restored.messages.at(-1).role==='assistant','retry completed and persisted on its own case');
+ mode('error');await page.locator('#question').fill('RETRY WHILE CURRENT');await page.locator('#send').click();await page.locator('[data-retry-request]').waitFor();mode('normal');await page.locator('[data-retry-request]').click();await page.locator('#work-confirm-accept').click();await page.waitForFunction(()=>!busy&&work.requests.at(-1).status==='completed');
+ check(await page.evaluate(()=>events.some(e=>e.type==='response_visible'&&e.payload.request===work.requests.at(-1).id)),'current-case retry records response arrival for navigation timing');
+ check(errors.length===0,'recovery and case changes produce no JavaScript errors');
+ console.log(`TOTAL CHAT RECOVERY ${n} checks passed; isolated SQLite, mock, and controlled lost replies.`);
+}finally{if(browser)await browser.close();server.kill();}})().catch(e=>{console.error(e);process.exitCode=1;});

@@ -1,5 +1,11 @@
 # Shared hosting kurulumu
 
+## 0.3.2 · İnceleme düzeltmeleri
+
+Mevcut şema 001–003 kurulumu için `storage/releases/vakalab-duzeltmeler-0.3.2.zip` paketini `/domains/vakalab.techdocsolution.com/vakalab` dizinine yükleyip aynı dizine çıkarın; mevcut `app` ve `public` klasörleri birleşerek dosyaların üzerine yazılmalıdır. ZIP'in içinde yalnız bu iki klasörün 32 kod dosyası vardır. Yeni SQL, migration veya seed gerekmez. `config/local.php`, `vendor` ve `storage` korunur. Güncelleme öncesinde kod/veritabanı yedeğini public dışında alın; ardından siteyi Ctrl+F5 ile yenileyin. Güncel giriş sayfası `assets/app.js?v=0.3.2` kullanır.
+
+Beş inceleme düzeltmesi ve 133/133 başarılı yerel kontrolün ayrıntıları [düzeltme/test raporunda](test-evidence/code-review-2026-10-26/FIXES_TESTS_TR.md) kayıtlıdır. Canlı hosting testi kullanıcı tarafından sonraya bırakılmıştır; bu kayıt canlıya dağıtım veya hosting kabulü yapıldığını göstermez. Dağıtım paketi ve özel yerel kurulum dosyaları Git'e dahil edilmez.
+
 ## 0.3.1 · Soru bazında tek rapor güncellemesi
 
 Mevcut 0.3.0 kurulumu için `storage/releases/vakalab-soru-raporu-0.3.1.zip` paketini `/domains/vakalab.techdocsolution.com/vakalab` içine yükleyip aynı dizine çıkarın. app/public dosyaları birlikte güncellenir; config/local.php, vendor ve storage korunur. SQL/seed/migration gerekmez (mevcut 001–003). Site kökü yine `vakalab/public` kalır. Güncellemeden sonra uygulamayı bir kez yenileyin. Her sorunun tam yanıtı ve ayrı geri bildirim/puan alanları görünmeli. Eski genel raporun soru puanları otomatik çıkarılmaz: AI ile bir kez yeni rapor hazırlayın veya her soruyu manuel değerlendirin. Yeni rapor daha sonra F5 gerektirmeden görünür. Öğrenci raporu ve indirmeler de aynı soru düzenini ve profil karşılaştırmasını içerir. Diğer onay/yayın kuralları korunur. Ayrıntılar `TEK_RAPOR_GUNCELLEME.md` içindedir.

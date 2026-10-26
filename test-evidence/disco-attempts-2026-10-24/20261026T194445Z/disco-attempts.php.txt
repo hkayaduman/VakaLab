@@ -1,0 +1,36 @@
+PASS DISCO 1 visits has explicit attempt column
+PASS DISCO 2 visits contains exactly two independent cases
+PASS DISCO 3 visits retains shared participant and pedagogical case
+PASS DISCO 4 visits every row identifies attempt 1
+PASS DISCO 5 visits each attempt has its own submission
+PASS DISCO 6 visits excludes post-submission navigation
+PASS DISCO 7 visits individual download contains only selected attempt
+PASS DISCO 8 visits never count the day between attempts
+PASS DISCO 9 sequence and previous/next links restart per attempt
+PASS DISCO 10 visits every row identifies attempt 2
+PASS DISCO 11 visits each attempt has its own submission
+PASS DISCO 12 visits excludes post-submission navigation
+PASS DISCO 13 visits individual download contains only selected attempt
+PASS DISCO 14 visits never count the day between attempts
+PASS DISCO 15 sequence and previous/next links restart per attempt
+PASS DISCO 16 visits empty CSV retains attempt column
+PASS DISCO 17 events has explicit attempt column
+PASS DISCO 18 events contains exactly two independent cases
+PASS DISCO 19 events retains shared participant and pedagogical case
+PASS DISCO 20 events every row identifies attempt 1
+PASS DISCO 21 events each attempt has its own submission
+PASS DISCO 22 events excludes post-submission navigation
+PASS DISCO 23 events individual download contains only selected attempt
+PASS DISCO 24 events every row identifies attempt 2
+PASS DISCO 25 events each attempt has its own submission
+PASS DISCO 26 events excludes post-submission navigation
+PASS DISCO 27 events individual download contains only selected attempt
+PASS DISCO 28 events empty CSV retains attempt column
+PASS DISCO 29 coded data preserves attempt numbers
+PASS DISCO 30 exports preserve applications
+PASS DISCO 31 exports preserve snapshots
+PASS DISCO 32 exports preserve messages
+PASS DISCO 33 exports preserve events
+PASS DISCO 34 exports preserve analysis_runs
+PASS DISCO 35 exports preserve reports
+TOTAL DISCO 35 checks passed.

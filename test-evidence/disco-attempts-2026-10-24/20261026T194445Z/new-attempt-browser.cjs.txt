@@ -1,0 +1,16 @@
+PASS UI 1 new attempt requires reason in UI
+PASS UI 2 researcher sees new attempt number
+PASS UI 3 cannot open another unfinished attempt
+PASS UI 4 researcher can inspect both attempts
+PASS UI 5 old attempt cannot create extra successor
+PASS UI 6 student can view historical attempt
+PASS UI 7 new profile is blank
+PASS UI 8 old final response remains read only
+PASS UI 9 old answer preserved
+PASS UI 10 one case card despite two attempts
+PASS UI 11 new attempt saves independently and reopens latest
+PASS UI 12 visits real CSV download includes attempt column and both attempt IDs
+PASS UI 13 events real CSV download includes attempt column and both attempt IDs
+PASS UI 14 attempt navigation fits mobile
+PASS UI 15 no browser errors
+OK 15 attempt UI checks

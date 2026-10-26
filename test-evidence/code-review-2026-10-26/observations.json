@@ -1,0 +1,8 @@
+{
+  "student_private_fields": {"view_hides_reason":true,"start_leaks_reason":true,"save_leaks_reason":true},
+  "coded_export_text": {"private_description_present":true,"path":"label_batches[].detail.label_definitions[].description/body.description"},
+  "stale_v2_publication": {"normal_show_blocks":true,"legacy_approve_publish_bypasses":true,"published_initial_score":0,"latest_decision":"reject"},
+  "changed_message_reused_key": {"same_request":true,"second_message_persisted":false},
+  "lost_response_changed_draft": {"draft":"","second_message_in_chat":false,"first_message_in_chat":true},
+  "retry_cross_case": {"current_app":true,"old_case_message_in_new_work":true,"real_new_case_messages":0}
+}

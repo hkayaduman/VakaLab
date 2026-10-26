@@ -5,6 +5,8 @@ Seed.php and review-editor.cjs are helpers, not standalone test suites.
 """
 import datetime, hashlib, json, os, pathlib, re, subprocess, sys, time
 
+if hasattr(sys.stdout,'reconfigure'):sys.stdout.reconfigure(encoding='utf-8',errors='replace')
+
 root=pathlib.Path(__file__).resolve().parents[1]
 tag=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
 out=root/'test-evidence'/'disco-attempts-2026-10-24'/tag

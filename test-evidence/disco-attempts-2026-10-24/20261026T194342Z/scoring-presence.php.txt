@@ -1,0 +1,27 @@
+PASS 1 exact full answer explicitly sent for problem
+PASS 2 current question rubric and case preserved for problem
+PASS 3 workflow instructions and schema placeholders omitted for problem
+PASS 4 answer remains untrusted user data for problem
+PASS 5 exact full answer explicitly sent for decision
+PASS 6 current question rubric and case preserved for decision
+PASS 7 workflow instructions and schema placeholders omitted for decision
+PASS 8 answer remains untrusted user data for decision
+PASS 9 frozen hosting missing-answer contradiction rejected for decision
+PASS 10 exact full answer explicitly sent for reason
+PASS 11 current question rubric and case preserved for reason
+PASS 12 workflow instructions and schema placeholders omitted for reason
+PASS 13 answer remains untrusted user data for reason
+PASS 14 frozen hosting missing-answer contradiction rejected for reason
+PASS 15 validation never automatically raises a score
+PASS 16 genuine unrelated answer may receive zero
+PASS 17 missing-answer claim rejected: Yanıt verilmedi.
+PASS 18 missing-answer claim rejected: Öğrenci yanıtı paylaşılmadığı için puanlama yapılamıyor.
+PASS 19 missing-answer claim rejected: Yanıtınız yok.
+PASS 20 missing-answer claim rejected: Yanıt sunulmadı.
+PASS 21 missing detail is not confused with missing answer
+PASS 22 criterion reason checked independently of overall feedback
+PASS 23 criterion feedback checked independently
+PASS 24 fabricated evidence still rejected
+PASS 25 empty answer never triggers a provider scoring request
+PASS 26 multiple answers never enter a single-question scoring request
+TOTAL scoring presence 26 checks passed; no provider calls.

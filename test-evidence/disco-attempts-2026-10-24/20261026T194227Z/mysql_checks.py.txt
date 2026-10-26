@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "D:\VakaLab\tests\mysql_checks.py", line 4, in <module>
+    home=pathlib.Path(os.environ['MARIADB_HOME']);php=os.environ.get('PHP_BIN',str(root/'.tools/php/php.exe'))
+                      ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 714, in __getitem__
+KeyError: 'MARIADB_HOME'

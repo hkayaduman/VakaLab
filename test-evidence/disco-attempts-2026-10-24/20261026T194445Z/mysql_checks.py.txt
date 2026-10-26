@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "D:\VakaLab\tests\mysql_checks.py", line 8, in <module>
+    subprocess.run([str(home/'bin/mariadb-install-db.exe'),f'--datadir={data}',f'--password={password}',f'--port={port}','--silent'],check=True,capture_output=True)
+  File "C:\Users\Ev hk\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 548, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ev hk\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 1026, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:\Users\Ev hk\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\subprocess.py", line 1538, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [WinError 2] The system cannot find the file specified

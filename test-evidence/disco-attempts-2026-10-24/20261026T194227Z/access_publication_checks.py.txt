@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "D:\VakaLab\tests\access_publication_checks.py", line 351, in <module>
+    main()
+  File "D:\VakaLab\tests\access_publication_checks.py", line 102, in main
+    raise RuntimeError('Isolated PHP server did not start')
+RuntimeError: Isolated PHP server did not start

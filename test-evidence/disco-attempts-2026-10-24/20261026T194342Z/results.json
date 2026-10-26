@@ -1,0 +1,177 @@
+{
+  "suites": [
+    {
+      "suite": "ai-chat-contract.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 9
+    },
+    {
+      "suite": "analysis-provenance.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.17,
+      "pass_lines": 17
+    },
+    {
+      "suite": "analysis-recalculate.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 21
+    },
+    {
+      "suite": "disco-attempts.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 35
+    },
+    {
+      "suite": "export-labels.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.34,
+      "pass_lines": 39
+    },
+    {
+      "suite": "holistic-contract.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 10
+    },
+    {
+      "suite": "holistic-review.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.5,
+      "pass_lines": 63
+    },
+    {
+      "suite": "label-contract.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 6.98,
+      "pass_lines": 22
+    },
+    {
+      "suite": "legacy-submission.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 21
+    },
+    {
+      "suite": "navigation.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.2,
+      "pass_lines": 82
+    },
+    {
+      "suite": "new-attempt.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 39
+    },
+    {
+      "suite": "presence.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 60
+    },
+    {
+      "suite": "process-data.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.23,
+      "pass_lines": 28
+    },
+    {
+      "suite": "report-layout.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.14,
+      "pass_lines": 11
+    },
+    {
+      "suite": "review-v2.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.25,
+      "pass_lines": 96
+    },
+    {
+      "suite": "rubric.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 21
+    },
+    {
+      "suite": "run.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 1.39,
+      "pass_lines": 87
+    },
+    {
+      "suite": "scoring-presence.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 26
+    },
+    {
+      "suite": "student-labels.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 33
+    },
+    {
+      "suite": "student-report.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 15
+    },
+    {
+      "suite": "analysis-observer.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.39,
+      "pass_lines": 5
+    },
+    {
+      "suite": "analysis-progress.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.22,
+      "pass_lines": 3
+    },
+    {
+      "suite": "api-runtime.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 5.36,
+      "pass_lines": 0
+    },
+    {
+      "suite": "browser.cjs",
+      "exit_code": 1,
+      "passed": false,
+      "seconds": 1.59,
+      "pass_lines": 0
+    }
+  ],
+  "live_provider": "not run by local runner",
+  "helper_files": [
+    "Seed.php",
+    "review-editor.cjs"
+  ]
+}

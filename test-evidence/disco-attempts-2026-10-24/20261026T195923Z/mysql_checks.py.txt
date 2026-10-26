@@ -1,0 +1,266 @@
+VERSION()
+11.4.12-MariaDB
+PASS 1 unprotected connection inherits short hosting timeout
+PASS 2 application connection extends its own idle timeout
+PASS 3 application leaves global server timeout unchanged
+PASS 4 unprotected connection is lost during provider wait
+PASS 5 application connection remains usable after provider wait
+PASS 6 result can be saved transactionally after provider wait
+PASS 1 seven synthetic students + researcher
+PASS 2 seed idempotent; existing responses untouched
+PASS 3 unassigned case denied
+PASS 4 draft case denied
+PASS 5 start idempotent
+PASS 6 IDOR denied
+PASS 7 researcher role denied
+PASS 8 AI locked before initial
+PASS 9 empty profile/initial blocked
+PASS 10 profile range
+PASS 11 profile integer only
+PASS 12 autosave increments revision
+PASS 13 unchanged content creates no revision
+PASS 14 stale revision rejected
+PASS 15 initial lock idempotent
+PASS 16 initial immutable after locking
+PASS 17 researcher cannot overwrite locked response
+PASS 18 AI idempotency no duplicate messages
+PASS 19 chat payload excludes private fields
+PASS 20 chat includes pinned case version
+PASS 21 second AI blocked by server
+PASS 22 autosave allowed during active AI
+PASS 23 submit blocked during AI
+PASS 24 missing final confidence blocked
+PASS 25 missing final severity blocked
+PASS 26 final severity range rejected
+PASS 27 final severity integer required
+PASS 28 single final submission
+PASS 29 zero final severity survives save and submission
+PASS 30 final severity preserved in immutable submission snapshot
+PASS 31 final severity preserved in research dataset export
+PASS 32 submit idempotent
+PASS 33 editing after submission blocked
+PASS 34 chat after submission blocked
+PASS 35 used case version immutable
+PASS 36 case edit adds version
+PASS 37 event dedup
+PASS 38 duration union no overlap double count
+PASS 39 missing/long gap remains unknown
+PASS 40 analysis requires sequential steps
+PASS 41 confidence 8 to 10 equals +2
+PASS 42 initial scoring isolated
+PASS 43 final scoring isolated, no confidence
+PASS 44 weighted mean computed in app
+PASS 45 out of range AI score rejected
+PASS 46 invented evidence rejected
+PASS 47 invalid mock JSON fails without score
+PASS 48 analysis step 3
+PASS 49 analysis step 4
+PASS 50 analysis step 5
+PASS 51 analysis step 6
+PASS 52 analysis step 7
+PASS 53 uncertain score never becomes approved total
+PASS 54 invalid feedback cannot create report
+PASS 55 failed feedback leaves no report
+PASS 56 unapproved report cannot publish
+PASS 57 approval does not publish
+PASS 58 case collection open blocks publication
+PASS 59 student cannot download approved but unpublished report
+PASS 60 coded export no identity or private text
+PASS 61 default export excludes synthetic data
+PASS 62 CSV formula escaped
+PASS 63 label definition version preserves prior
+PASS 64 login edit preserves technical ID
+PASS 65 archive/freeze preserves applications
+PASS 66 separate publish after case collection closure
+PASS 67 student report shows answer score feedback
+PASS 68 student report excludes technical review fields
+PASS 69 student feedback excludes model and private review reasons
+PASS 70 approved zero is a real score
+PASS 71 student report removes internal appendix
+PASS 72 researcher report preserves private snapshot appendix
+PASS 73 student report contains only reviewed snapshot (approved evidence allowed)
+PASS 74 report ownership enforced
+PASS 75 case collection closure prevents response changes
+PASS 76 real XLSX package
+PASS 77 XLSX separate event and label sheets
+PASS 78 real DOCX package
+PASS 79 DOCX Turkish text preserved
+PASS 80 real PDF signature
+PASS 81 PDF font/content generated
+PASS 82 final perceived difficulty is required for new submissions
+PASS 83 final perceived difficulty requires an integer in range
+PASS 84 final perceived difficulty requires an integer in range
+PASS 85 zero final perceived difficulty is a valid answer
+PASS 86 final difficulty persists in immutable submission snapshot
+PASS 87 final difficulty persists in research dataset export
+TOTAL 87 assertions passed. mysql functional tests; hosting/browser tests separate.
+PASS 1 migration preserves applications
+PASS 2 migration preserves snapshots
+PASS 3 migration preserves messages
+PASS 4 migration preserves events
+PASS 5 migration preserves analysis_runs
+PASS 6 migration preserves reports
+PASS 7 migration idempotent
+PASS 8 other researcher cannot restart unowned work
+PASS 9 student cannot open attempt
+PASS 10 reason required
+PASS 11 inactive assignment denied
+PASS 12 new attempt starts at beginning
+PASS 13 new attempt completely blank
+PASS 14 same case version pinned
+PASS 15 no copied messages
+PASS 16 no copied snapshots
+PASS 17 no copied events
+PASS 18 no copied analysis_runs
+PASS 19 no copied reports
+PASS 20 first application unchanged
+PASS 21 old messages unchanged
+PASS 22 old snapshots unchanged
+PASS 23 old events unchanged
+PASS 24 old analysis_runs unchanged
+PASS 25 old reports unchanged
+PASS 26 student starts latest attempt
+PASS 27 closed collection grants personal access
+PASS 28 duplicate request returns same successor
+PASS 29 unfinished attempt cannot restart
+PASS 30 old submission stays locked
+PASS 31 student sees both attempts
+PASS 32 audit links attempts with reason
+PASS 33 student edits new attempt independently
+PASS 34 dashboard selects latest first
+PASS 35 second attempt can complete full workflow
+PASS 36 subsequent attempts numbered independently
+PASS 37 stale restart cannot create fourth attempt
+PASS 38 all historical attempts remain accessible
+OK 38 checks
+PASS DISCO 1 visits has explicit attempt column
+PASS DISCO 2 visits contains exactly two independent cases
+PASS DISCO 3 visits retains shared participant and pedagogical case
+PASS DISCO 4 visits every row identifies attempt 1
+PASS DISCO 5 visits each attempt has its own submission
+PASS DISCO 6 visits excludes post-submission navigation
+PASS DISCO 7 visits individual download contains only selected attempt
+PASS DISCO 8 visits never count the day between attempts
+PASS DISCO 9 sequence and previous/next links restart per attempt
+PASS DISCO 10 visits every row identifies attempt 2
+PASS DISCO 11 visits each attempt has its own submission
+PASS DISCO 12 visits excludes post-submission navigation
+PASS DISCO 13 visits individual download contains only selected attempt
+PASS DISCO 14 visits never count the day between attempts
+PASS DISCO 15 sequence and previous/next links restart per attempt
+PASS DISCO 16 visits empty CSV retains attempt column
+PASS DISCO 17 events has explicit attempt column
+PASS DISCO 18 events contains exactly two independent cases
+PASS DISCO 19 events retains shared participant and pedagogical case
+PASS DISCO 20 events every row identifies attempt 1
+PASS DISCO 21 events each attempt has its own submission
+PASS DISCO 22 events excludes post-submission navigation
+PASS DISCO 23 events individual download contains only selected attempt
+PASS DISCO 24 events every row identifies attempt 2
+PASS DISCO 25 events each attempt has its own submission
+PASS DISCO 26 events excludes post-submission navigation
+PASS DISCO 27 events individual download contains only selected attempt
+PASS DISCO 28 events empty CSV retains attempt column
+PASS DISCO 29 coded data preserves attempt numbers
+PASS DISCO 30 exports preserve applications
+PASS DISCO 31 exports preserve snapshots
+PASS DISCO 32 exports preserve messages
+PASS DISCO 33 exports preserve events
+PASS DISCO 34 exports preserve analysis_runs
+PASS DISCO 35 exports preserve reports
+TOTAL DISCO 35 checks passed.
+PASS 1 all six answers included in one request
+PASS 2 question section and answer matched: problem
+PASS 3 question section and answer matched: decision
+PASS 4 question section and answer matched: reason
+PASS 5 question section and answer matched: final_decision
+PASS 6 question section and answer matched: final_reason
+PASS 7 question section and answer matched: reflection
+PASS 8 private identifiers and unrelated data excluded
+PASS 9 student cannot generate assessment
+PASS 10 other researcher cannot edit work
+PASS 11 manual report and scoring make zero provider calls
+PASS 12 manual report has holistic student projection
+PASS 13 client-supplied scores ignored and real zero retained
+PASS 14 six question sections with separate criterion scores
+PASS 15 profile comparison computed without provider call
+PASS 16 old step endpoint cannot add calls to holistic report
+PASS 17 old approval endpoint cannot bypass holistic version guard
+PASS 18 publication requires separate approval
+PASS 19 approval does not publish
+PASS 20 open data collection blocks student publication
+PASS 21 student cannot download private draft
+PASS 22 closed case permits explicitly approved publication
+PASS 23 student gets report projection without internal assessment fields
+PASS 24 duplicate concurrent generation blocked before provider call
+PASS 25 AI assessment makes exactly one provider call
+PASS 26 AI updates the single current report with revision number
+PASS 27 AI replacement requires fresh approval and publication
+PASS 28 weighted totals calculated by application
+PASS 29 one assessment record instead of per-question steps
+PASS 30 new contract version stored without schema migration
+PASS 31 stale browser cannot approve replacement report
+PASS 32 invalid model scores rejected
+PASS 33 failed generation preserves last saved report
+PASS 34 failed generation releases work lock
+PASS 35 manual save requires every rubric criterion
+PASS 36 manual levels restricted to selected rubric
+PASS 37 one report includes scores and profile comparison
+PASS 38 own question answer feedback and score stay paired: problem
+PASS 39 own question answer feedback and score stay paired: decision
+PASS 40 own question answer feedback and score stay paired: reason
+PASS 41 own question answer feedback and score stay paired: final_decision
+PASS 42 own question answer feedback and score stay paired: final_reason
+PASS 43 own question answer feedback and score stay paired: reflection
+PASS 44 another question cannot supply scoring evidence
+PASS 45 missing reflection assessment rejected
+PASS 46 manual question feedback is required
+PASS 47 filled answer cannot be described as missing
+PASS 48 previous general report remains exportable
+PASS 49 holistic docx export
+PASS 50 holistic pdf export
+PASS 51 holistic xlsx export
+PASS 52 Word includes question answer feedback: problem
+PASS 53 Excel keeps question answer and feedback on same row: problem
+PASS 54 Word includes question answer feedback: decision
+PASS 55 Excel keeps question answer and feedback on same row: decision
+PASS 56 Word includes question answer feedback: reason
+PASS 57 Excel keeps question answer and feedback on same row: reason
+PASS 58 Word includes question answer feedback: final_decision
+PASS 59 Excel keeps question answer and feedback on same row: final_decision
+PASS 60 Word includes question answer feedback: final_reason
+PASS 61 Excel keeps question answer and feedback on same row: final_reason
+PASS 62 Word includes question answer feedback: reflection
+PASS 63 Excel keeps question answer and feedback on same row: reflection
+TOTAL HOLISTIC 63 checks passed; isolated MySQL and counted provider spy.
+PASS REVIEW 1 new start uses student projection
+PASS REVIEW 2 existing start hides researcher fields
+PASS REVIEW 3 autosave hides researcher fields
+PASS REVIEW 4 initial confirmation hides researcher fields
+PASS REVIEW 5 repeated initial confirmation hides researcher fields
+PASS REVIEW 6 same normalized message and key remain idempotent
+PASS REVIEW 7 reused key with different text returns conflict
+PASS REVIEW 8 key conflict creates no second request
+PASS REVIEW 9 submission hides researcher fields
+PASS REVIEW 10 repeated submission hides researcher fields
+PASS REVIEW 11 student view hides researcher fields
+PASS REVIEW 12 researcher retains private reason
+PASS REVIEW 13 raw export preserves historical definition text
+PASS REVIEW 14 coded export removes nested definition descriptions
+PASS REVIEW 15 coded export retains batch history
+PASS REVIEW 16 coded labels retain original selections without free text
+PASS REVIEW 17 coded labels retain original selections without free text
+PASS REVIEW 18 coded selection precedence matches raw export
+PASS REVIEW 19 current v2 report remains compatible with approve and publish
+PASS REVIEW 20 changed decisions block show
+PASS REVIEW 21 changed decisions block approve
+PASS REVIEW 22 changed decisions block publish
+PASS REVIEW 23 historically approved stale report cannot publish
+PASS REVIEW 24 failed publication stays withdrawn
+PASS REVIEW 25 rebuilt report reflects rejected initial score
+PASS REVIEW 26 newer evaluation blocks older report show
+PASS REVIEW 27 newer evaluation blocks older report approve
+PASS REVIEW 28 newer evaluation blocks older report publish
+TOTAL REVIEW REGRESSIONS 28 checks passed; synthetic data only.
+BACKUP RESTORE: 8 table counts match in separate restored database.
+MYSQL schema, seed, workflow, FK, formats: passed on isolated MariaDB.

@@ -1,0 +1,29 @@
+PASS REVIEW 1 new start uses student projection
+PASS REVIEW 2 existing start hides researcher fields
+PASS REVIEW 3 autosave hides researcher fields
+PASS REVIEW 4 initial confirmation hides researcher fields
+PASS REVIEW 5 repeated initial confirmation hides researcher fields
+PASS REVIEW 6 same normalized message and key remain idempotent
+PASS REVIEW 7 reused key with different text returns conflict
+PASS REVIEW 8 key conflict creates no second request
+PASS REVIEW 9 submission hides researcher fields
+PASS REVIEW 10 repeated submission hides researcher fields
+PASS REVIEW 11 student view hides researcher fields
+PASS REVIEW 12 researcher retains private reason
+PASS REVIEW 13 raw export preserves historical definition text
+PASS REVIEW 14 coded export removes nested definition descriptions
+PASS REVIEW 15 coded export retains batch history
+PASS REVIEW 16 coded labels retain original selections without free text
+PASS REVIEW 17 coded labels retain original selections without free text
+PASS REVIEW 18 coded selection precedence matches raw export
+PASS REVIEW 19 current v2 report remains compatible with approve and publish
+PASS REVIEW 20 changed decisions block show
+PASS REVIEW 21 changed decisions block approve
+PASS REVIEW 22 changed decisions block publish
+PASS REVIEW 23 historically approved stale report cannot publish
+PASS REVIEW 24 failed publication stays withdrawn
+PASS REVIEW 25 rebuilt report reflects rejected initial score
+PASS REVIEW 26 newer evaluation blocks older report show
+PASS REVIEW 27 newer evaluation blocks older report approve
+PASS REVIEW 28 newer evaluation blocks older report publish
+TOTAL REVIEW REGRESSIONS 28 checks passed; synthetic data only.

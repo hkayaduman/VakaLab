@@ -1,0 +1,2 @@
+PASS V2 STATE 10 checks: exact order, four reviews, no chat decision, independent rewrite and merge.
+PASS V2 SEQUENCE 3 checks: automatic preparation stops for four human decisions.

@@ -1,0 +1,25 @@
+PASS BROWSER 1 only assigned active cases shown
+PASS BROWSER 2 profile starts unselected
+PASS BROWSER 3 AI unlocked after server initial confirmation
+PASS BROWSER 4 initial rendered read only
+PASS BROWSER 5 logout page exit does not recreate cleared event queues
+PASS BROWSER 6 immediate logout and relogin does not leave false other-tab lock
+PASS BROWSER 7 returning through home releases owned tab lease
+PASS BROWSER 8 pinned workspace title preserved after save
+PASS BROWSER 9 initial not automatically shown beside final
+PASS BROWSER 10 mock assistant rendered as text
+PASS BROWSER 11 final draft survives chat navigation
+PASS BROWSER 12 second tab read-only lease
+PASS BROWSER 13 mobile no document horizontal overflow
+PASS BROWSER 14 mobile section navigation present
+PASS BROWSER 15 all seven tabs stop telemetry after successful final submission
+PASS BROWSER 16 submission locks final fields
+PASS BROWSER 17 selected case lists seven synthetic participants
+PASS BROWSER 18 student list timestamps formatted as semantic time elements
+PASS BROWSER 19 student list shows explicit configured time zone
+PASS BROWSER 20 student list submitted filter
+PASS BROWSER 21 case selection shows only the selected case students
+PASS BROWSER 22 researcher can add participant through form
+Error: single application analysis UI
+    at check (D:\VakaLab\tests\browser.cjs:10:53)
+    at D:\VakaLab\tests\browser.cjs:23:203

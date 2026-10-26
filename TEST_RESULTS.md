@@ -1,5 +1,14 @@
 # Gerçek test sonuçları — 2026-10-20
 
+## İnceleme düzeltmeleri ve kapsamlı regresyon 0.3.2 — 2026-10-26
+
+- Beş bulgu düzeltildi: öğrenci yanıtlarında özel araştırmacı gerekçesi, ağ belirsizliği sonrası değişen mesajın kaybı, yeniden denemede vaka karışması, eski v2 raporun yeniden yayını ve kodlanmış etiket geçmişindeki serbest tanım metinleri.
+- Tam koşu: **45 test paketi + sözdizimi/diff kontrolleri = 133/133 başarılı adım**. Kanıt: `test-evidence/disco-attempts-2026-10-24/20261026T195923Z/results.json`. SQLite, ayrı MariaDB, gerçek Chrome, HTTP, rapor/dışa aktarım ve yedekten geri yükleme dahil. Ücretli/canlı sağlayıcı çağrısı yoktur.
+- Yeni hata regresyonu SQLite ve MariaDB'de 28'er, mesaj kurtarma tarayıcı paketi 12 kontrolle geçti. Güncel v3 ekranına uyarlanan geniş tarayıcı paketi 115 kontrolü tamamladı.
+- Yedi bölüm gerçek tıklamalarla 39 kontrol altında bağımsız `performance.now()` saatiyle karşılaştırıldı: 3,0636 s bağımsız toplam, 3,065 s kayıt; en büyük bölüm farkı 8,7 ms (150 ms tolerans). Hedef bölüm, kapanış ve UI toplamları eşleşti.
+- Gezinme 82, presence alan testi 60, gerçek odak/sekme/küçültme 24, karma vaka yolculuğu 27 kontrolle geçti. Karma yolculuk 15,651 s = bölüm içi 5,745 s + uygulama odağı dışında 6,915 s + vaka dışında 2,991 s. Teslim sonrası izleme durdu; API, CSV ve ekrandaki yuvarlanmış süreler eşleşti. AI bekleme süresi ayrıca öğrenci toplamına eklenmedi.
+- Ayrıntılar: [Düzeltme ve test raporu](test-evidence/code-review-2026-10-26/FIXES_TESTS_TR.md). Yeni migration yoktur; kaynaklar yerelde değiştirildi, dağıtım yapılmadı. Canlı hosting ve fiziksel mobil cihaz doğrulaması bu koşuya dahil değildir.
+
 ## Soru bazında tek rapor 0.3.1 — 2026-10-26
 
 - `tests/holistic-review.php`: SQLite ve ayrı yerel MariaDB 11.4.12 üzerinde **63 kontrol** geçti. Tek AI çağrısı, manuel yolda sıfır çağrı, altı sorunun tam soru/yanıt/geri bildirim/puan eşleşmeleri, başka soru yanıtından kanıt alınmasının reddi, dolu yanıta yok denmesinin reddi, soru/toplam ağırlıkları, ayrı onay/yayın ve eski rapor uyumluluğu doğrulandı. Word içinde her soru/yanıt/geri bildirimin bulunması ve Excel'de aynı satırda kalması da denetlendi; PDF üretimi geçti.

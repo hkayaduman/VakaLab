@@ -1,0 +1,39 @@
+PASS EXPORT 1 all accepted event types have Turkish descriptions
+PASS EXPORT 2 no event filtering or duplication
+PASS EXPORT 3 original codes and UTC preserved: section_open
+PASS EXPORT 4 original codes and UTC preserved: field_focus
+PASS EXPORT 5 original codes and UTC preserved: text_changed
+PASS EXPORT 6 original codes and UTC preserved: profile_changed
+PASS EXPORT 7 original codes and UTC preserved: question_changed
+PASS EXPORT 8 original codes and UTC preserved: copy
+PASS EXPORT 9 original codes and UTC preserved: paste
+PASS EXPORT 10 original codes and UTC preserved: scroll
+PASS EXPORT 11 original codes and UTC preserved: visibility
+PASS EXPORT 12 original codes and UTC preserved: focus
+PASS EXPORT 13 original codes and UTC preserved: heartbeat
+PASS EXPORT 14 original codes and UTC preserved: offline
+PASS EXPORT 15 original codes and UTC preserved: online
+PASS EXPORT 16 original codes and UTC preserved: recovered
+PASS EXPORT 17 original codes and UTC preserved: response_visible
+PASS EXPORT 18 original codes and UTC preserved: page_exit
+PASS EXPORT 19 original codes and UTC preserved: section_leave
+PASS EXPORT 20 original codes and UTC preserved: workflow_confirmed
+PASS EXPORT 21 original codes and UTC preserved: message_send
+PASS EXPORT 22 original codes and UTC preserved: app_presence
+PASS EXPORT 23 heartbeat clearly marked as technical observation
+PASS EXPORT 24 section code translated
+PASS EXPORT 25 coded output still removes synthetic private content
+PASS EXPORT 26 raw output retains synthetic event payload
+PASS EXPORT 27 stored event history unchanged
+PASS EXPORT 28 dictionary documents all event codes
+PASS EXPORT 29 dictionary documents all sections
+PASS EXPORT 30 CSV includes readable Turkish columns
+PASS EXPORT 31 JSON includes readable descriptions
+
+Fatal error: Uncaught PhpOffice\PhpSpreadsheet\Reader\Exception: File "D:\VakaLab\tests/tmp/event_labels_dac3ab3fd6f7dac00b2df1fec571b104.xlsx" does not exist or is not readable. in D:\VakaLab\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php:165
+Stack trace:
+#0 D:\VakaLab\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(183): PhpOffice\PhpSpreadsheet\Shared\File::assertFile('D:\\VakaLab\\test...')
+#1 D:\VakaLab\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\IOFactory.php(145): PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile('D:\\VakaLab\\test...', NULL, Array)
+#2 D:\VakaLab\tests\export-labels.php(26): PhpOffice\PhpSpreadsheet\IOFactory::load('D:\\VakaLab\\test...')
+#3 {main}
+  thrown in D:\VakaLab\vendor\phpoffice\phpspreadsheet\src\PhpSpreadsheet\Shared\File.php on line 165

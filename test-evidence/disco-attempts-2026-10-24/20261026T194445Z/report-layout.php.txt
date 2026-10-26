@@ -1,0 +1,12 @@
+PASS section totals add up to 7 / 24
+PASS zero is a real total
+PASS unscored section prevents misleading partial total
+PASS missing section prevents total
+PASS legacy final-only total preserved
+PASS existing snapshot without stored aggregate gets export total
+PASS DOCX includes prominent aggregate and all section totals
+PASS DOCX clearly labels answers comments and scores
+PASS DOCX includes actual answers and distinct answer/comment shading
+PASS DOCX has summary shading and title styles without forced section breaks
+PASS student copy has no private appendix
+D:\VakaLab\tests/tmp/formatted-student-report.docx

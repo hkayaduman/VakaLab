@@ -76,7 +76,8 @@ try:
     a=res['data'];check(student.call('chat',{'app_id':aid,'key':uuid.uuid4().hex,'text':'ikinci'},port=ports[1])[0]==409,'parallel second message rejected')
     check(student.call('submit',{'app_id':aid,'revision':a['revision'],'draft':d},port=ports[1])[0]==409,'parallel submit rejected')
     status,res=future.result();check(status==200 and res['data']['status']=='completed','delayed AI completes')
-    check(student.call('chat',{'app_id':aid,'key':key,'text':'same'})[1]['data']['id']==res['data']['id'],'HTTP duplicate key idempotent')
+    check(student.call('chat',{'app_id':aid,'key':key,'text':'SENTETİK gecikmeli soru'})[1]['data']['id']==res['data']['id'],'HTTP duplicate key and same message idempotent')
+    check(student.call('chat',{'app_id':aid,'key':key,'text':'Different message'})[0]==409,'HTTP reused key with different message rejected')
     check(connection.execute('select count(*) from messages where app_id=?',(aid,)).fetchone()[0]==2,'only one user and one assistant message')
     # Failure and explicit retry: one immutable student message, separate attempts.
     config_write('error');badkey=uuid.uuid4().hex;status,res=student.call('chat',{'app_id':aid,'key':badkey,'text':'SENTETİK hata sorusu'});req=res['data'];check(req['status']=='failed','mock provider error recorded')

@@ -1,0 +1,5 @@
+PASS observer serial reads, completion refresh, no unchanged renders, stops on completion
+PASS late response cannot reopen a different page
+PASS open editor can defer rendering without losing final update
+PASS temporary read failure recovers without an execute callback
+PASS stable snapshots detect status and decision changes

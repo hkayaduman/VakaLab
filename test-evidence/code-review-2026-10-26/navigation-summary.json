@@ -1,0 +1,57 @@
+{
+  "checks": 39,
+  "tolerance_ms": 150,
+  "expected_total_seconds": 3.0635999999940395,
+  "actual_total_seconds": 3.065,
+  "comparisons": [
+    {
+      "section": "case",
+      "next": "profile",
+      "expected_seconds": 0.2798000000119209,
+      "actual_seconds": 0.286,
+      "error_ms": 6.199999988079075
+    },
+    {
+      "section": "profile",
+      "next": "initial",
+      "expected_seconds": 0.3612999999821186,
+      "actual_seconds": 0.364,
+      "error_ms": 2.7000000178813988
+    },
+    {
+      "section": "initial",
+      "next": "ai",
+      "expected_seconds": 0.3877000000178814,
+      "actual_seconds": 0.379,
+      "error_ms": 8.700000017881404
+    },
+    {
+      "section": "ai",
+      "next": "final",
+      "expected_seconds": 0.4270999999940395,
+      "actual_seconds": 0.43,
+      "error_ms": 2.900000005960468
+    },
+    {
+      "section": "final",
+      "next": "reflection",
+      "expected_seconds": 0.4965,
+      "actual_seconds": 0.494,
+      "error_ms": 2.500000000000002
+    },
+    {
+      "section": "reflection",
+      "next": "confirm",
+      "expected_seconds": 0.5213000000119209,
+      "actual_seconds": 0.524,
+      "error_ms": 2.699999988079127
+    },
+    {
+      "section": "confirm",
+      "next": "case",
+      "expected_seconds": 0.5898999999761582,
+      "actual_seconds": 0.588,
+      "error_ms": 1.8999999761581954
+    }
+  ]
+}

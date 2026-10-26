@@ -1,0 +1,58 @@
+PASS 1 all six answers included in one request
+PASS 2 question section and answer matched: problem
+PASS 3 question section and answer matched: decision
+PASS 4 question section and answer matched: reason
+PASS 5 question section and answer matched: final_decision
+PASS 6 question section and answer matched: final_reason
+PASS 7 question section and answer matched: reflection
+PASS 8 private identifiers and unrelated data excluded
+PASS 9 student cannot generate assessment
+PASS 10 other researcher cannot edit work
+PASS 11 manual report and scoring make zero provider calls
+PASS 12 manual report has holistic student projection
+PASS 13 client-supplied scores ignored and real zero retained
+PASS 14 six question sections with separate criterion scores
+PASS 15 profile comparison computed without provider call
+PASS 16 old step endpoint cannot add calls to holistic report
+PASS 17 old approval endpoint cannot bypass holistic version guard
+PASS 18 publication requires separate approval
+PASS 19 approval does not publish
+PASS 20 open data collection blocks student publication
+PASS 21 student cannot download private draft
+PASS 22 closed case permits explicitly approved publication
+PASS 23 student gets report projection without internal assessment fields
+PASS 24 duplicate concurrent generation blocked before provider call
+PASS 25 AI assessment makes exactly one provider call
+PASS 26 AI updates the single current report with revision number
+PASS 27 AI replacement requires fresh approval and publication
+PASS 28 weighted totals calculated by application
+PASS 29 one assessment record instead of per-question steps
+PASS 30 new contract version stored without schema migration
+PASS 31 stale browser cannot approve replacement report
+PASS 32 invalid model scores rejected
+PASS 33 failed generation preserves last saved report
+PASS 34 failed generation releases work lock
+PASS 35 manual save requires every rubric criterion
+PASS 36 manual levels restricted to selected rubric
+PASS 37 one report includes scores and profile comparison
+PASS 38 own question answer feedback and score stay paired: problem
+PASS 39 own question answer feedback and score stay paired: decision
+PASS 40 own question answer feedback and score stay paired: reason
+PASS 41 own question answer feedback and score stay paired: final_decision
+PASS 42 own question answer feedback and score stay paired: final_reason
+PASS 43 own question answer feedback and score stay paired: reflection
+PASS 44 another question cannot supply scoring evidence
+PASS 45 missing reflection assessment rejected
+PASS 46 manual question feedback is required
+PASS 47 filled answer cannot be described as missing
+PASS 48 previous general report remains exportable
+PASS 49 holistic docx export
+
+Fatal error: Uncaught Mpdf\MpdfException: Temporary files directory "D:\VakaLab\app/../storage/mpdf" is not writable in D:\VakaLab\vendor\mpdf\mpdf\src\Cache.php:21
+Stack trace:
+#0 D:\VakaLab\vendor\mpdf\mpdf\src\ServiceFactory.php(75): Mpdf\Cache->__construct('D:\\VakaLab\\app/...', 3600)
+#1 D:\VakaLab\vendor\mpdf\mpdf\src\Mpdf.php(1076): Mpdf\ServiceFactory->getServices(Object(Mpdf\Mpdf), Object(Psr\Log\NullLogger), Array, Object(Mpdf\Language\LanguageToFont), Object(Mpdf\Language\ScriptToLanguage), NULL, NULL, NULL, NULL)
+#2 D:\VakaLab\app\Export.php(173): Mpdf\Mpdf->__construct(Array)
+#3 D:\VakaLab\tests\holistic-review.php(81): Export::reportFile(Array, 'pdf', 'D:\\VakaLab\\test...')
+#4 {main}
+  thrown in D:\VakaLab\vendor\mpdf\mpdf\src\Cache.php on line 21
