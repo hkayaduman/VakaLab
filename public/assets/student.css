@@ -74,7 +74,7 @@ body[data-ui-role="student"] .tabs button {
     justify-content: center;
     gap: 8px;
     min-width: 0;
-    min-height: 56px;
+    min-height: 76px;
     padding: 10px 8px;
     border: 1px solid var(--line);
     background: #fff;
@@ -87,12 +87,17 @@ body[data-ui-role="student"] .student-work-heading { padding-top: 10px; }
 body[data-ui-role="student"] .student-work-heading > .toolbar { margin-bottom: 8px; }
 body[data-ui-role="student"] .student-tab-number { display: grid; place-items: center; width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; background: #e7eee8; font-size: 12px; font-weight: 750; }
 body[data-ui-role="student"] .tabs .active .student-tab-number { background: #ffffff24; color: #fff; }
-body[data-ui-role="student"] .student-tab-lock { position: absolute; top: 3px; right: 3px; font-size: 9px; line-height: 1; }
+body[data-ui-role="student"] .student-tab-copy { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; }
+body[data-ui-role="student"] .student-tab-state { display: inline-flex; align-items: center; justify-content: center; padding: 3px 6px; border: 1px solid; border-radius: 5px; font-size: 10px; font-weight: 700; line-height: 1.3; white-space: nowrap; }
+body[data-ui-role="student"] .student-tab-state.is-locked { color: #694000; background: #fff1ce; border-color: #d8b45d; }
+body[data-ui-role="student"] .student-tab-state.is-readonly { color: #40566a; background: #edf2f7; border-color: #aabcca; }
+body[data-ui-role="student"] .tabs .active .student-tab-state.is-locked { color: #ffe5a3; background: #3c4b28; border-color: #c5a956; }
+body[data-ui-role="student"] .tabs .active .student-tab-state.is-readonly { color: #edf4fa; background: #36564e; border-color: #a4bcb3; }
 body[data-ui-role="student"] .student-tab-label { line-height: 1.4; }
 body[data-ui-role="student"] .tabs .error-count { font-size: 11px; }
 @media (max-width: 1000px) {
     body[data-ui-role="student"] .tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    body[data-ui-role="student"] .tabs button { flex-direction: column; gap: 4px; min-height: 68px; padding: 8px 5px; }
+    body[data-ui-role="student"] .tabs button { flex-direction: column; gap: 4px; min-height: 90px; padding: 8px 5px; }
     body[data-ui-role="student"] .student-tab-label { font-size: 12px; }
 }
 body[data-ui-role="student"] .tabs button:hover:not(:disabled) { background: #e8eee8; }
