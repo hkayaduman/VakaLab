@@ -1,0 +1,97 @@
+PASS 1 new contract recorded without schema change
+PASS 2 prepared section 1
+PASS 3 prepared section 2
+PASS 4 prepared section 3
+PASS 5 prepared section 5
+PASS 6 prepared section 4
+PASS 7 prepared section 6
+PASS 8 historical missing-answer contradiction cannot be accepted
+PASS 9 rejected contradiction leaves no approval decision
+PASS 10 profile has comparison and feedback without score
+PASS 11 final perceived difficulty reaches profile comparison with exact difference
+PASS 12 structured output remains opt-in for existing compatible providers
+PASS 13 legacy analysis format remains compatible when strict V2 schemas are enabled
+PASS 14 native feedback contract excludes encoded object or array
+PASS 15 native feedback contract excludes encoded object or array
+PASS 16 native feedback contract excludes encoded object or array
+PASS 17 native feedback contract excludes encoded object or array
+PASS 18 native feedback contract permits plain Turkish text
+PASS 19 native feedback contract permits plain Turkish text
+PASS 20 strict profile contract requires feedback instead of response alias
+PASS 21 native scoring evidence is selected only from exact current answer sentences
+PASS 22 strict question contract uses actual rubric IDs and only the current answer source
+PASS 23 real confidence difference; no invented missing profile measurement
+PASS 24 separate question scores for section 3
+PASS 25 isolated answer payload problem
+PASS 26 rubric score and improvement feedback problem
+PASS 27 isolated answer payload decision
+PASS 28 rubric score and improvement feedback decision
+PASS 29 isolated answer payload reason
+PASS 30 rubric score and improvement feedback reason
+PASS 31 separate question scores for section 4
+PASS 32 isolated answer payload final_decision
+PASS 33 rubric score and improvement feedback final_decision
+PASS 34 isolated answer payload final_reason
+PASS 35 rubric score and improvement feedback final_reason
+PASS 36 separate question scores for section 6
+PASS 37 isolated answer payload reflection
+PASS 38 rubric score and improvement feedback reflection
+PASS 39 chat counts and 120-second navigation interval are computed exactly
+PASS 40 chat has only computed statistics without AI scoring/comment
+PASS 41 chat statistics have no human score/feedback decision
+PASS 42 chat statistics cannot be sent to AI for rewriting
+PASS 43 serialized JSON object cannot become student feedback
+PASS 44 serialized JSON array cannot become student feedback
+PASS 45 serialized JSON fragment cannot become student feedback
+PASS 46 code block cannot become student feedback
+PASS 47 technical profile field cannot become student feedback
+PASS 48 accepted AI result can be edited; aggregate is computed from criteria 3
+PASS 49 previous acceptance preserved 3
+PASS 50 inconsistent researcher level and score rejected 3
+PASS 51 blank researcher scoring reason rejected 3
+PASS 52 accepted AI result can be edited; aggregate is computed from criteria 4
+PASS 53 previous acceptance preserved 4
+PASS 54 inconsistent researcher level and score rejected 4
+PASS 55 blank researcher scoring reason rejected 4
+PASS 56 accepted AI result can be edited; aggregate is computed from criteria 6
+PASS 57 previous acceptance preserved 6
+PASS 58 inconsistent researcher level and score rejected 6
+PASS 59 blank researcher scoring reason rejected 6
+PASS 60 only four human reviews required for report
+PASS 61 student report includes separately scored reflection
+PASS 62 accepted profile comment reaches report unchanged
+PASS 63 report keeps each question separate
+PASS 64 reflection score preserved; no invented overall aggregate
+PASS 65 report includes the original reviewed student answer
+PASS 66 old reports recover answer from reviewed sources rather than live draft
+PASS 67 answer projection does not expose private scoring input
+PASS 68 student report excludes internal review and chat commentary
+PASS 69 previous report snapshots untouched
+PASS 70 profile comment can be regenerated independently
+PASS 71 new profile feedback requires a new decision
+PASS 72 other scores unaffected by profile rewrite
+PASS 73 profile rejection is a valid explicit review decision
+PASS 74 edited question scores remain bounded by rubric
+PASS 75 legacy runs preserved
+PASS 76 unpublished review report is unavailable to student
+PASS 77 reflection feedback edit updates the single unapproved report
+PASS 78 report feedback editing preserves scores without adding another report
+PASS 79 one-click student visibility respects open collection
+PASS 80 approved review report cannot be overwritten
+PASS 81 review report cannot be published while collection is open
+PASS 82 student receives only the approved published review projection
+PASS 83 reopening collection hides published review report
+PASS 84 preparing again overwrites the same report
+PASS 85 recalculation withdraws old student report pending review
+PASS 86 new human review automatically replaces the single report and requires showing again
+PASS 87 student sees exactly one current report
+PASS 88 student cannot revoke researcher publication
+PASS 89 hide preserves report approval content and identity
+PASS 90 hidden report disappears from student report list
+PASS 91 hidden report cannot be downloaded by student
+PASS 92 visibility withdrawal is audited
+PASS 93 repeated hide remains safe
+PASS 94 researcher can show the same report again
+PASS 95 invalid provider output is not persisted as a completed review
+PASS 96 failed review records validation diagnosis without provider credentials
+TOTAL V2 96 checks passed; isolated SQLite/mock.

@@ -1,0 +1,41 @@
+PASS LIVE TIMING 1 AI tab stays locked before initial confirmation
+PASS LIVE TIMING 2 case has one correctly bounded visit
+PASS LIVE TIMING 3 case records actual destination profile
+PASS LIVE TIMING 4 case duration agrees with independent monotonic clock within 150ms
+PASS LIVE TIMING 5 case unlocked time is positive
+PASS LIVE TIMING 6 profile has one correctly bounded visit
+PASS LIVE TIMING 7 profile records actual destination initial
+PASS LIVE TIMING 8 profile duration agrees with independent monotonic clock within 150ms
+PASS LIVE TIMING 9 profile unlocked time is positive
+PASS LIVE TIMING 10 initial has one correctly bounded visit
+PASS LIVE TIMING 11 initial records actual destination ai
+PASS LIVE TIMING 12 initial duration agrees with independent monotonic clock within 150ms
+PASS LIVE TIMING 13 initial unlocked time is positive
+PASS LIVE TIMING 14 ai has one correctly bounded visit
+PASS LIVE TIMING 15 ai records actual destination final
+PASS LIVE TIMING 16 ai duration agrees with independent monotonic clock within 150ms
+PASS LIVE TIMING 17 ai unlocked time is positive
+PASS LIVE TIMING 18 final has one correctly bounded visit
+PASS LIVE TIMING 19 final records actual destination reflection
+PASS LIVE TIMING 20 final duration agrees with independent monotonic clock within 150ms
+PASS LIVE TIMING 21 final unlocked time is positive
+PASS LIVE TIMING 22 reflection has one correctly bounded visit
+PASS LIVE TIMING 23 reflection records actual destination confirm
+PASS LIVE TIMING 24 reflection duration agrees with independent monotonic clock within 150ms
+PASS LIVE TIMING 25 reflection unlocked time is positive
+PASS LIVE TIMING 26 confirm has one correctly bounded visit
+PASS LIVE TIMING 27 confirm records actual destination case
+PASS LIVE TIMING 28 confirm duration agrees with independent monotonic clock within 150ms
+PASS LIVE TIMING 29 confirm unlocked time is positive
+PASS LIVE TIMING 30 all seven sections independently timed
+PASS LIVE TIMING 31 seven-section total agrees with elapsed monotonic time without double counting
+PASS LIVE TIMING 32 case UI total matches API including repeated visits
+PASS LIVE TIMING 33 profile UI total matches API including repeated visits
+PASS LIVE TIMING 34 initial UI total matches API including repeated visits
+PASS LIVE TIMING 35 ai UI total matches API including repeated visits
+PASS LIVE TIMING 36 final UI total matches API including repeated visits
+PASS LIVE TIMING 37 reflection UI total matches API including repeated visits
+PASS LIVE TIMING 38 confirm UI total matches API including repeated visits
+PASS LIVE TIMING 39 tab timing journey has no JavaScript errors
+{"checks":39,"tolerance_ms":150,"expected_total_seconds":3.0284000000059605,"actual_total_seconds":3.0290000000000004,"comparisons":[{"section":"case","next":"profile","expected_seconds":0.2779000000059605,"actual_seconds":0.279,"error_ms":1.0999999940395355},{"section":"profile","next":"initial","expected_seconds":0.3343999999910593,"actual_seconds":0.339,"error_ms":4.6000000089407305},{"section":"initial","next":"ai","expected_seconds":0.38829999999701975,"actual_seconds":0.383,"error_ms":5.299999997019745},{"section":"ai","next":"final","expected_seconds":0.4308000000119209,"actual_seconds":0.433,"error_ms":2.199999988079071},{"section":"final","next":"reflection","expected_seconds":0.48619999998807906,"actual_seconds":0.484,"error_ms":2.199999988079071},{"section":"reflection","next":"confirm","expected_seconds":0.5272000000029803,"actual_seconds":0.531,"error_ms":3.799999997019743},{"section":"confirm","next":"case","expected_seconds":0.5836000000089407,"actual_seconds":0.58,"error_ms":3.6000000089407846}]}
+TOTAL LIVE TIMING 39 checks passed; all seven sections, independent monotonic measurements.

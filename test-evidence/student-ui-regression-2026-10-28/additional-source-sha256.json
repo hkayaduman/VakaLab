@@ -1,0 +1,7 @@
+{
+  "public/assets/app.js": "440999cdcc5c5f2e8e070bee8e536a4476bfd6a8764c7f32ee15c201ae9a8a0b",
+  "public/assets/app.css": "6089e868058718c2b793b7c9d4981384f1a82990bf59518484f0465954ee8e90",
+  "public/assets/student.css": "81ef34f5e839a84214b37c905a9475241137153714ee7b84a901aebfebad6365",
+  "public/index.php": "1877cad652528d0bf04e63827a00c5c55d26d04ccee4c6477d3b00dc65ab62be",
+  "tests/export-roundtrip.php": "1b856c2392853d787cfd0135b93950f8594b30c868ec1f903cf1d597c448387f"
+}

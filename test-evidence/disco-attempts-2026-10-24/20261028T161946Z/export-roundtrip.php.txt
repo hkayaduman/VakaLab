@@ -1,0 +1,269 @@
+PASS ROUNDTRIP 1 raw known seven-tab journey totals exactly 70 seconds
+PASS ROUNDTRIP 2 raw outside time remains exactly four separate seconds
+PASS ROUNDTRIP 3 raw initial and submission markers retained
+PASS ROUNDTRIP 4 raw JSON preserves all tables and values
+PASS ROUNDTRIP 5 raw Excel contains every dataset table
+PASS ROUNDTRIP 6 raw/cases CSV has UTF-8 BOM
+PASS ROUNDTRIP 7 raw/cases CSV columns and row count
+PASS ROUNDTRIP 8 raw/cases CSV every cell matches source
+PASS ROUNDTRIP 9 raw/cases Excel column names
+PASS ROUNDTRIP 10 raw/cases Excel every cell matches source
+PASS ROUNDTRIP 11 raw/case_versions CSV has UTF-8 BOM
+PASS ROUNDTRIP 12 raw/case_versions CSV columns and row count
+PASS ROUNDTRIP 13 raw/case_versions CSV every cell matches source
+PASS ROUNDTRIP 14 raw/case_versions Excel column names
+PASS ROUNDTRIP 15 raw/case_versions Excel every cell matches source
+PASS ROUNDTRIP 16 raw/participants CSV has UTF-8 BOM
+PASS ROUNDTRIP 17 raw/participants CSV columns and row count
+PASS ROUNDTRIP 18 raw/participants CSV every cell matches source
+PASS ROUNDTRIP 19 raw/participants Excel column names
+PASS ROUNDTRIP 20 raw/participants Excel every cell matches source
+PASS ROUNDTRIP 21 raw/assignments CSV has UTF-8 BOM
+PASS ROUNDTRIP 22 raw/assignments CSV columns and row count
+PASS ROUNDTRIP 23 raw/assignments CSV every cell matches source
+PASS ROUNDTRIP 24 raw/assignments Excel column names
+PASS ROUNDTRIP 25 raw/assignments Excel every cell matches source
+PASS ROUNDTRIP 26 raw/reports CSV has UTF-8 BOM
+PASS ROUNDTRIP 27 raw/reports CSV columns and row count
+PASS ROUNDTRIP 28 raw/reports CSV every cell matches source
+PASS ROUNDTRIP 29 raw/reports Excel column names
+PASS ROUNDTRIP 30 raw/reports Excel every cell matches source
+PASS ROUNDTRIP 31 raw/research_notes CSV has UTF-8 BOM
+PASS ROUNDTRIP 32 raw/research_notes CSV columns and row count
+PASS ROUNDTRIP 33 raw/research_notes CSV every cell matches source
+PASS ROUNDTRIP 34 raw/research_notes Excel column names
+PASS ROUNDTRIP 35 raw/research_notes Excel every cell matches source
+PASS ROUNDTRIP 36 raw/applications CSV has UTF-8 BOM
+PASS ROUNDTRIP 37 raw/applications CSV columns and row count
+PASS ROUNDTRIP 38 raw/applications CSV every cell matches source
+PASS ROUNDTRIP 39 raw/applications Excel column names
+PASS ROUNDTRIP 40 raw/applications Excel every cell matches source
+PASS ROUNDTRIP 41 raw/events CSV has UTF-8 BOM
+PASS ROUNDTRIP 42 raw/events CSV columns and row count
+PASS ROUNDTRIP 43 raw/events CSV every cell matches source
+PASS ROUNDTRIP 44 raw/events Excel column names
+PASS ROUNDTRIP 45 raw/events Excel every cell matches source
+PASS ROUNDTRIP 46 raw/server_events CSV has UTF-8 BOM
+PASS ROUNDTRIP 47 raw/server_events CSV columns and row count
+PASS ROUNDTRIP 48 raw/server_events CSV every cell matches source
+PASS ROUNDTRIP 49 raw/server_events Excel column names
+PASS ROUNDTRIP 50 raw/server_events Excel every cell matches source
+PASS ROUNDTRIP 51 raw/visits CSV has UTF-8 BOM
+PASS ROUNDTRIP 52 raw/visits CSV columns and row count
+PASS ROUNDTRIP 53 raw/visits CSV every cell matches source
+PASS ROUNDTRIP 54 raw/visits Excel column names
+PASS ROUNDTRIP 55 raw/visits Excel every cell matches source
+PASS ROUNDTRIP 56 raw/navigation_visits CSV has UTF-8 BOM
+PASS ROUNDTRIP 57 raw/navigation_visits CSV columns and row count
+PASS ROUNDTRIP 58 raw/navigation_visits CSV every cell matches source
+PASS ROUNDTRIP 59 raw/navigation_visits Excel column names
+PASS ROUNDTRIP 60 raw/navigation_visits Excel every cell matches source
+PASS ROUNDTRIP 61 raw/navigation_activities CSV has UTF-8 BOM
+PASS ROUNDTRIP 62 raw/navigation_activities CSV columns and row count
+PASS ROUNDTRIP 63 raw/navigation_activities CSV every cell matches source
+PASS ROUNDTRIP 64 raw/navigation_activities Excel column names
+PASS ROUNDTRIP 65 raw/navigation_activities Excel every cell matches source
+PASS ROUNDTRIP 66 raw/navigation_milestones CSV has UTF-8 BOM
+PASS ROUNDTRIP 67 raw/navigation_milestones CSV columns and row count
+PASS ROUNDTRIP 68 raw/navigation_milestones CSV every cell matches source
+PASS ROUNDTRIP 69 raw/navigation_milestones Excel column names
+PASS ROUNDTRIP 70 raw/navigation_milestones Excel every cell matches source
+PASS ROUNDTRIP 71 raw/messages CSV has UTF-8 BOM
+PASS ROUNDTRIP 72 raw/messages CSV columns and row count
+PASS ROUNDTRIP 73 raw/messages CSV every cell matches source
+PASS ROUNDTRIP 74 raw/messages Excel column names
+PASS ROUNDTRIP 75 raw/messages Excel every cell matches source
+PASS ROUNDTRIP 76 raw/labels CSV has UTF-8 BOM
+PASS ROUNDTRIP 77 raw/labels CSV columns and row count
+PASS ROUNDTRIP 78 raw/labels CSV every cell matches source
+PASS ROUNDTRIP 79 raw/labels Excel column names
+PASS ROUNDTRIP 80 raw/labels Excel every cell matches source
+PASS ROUNDTRIP 81 raw/label_reviews CSV has UTF-8 BOM
+PASS ROUNDTRIP 82 raw/label_reviews CSV columns and row count
+PASS ROUNDTRIP 83 raw/label_reviews CSV every cell matches source
+PASS ROUNDTRIP 84 raw/label_reviews Excel column names
+PASS ROUNDTRIP 85 raw/label_reviews Excel every cell matches source
+PASS ROUNDTRIP 86 raw/label_batches CSV has UTF-8 BOM
+PASS ROUNDTRIP 87 raw/label_batches CSV columns and row count
+PASS ROUNDTRIP 88 raw/label_batches CSV every cell matches source
+PASS ROUNDTRIP 89 raw/label_batches Excel column names
+PASS ROUNDTRIP 90 raw/label_batches Excel every cell matches source
+PASS ROUNDTRIP 91 raw/drafts CSV has UTF-8 BOM
+PASS ROUNDTRIP 92 raw/drafts CSV columns and row count
+PASS ROUNDTRIP 93 raw/drafts CSV every cell matches source
+PASS ROUNDTRIP 94 raw/drafts Excel column names
+PASS ROUNDTRIP 95 raw/drafts Excel every cell matches source
+PASS ROUNDTRIP 96 raw/snapshots CSV has UTF-8 BOM
+PASS ROUNDTRIP 97 raw/snapshots CSV columns and row count
+PASS ROUNDTRIP 98 raw/snapshots CSV every cell matches source
+PASS ROUNDTRIP 99 raw/snapshots Excel column names
+PASS ROUNDTRIP 100 raw/snapshots Excel every cell matches source
+PASS ROUNDTRIP 101 raw/ai_requests CSV has UTF-8 BOM
+PASS ROUNDTRIP 102 raw/ai_requests CSV columns and row count
+PASS ROUNDTRIP 103 raw/ai_requests CSV every cell matches source
+PASS ROUNDTRIP 104 raw/ai_requests Excel column names
+PASS ROUNDTRIP 105 raw/ai_requests Excel every cell matches source
+PASS ROUNDTRIP 106 raw/ai_attempts CSV has UTF-8 BOM
+PASS ROUNDTRIP 107 raw/ai_attempts CSV columns and row count
+PASS ROUNDTRIP 108 raw/ai_attempts CSV every cell matches source
+PASS ROUNDTRIP 109 raw/ai_attempts Excel column names
+PASS ROUNDTRIP 110 raw/ai_attempts Excel every cell matches source
+PASS ROUNDTRIP 111 raw/analyses CSV has UTF-8 BOM
+PASS ROUNDTRIP 112 raw/analyses CSV columns and row count
+PASS ROUNDTRIP 113 raw/analyses CSV every cell matches source
+PASS ROUNDTRIP 114 raw/analyses Excel column names
+PASS ROUNDTRIP 115 raw/analyses Excel every cell matches source
+PASS ROUNDTRIP 116 raw/decisions CSV has UTF-8 BOM
+PASS ROUNDTRIP 117 raw/decisions CSV columns and row count
+PASS ROUNDTRIP 118 raw/decisions CSV every cell matches source
+PASS ROUNDTRIP 119 raw/decisions Excel column names
+PASS ROUNDTRIP 120 raw/decisions Excel every cell matches source
+PASS ROUNDTRIP 121 raw/definitions CSV has UTF-8 BOM
+PASS ROUNDTRIP 122 raw/definitions CSV columns and row count
+PASS ROUNDTRIP 123 raw/definitions CSV every cell matches source
+PASS ROUNDTRIP 124 raw/definitions Excel column names
+PASS ROUNDTRIP 125 raw/definitions Excel every cell matches source
+PASS ROUNDTRIP 126 raw/dictionary CSV has UTF-8 BOM
+PASS ROUNDTRIP 127 raw/dictionary CSV columns and row count
+PASS ROUNDTRIP 128 raw/dictionary CSV every cell matches source
+PASS ROUNDTRIP 129 raw/dictionary Excel column names
+PASS ROUNDTRIP 130 raw/dictionary Excel every cell matches source
+PASS ROUNDTRIP 131 raw export preserves exact submitted answers and zero measurements
+PASS ROUNDTRIP 132 submission snapshot retains real zero values
+PASS ROUNDTRIP 133 coded known seven-tab journey totals exactly 70 seconds
+PASS ROUNDTRIP 134 coded outside time remains exactly four separate seconds
+PASS ROUNDTRIP 135 coded initial and submission markers retained
+PASS ROUNDTRIP 136 coded JSON preserves all tables and values
+PASS ROUNDTRIP 137 coded Excel contains every dataset table
+PASS ROUNDTRIP 138 coded/cases CSV has UTF-8 BOM
+PASS ROUNDTRIP 139 coded/cases CSV columns and row count
+PASS ROUNDTRIP 140 coded/cases CSV every cell matches source
+PASS ROUNDTRIP 141 coded/cases empty Excel sheet remains empty
+PASS ROUNDTRIP 142 coded/case_versions CSV has UTF-8 BOM
+PASS ROUNDTRIP 143 coded/case_versions CSV columns and row count
+PASS ROUNDTRIP 144 coded/case_versions CSV every cell matches source
+PASS ROUNDTRIP 145 coded/case_versions empty Excel sheet remains empty
+PASS ROUNDTRIP 146 coded/participants CSV has UTF-8 BOM
+PASS ROUNDTRIP 147 coded/participants CSV columns and row count
+PASS ROUNDTRIP 148 coded/participants CSV every cell matches source
+PASS ROUNDTRIP 149 coded/participants empty Excel sheet remains empty
+PASS ROUNDTRIP 150 coded/assignments CSV has UTF-8 BOM
+PASS ROUNDTRIP 151 coded/assignments CSV columns and row count
+PASS ROUNDTRIP 152 coded/assignments CSV every cell matches source
+PASS ROUNDTRIP 153 coded/assignments empty Excel sheet remains empty
+PASS ROUNDTRIP 154 coded/reports CSV has UTF-8 BOM
+PASS ROUNDTRIP 155 coded/reports CSV columns and row count
+PASS ROUNDTRIP 156 coded/reports CSV every cell matches source
+PASS ROUNDTRIP 157 coded/reports empty Excel sheet remains empty
+PASS ROUNDTRIP 158 coded/research_notes CSV has UTF-8 BOM
+PASS ROUNDTRIP 159 coded/research_notes CSV columns and row count
+PASS ROUNDTRIP 160 coded/research_notes CSV every cell matches source
+PASS ROUNDTRIP 161 coded/research_notes empty Excel sheet remains empty
+PASS ROUNDTRIP 162 coded/applications CSV has UTF-8 BOM
+PASS ROUNDTRIP 163 coded/applications CSV columns and row count
+PASS ROUNDTRIP 164 coded/applications CSV every cell matches source
+PASS ROUNDTRIP 165 coded/applications Excel column names
+PASS ROUNDTRIP 166 coded/applications Excel every cell matches source
+PASS ROUNDTRIP 167 coded/events CSV has UTF-8 BOM
+PASS ROUNDTRIP 168 coded/events CSV columns and row count
+PASS ROUNDTRIP 169 coded/events CSV every cell matches source
+PASS ROUNDTRIP 170 coded/events Excel column names
+PASS ROUNDTRIP 171 coded/events Excel every cell matches source
+PASS ROUNDTRIP 172 coded/server_events CSV has UTF-8 BOM
+PASS ROUNDTRIP 173 coded/server_events CSV columns and row count
+PASS ROUNDTRIP 174 coded/server_events CSV every cell matches source
+PASS ROUNDTRIP 175 coded/server_events Excel column names
+PASS ROUNDTRIP 176 coded/server_events Excel every cell matches source
+PASS ROUNDTRIP 177 coded/visits CSV has UTF-8 BOM
+PASS ROUNDTRIP 178 coded/visits CSV columns and row count
+PASS ROUNDTRIP 179 coded/visits CSV every cell matches source
+PASS ROUNDTRIP 180 coded/visits Excel column names
+PASS ROUNDTRIP 181 coded/visits Excel every cell matches source
+PASS ROUNDTRIP 182 coded/navigation_visits CSV has UTF-8 BOM
+PASS ROUNDTRIP 183 coded/navigation_visits CSV columns and row count
+PASS ROUNDTRIP 184 coded/navigation_visits CSV every cell matches source
+PASS ROUNDTRIP 185 coded/navigation_visits Excel column names
+PASS ROUNDTRIP 186 coded/navigation_visits Excel every cell matches source
+PASS ROUNDTRIP 187 coded/navigation_activities CSV has UTF-8 BOM
+PASS ROUNDTRIP 188 coded/navigation_activities CSV columns and row count
+PASS ROUNDTRIP 189 coded/navigation_activities CSV every cell matches source
+PASS ROUNDTRIP 190 coded/navigation_activities Excel column names
+PASS ROUNDTRIP 191 coded/navigation_activities Excel every cell matches source
+PASS ROUNDTRIP 192 coded/navigation_milestones CSV has UTF-8 BOM
+PASS ROUNDTRIP 193 coded/navigation_milestones CSV columns and row count
+PASS ROUNDTRIP 194 coded/navigation_milestones CSV every cell matches source
+PASS ROUNDTRIP 195 coded/navigation_milestones Excel column names
+PASS ROUNDTRIP 196 coded/navigation_milestones Excel every cell matches source
+PASS ROUNDTRIP 197 coded/messages CSV has UTF-8 BOM
+PASS ROUNDTRIP 198 coded/messages CSV columns and row count
+PASS ROUNDTRIP 199 coded/messages CSV every cell matches source
+PASS ROUNDTRIP 200 coded/messages Excel column names
+PASS ROUNDTRIP 201 coded/messages Excel every cell matches source
+PASS ROUNDTRIP 202 coded/labels CSV has UTF-8 BOM
+PASS ROUNDTRIP 203 coded/labels CSV columns and row count
+PASS ROUNDTRIP 204 coded/labels CSV every cell matches source
+PASS ROUNDTRIP 205 coded/labels Excel column names
+PASS ROUNDTRIP 206 coded/labels Excel every cell matches source
+PASS ROUNDTRIP 207 coded/label_reviews CSV has UTF-8 BOM
+PASS ROUNDTRIP 208 coded/label_reviews CSV columns and row count
+PASS ROUNDTRIP 209 coded/label_reviews CSV every cell matches source
+PASS ROUNDTRIP 210 coded/label_reviews Excel column names
+PASS ROUNDTRIP 211 coded/label_reviews Excel every cell matches source
+PASS ROUNDTRIP 212 coded/label_batches CSV has UTF-8 BOM
+PASS ROUNDTRIP 213 coded/label_batches CSV columns and row count
+PASS ROUNDTRIP 214 coded/label_batches CSV every cell matches source
+PASS ROUNDTRIP 215 coded/label_batches Excel column names
+PASS ROUNDTRIP 216 coded/label_batches Excel every cell matches source
+PASS ROUNDTRIP 217 coded/drafts CSV has UTF-8 BOM
+PASS ROUNDTRIP 218 coded/drafts CSV columns and row count
+PASS ROUNDTRIP 219 coded/drafts CSV every cell matches source
+PASS ROUNDTRIP 220 coded/drafts Excel column names
+PASS ROUNDTRIP 221 coded/drafts Excel every cell matches source
+PASS ROUNDTRIP 222 coded/snapshots CSV has UTF-8 BOM
+PASS ROUNDTRIP 223 coded/snapshots CSV columns and row count
+PASS ROUNDTRIP 224 coded/snapshots CSV every cell matches source
+PASS ROUNDTRIP 225 coded/snapshots Excel column names
+PASS ROUNDTRIP 226 coded/snapshots Excel every cell matches source
+PASS ROUNDTRIP 227 coded/ai_requests CSV has UTF-8 BOM
+PASS ROUNDTRIP 228 coded/ai_requests CSV columns and row count
+PASS ROUNDTRIP 229 coded/ai_requests CSV every cell matches source
+PASS ROUNDTRIP 230 coded/ai_requests Excel column names
+PASS ROUNDTRIP 231 coded/ai_requests Excel every cell matches source
+PASS ROUNDTRIP 232 coded/ai_attempts CSV has UTF-8 BOM
+PASS ROUNDTRIP 233 coded/ai_attempts CSV columns and row count
+PASS ROUNDTRIP 234 coded/ai_attempts CSV every cell matches source
+PASS ROUNDTRIP 235 coded/ai_attempts Excel column names
+PASS ROUNDTRIP 236 coded/ai_attempts Excel every cell matches source
+PASS ROUNDTRIP 237 coded/analyses CSV has UTF-8 BOM
+PASS ROUNDTRIP 238 coded/analyses CSV columns and row count
+PASS ROUNDTRIP 239 coded/analyses CSV every cell matches source
+PASS ROUNDTRIP 240 coded/analyses Excel column names
+PASS ROUNDTRIP 241 coded/analyses Excel every cell matches source
+PASS ROUNDTRIP 242 coded/decisions CSV has UTF-8 BOM
+PASS ROUNDTRIP 243 coded/decisions CSV columns and row count
+PASS ROUNDTRIP 244 coded/decisions CSV every cell matches source
+PASS ROUNDTRIP 245 coded/decisions Excel column names
+PASS ROUNDTRIP 246 coded/decisions Excel every cell matches source
+PASS ROUNDTRIP 247 coded/definitions CSV has UTF-8 BOM
+PASS ROUNDTRIP 248 coded/definitions CSV columns and row count
+PASS ROUNDTRIP 249 coded/definitions CSV every cell matches source
+PASS ROUNDTRIP 250 coded/definitions empty Excel sheet remains empty
+PASS ROUNDTRIP 251 coded/dictionary CSV has UTF-8 BOM
+PASS ROUNDTRIP 252 coded/dictionary CSV columns and row count
+PASS ROUNDTRIP 253 coded/dictionary CSV every cell matches source
+PASS ROUNDTRIP 254 coded/dictionary Excel column names
+PASS ROUNDTRIP 255 coded/dictionary Excel every cell matches source
+PASS ROUNDTRIP 256 coded exports exclude private note identity and answer text
+PASS ROUNDTRIP 257 CSV spreadsheet formula escaped: =1+1
+PASS ROUNDTRIP 258 CSV spreadsheet formula escaped: +SUM(A1)
+PASS ROUNDTRIP 259 CSV spreadsheet formula escaped: @SUM(A1)
+PASS ROUNDTRIP 260 CSV spreadsheet formula escaped: -1+1
+PASS ROUNDTRIP 261 export preserves source table applications
+PASS ROUNDTRIP 262 export preserves source table snapshots
+PASS ROUNDTRIP 263 export preserves source table messages
+PASS ROUNDTRIP 264 export preserves source table events
+PASS ROUNDTRIP 265 export preserves source table reports
+PASS ROUNDTRIP 266 export preserves source table draft_revisions
+PASS ROUNDTRIP 267 export preserves source table research_notes
+{"checks":267,"compared_excel_data_cells":4857,"tables":{"raw":{"cases":{"rows":6,"columns":11},"case_versions":{"rows":6,"columns":7},"participants":{"rows":7,"columns":6},"assignments":{"rows":41,"columns":5},"reports":{"rows":2,"columns":9},"research_notes":{"rows":1,"columns":6},"applications":{"rows":6,"columns":18},"events":{"rows":20,"columns":16},"server_events":{"rows":10,"columns":5},"visits":{"rows":18,"columns":10},"navigation_visits":{"rows":12,"columns":39},"navigation_activities":{"rows":15,"columns":45},"navigation_milestones":{"rows":2,"columns":7},"messages":{"rows":6,"columns":8},"labels":{"rows":4,"columns":8},"label_reviews":{"rows":1,"columns":5},"label_batches":{"rows":1,"columns":4},"drafts":{"rows":9,"columns":6},"snapshots":{"rows":7,"columns":6},"ai_requests":{"rows":3,"columns":11},"ai_attempts":{"rows":3,"columns":6},"analyses":{"rows":9,"columns":13},"decisions":{"rows":5,"columns":7},"definitions":{"rows":4,"columns":10},"dictionary":{"rows":37,"columns":2}},"coded":{"cases":{"rows":0,"columns":0},"case_versions":{"rows":0,"columns":0},"participants":{"rows":0,"columns":0},"assignments":{"rows":0,"columns":0},"reports":{"rows":0,"columns":0},"research_notes":{"rows":0,"columns":0},"applications":{"rows":6,"columns":7},"events":{"rows":20,"columns":14},"server_events":{"rows":10,"columns":5},"visits":{"rows":18,"columns":10},"navigation_visits":{"rows":12,"columns":39},"navigation_activities":{"rows":15,"columns":45},"navigation_milestones":{"rows":2,"columns":7},"messages":{"rows":6,"columns":8},"labels":{"rows":4,"columns":7},"label_reviews":{"rows":1,"columns":4},"label_batches":{"rows":1,"columns":4},"drafts":{"rows":9,"columns":6},"snapshots":{"rows":7,"columns":6},"ai_requests":{"rows":3,"columns":11},"ai_attempts":{"rows":3,"columns":6},"analyses":{"rows":9,"columns":13},"decisions":{"rows":5,"columns":6},"definitions":{"rows":0,"columns":0},"dictionary":{"rows":37,"columns":2}}},"working_database_opened":false,"provider":"mock","outputs":"D:\\VakaLab\\tests\/tmp\/export-roundtrip-b6875791c400654a6750977147c8d828"}
+TOTAL EXPORT ROUNDTRIP 267 checks passed.

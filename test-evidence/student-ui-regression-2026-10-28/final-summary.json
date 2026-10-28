@@ -1,0 +1,10 @@
+{
+  "full_run": "test-evidence\\disco-attempts-2026-10-24\\20261028T155714Z",
+  "total_steps": 135,
+  "functional_suites": 46,
+  "all_passed": true,
+  "source_files_matching": 88,
+  "extra_export_checks": 267,
+  "compared_excel_data_cells": 4857,
+  "working_database_sha256": "3c92abb6953864f8dc9b855d46f408f44ea512b228740ad530df253c78abed74"
+}

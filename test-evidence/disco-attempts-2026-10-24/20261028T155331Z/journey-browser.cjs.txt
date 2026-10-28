@@ -1,0 +1,29 @@
+PASS PRESENCE BROWSER 1 cancelling keeps mixed journey open
+PASS PRESENCE BROWSER 2 no telemetry after successful submission despite later tab and section changes
+PASS PRESENCE BROWSER 3 two home/reopen cycles produce exactly two case-away intervals
+PASS PRESENCE BROWSER 4 only real other-tab departure produces app-outside interval
+PASS PRESENCE BROWSER 5 old unclosed history remains unknown
+PASS PRESENCE BROWSER 6 both case-away intervals retain actual elapsed durations
+PASS PRESENCE BROWSER 7 work in case B lies inside case A absence, without being relabeled app-outside
+PASS PRESENCE BROWSER 8 closed case A intervals have no holes and no overlaps
+PASS PRESENCE BROWSER 9 section plus app-outside plus case-away seconds exactly equal observed journey duration
+PASS PRESENCE BROWSER 10 every individual visit duration agrees with raw timestamps
+PASS PRESENCE BROWSER 11 no absence is charged to a section
+PASS PRESENCE BROWSER 12 one real AI question and answer survive multiple case returns exactly once
+PASS PRESENCE BROWSER 13 response during other-tab absence keeps outside context
+PASS PRESENCE BROWSER 14 cross-section AI preparation excludes app-outside time
+PASS PRESENCE BROWSER 15 AI viewing never runs while application is outside
+PASS PRESENCE BROWSER 16 mixed journey has one final success marker and no duplicate submit
+PASS PRESENCE BROWSER 17 actual CSV download parses successfully
+PASS PRESENCE BROWSER 18 CSV contains only selected case A process
+PASS PRESENCE BROWSER 19 CSV preserves two case gaps and one app absence
+PASS PRESENCE BROWSER 20 every CSV numeric duration agrees with raw start/end timestamps
+PASS PRESENCE BROWSER 21 CSV event identities are unique
+PASS PRESENCE BROWSER 22 CSV sequence and previous/next references are internally consistent
+PASS PRESENCE BROWSER 23 APP_OUTSIDE totals match researcher API exactly
+PASS PRESENCE BROWSER 24 CASE_AWAY totals match researcher API exactly
+PASS PRESENCE BROWSER 25 Vaka sekmesi etkin değil rounded UI total agrees with unrounded API
+PASS PRESENCE BROWSER 26 Vaka dışında rounded UI total agrees with unrounded API
+PASS PRESENCE BROWSER 27 mixed journey has no browser JavaScript errors
+{"checks":27,"caseA":{"id":"8b8a7d46a382e2aaee8844f947e5d166","spanSeconds":14.833,"sectionSeconds":5.527,"outsideSeconds":6.412,"caseAwaySeconds":2.894,"csvRows":20,"questions":1,"answers":1}}
+TOTAL MIXED JOURNEY 27 checks passed; independent timing/CSV/UI comparisons, isolated data.

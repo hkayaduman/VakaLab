@@ -1,0 +1,13 @@
+PASS CHAT RECOVERY 1 lost reply preserves message draft
+PASS CHAT RECOVERY 2 changed message after lost reply really reaches server once
+PASS CHAT RECOVERY 3 original completed message is retained once
+PASS CHAT RECOVERY 4 changed message uses a new request identity
+PASS CHAT RECOVERY 5 same message after lost reply remains idempotent
+PASS CHAT RECOVERY 6 completed send removes pending key and text
+PASS CHAT RECOVERY 7 editing after pre-delivery failure sends only the actual new text
+PASS CHAT RECOVERY 8 late retry cannot change another case messages or busy state
+PASS CHAT RECOVERY 9 retry preserves exactly one original user message
+PASS CHAT RECOVERY 10 retry completed and persisted on its own case
+PASS CHAT RECOVERY 11 current-case retry records response arrival for navigation timing
+PASS CHAT RECOVERY 12 recovery and case changes produce no JavaScript errors
+TOTAL CHAT RECOVERY 12 checks passed; isolated SQLite, mock, and controlled lost replies.

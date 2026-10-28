@@ -1,0 +1,947 @@
+{
+  "suites": [
+    {
+      "suite": "ai-chat-contract.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 9
+    },
+    {
+      "suite": "analysis-provenance.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 17
+    },
+    {
+      "suite": "analysis-recalculate.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 21
+    },
+    {
+      "suite": "disco-attempts.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.2,
+      "pass_lines": 35
+    },
+    {
+      "suite": "export-labels.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.84,
+      "pass_lines": 39
+    },
+    {
+      "suite": "holistic-contract.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 10
+    },
+    {
+      "suite": "holistic-review.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.58,
+      "pass_lines": 63
+    },
+    {
+      "suite": "label-contract.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 6.7,
+      "pass_lines": 22
+    },
+    {
+      "suite": "legacy-submission.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.2,
+      "pass_lines": 21
+    },
+    {
+      "suite": "navigation.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.23,
+      "pass_lines": 82
+    },
+    {
+      "suite": "new-attempt.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 39
+    },
+    {
+      "suite": "presence.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.22,
+      "pass_lines": 60
+    },
+    {
+      "suite": "process-data.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.25,
+      "pass_lines": 28
+    },
+    {
+      "suite": "report-layout.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.17,
+      "pass_lines": 11
+    },
+    {
+      "suite": "review-regressions.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.24,
+      "pass_lines": 28
+    },
+    {
+      "suite": "review-v2.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.25,
+      "pass_lines": 96
+    },
+    {
+      "suite": "rubric.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 21
+    },
+    {
+      "suite": "run.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 1.16,
+      "pass_lines": 87
+    },
+    {
+      "suite": "scoring-presence.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 26
+    },
+    {
+      "suite": "student-labels.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.19,
+      "pass_lines": 33
+    },
+    {
+      "suite": "student-report.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 15
+    },
+    {
+      "suite": "analysis-observer.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.36,
+      "pass_lines": 5
+    },
+    {
+      "suite": "analysis-progress.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.17,
+      "pass_lines": 3
+    },
+    {
+      "suite": "api-runtime.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 5.36,
+      "pass_lines": 0
+    },
+    {
+      "suite": "browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 13.47,
+      "pass_lines": 115
+    },
+    {
+      "suite": "chat-draft-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 21.36,
+      "pass_lines": 11
+    },
+    {
+      "suite": "chat-recovery-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 4.53,
+      "pass_lines": 12
+    },
+    {
+      "suite": "confirmation-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 7.7,
+      "pass_lines": 16
+    },
+    {
+      "suite": "holistic-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 9.28,
+      "pass_lines": 36
+    },
+    {
+      "suite": "journey-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 19.24,
+      "pass_lines": 27
+    },
+    {
+      "suite": "label-groups-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 3.88,
+      "pass_lines": 11
+    },
+    {
+      "suite": "labels.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 1
+    },
+    {
+      "suite": "navigation-timing-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 7.48,
+      "pass_lines": 39
+    },
+    {
+      "suite": "new-attempt-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 3.58,
+      "pass_lines": 15
+    },
+    {
+      "suite": "presence-browser.cjs",
+      "exit_code": 1,
+      "passed": false,
+      "seconds": 22.75,
+      "pass_lines": 16
+    },
+    {
+      "suite": "process-data.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "report-layout-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 1.41,
+      "pass_lines": 9
+    },
+    {
+      "suite": "researcher-ui.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 8.75,
+      "pass_lines": 50
+    },
+    {
+      "suite": "review-v2.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 2
+    },
+    {
+      "suite": "table-layout.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 1.97,
+      "pass_lines": 6
+    },
+    {
+      "suite": "time.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 1
+    },
+    {
+      "suite": "validation.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 17.22,
+      "pass_lines": 50
+    },
+    {
+      "suite": "http_checks.py",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 15.67,
+      "pass_lines": 43
+    },
+    {
+      "suite": "access_publication_checks.py",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 4.42,
+      "pass_lines": 119
+    },
+    {
+      "suite": "mysql_checks.py",
+      "exit_code": 1,
+      "passed": false,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Admin.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Ai.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Analysis.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-ApiRuntime.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-App.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Auth.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-bootstrap.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Db.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-EventLabels.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Export.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-HolisticReview.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-MessageLabels.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Migration.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.12,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Navigation.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Review.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Rules.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Scope.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-StudentReport.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-app-Telemetry.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-public-api.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-public-index.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-bin-console.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-bin-upgrade-sqlite.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-ai-chat-contract.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-analysis-provenance.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-analysis-recalculate.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-db-idle-timeout.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-disco-attempts.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-export-labels.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-export-roundtrip.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-holistic-contract.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-holistic-review.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-label-catalog-live.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-label-contract.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-legacy-submission.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-live-workflow.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-navigation.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.12,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-new-attempt.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-openrouter-prompts.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-presence.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-process-data.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-report-layout.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-review-regressions.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-review-v2.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-rubric.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-run.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-scoring-live.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-scoring-presence.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-Seed.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-student-label-overrides-live.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-student-labels-live.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-student-labels.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-student-report.php",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-assets-analysis.js",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-assets-app.js",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-assets-holistic.js",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-assets-labels.js",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-assets-process.js",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-assets-researcher.js",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-assets-review.js",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-assets-time.js",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-assets-validation.js",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-analysis-observer.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-analysis-progress.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-api-runtime.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-chat-draft-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.06,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-chat-recovery-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.06,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-confirmation-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-holistic-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-journey-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-label-groups-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-labels.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.12,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-navigation-timing-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.12,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-new-attempt-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-presence-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-process-data.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-report-layout-browser.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.12,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-researcher-ui.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-review-editor.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-review-v2.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-table-layout.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.09,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-time.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-validation.cjs",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.08,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-access_publication_checks.py",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.12,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-http_checks.py",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-mysql_checks.py",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "lint-tests-run-regression.py",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.11,
+      "pass_lines": 0
+    },
+    {
+      "suite": "git-diff-check",
+      "exit_code": 0,
+      "passed": true,
+      "seconds": 0.06,
+      "pass_lines": 0
+    }
+  ],
+  "live_provider": "not run by local runner",
+  "helper_files": [
+    "Seed.php",
+    "review-editor.cjs"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "file": "storage/vakalab_test.sqlite",
+  "initial_sha256": "09e7e0f057f27e81c5992960a10f45443d2012c0328073aea6cd6d69048591d5",
+  "mid_run_sha256": "1d54f529e4f73ae58e885e6aa3ddc3a16e7993c9fd6075ec700c773d775caf84",
+  "final_sha256": "1d54f529e4f73ae58e885e6aa3ddc3a16e7993c9fd6075ec700c773d775caf84",
+  "note": "The working file changed during the interval; hashes do not establish its cause. Tests use separate fixtures. No unchanged working-file assertion is made."
+}

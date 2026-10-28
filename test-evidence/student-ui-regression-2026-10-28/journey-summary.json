@@ -1,0 +1,13 @@
+{
+  "checks": 27,
+  "caseA": {
+    "id": "be1415b9fc277bd4e5e7acbb1e2d8e24",
+    "spanSeconds": 15.016,
+    "sectionSeconds": 5.590000000000001,
+    "outsideSeconds": 6.439,
+    "caseAwaySeconds": 2.987,
+    "csvRows": 20,
+    "questions": 1,
+    "answers": 1
+  }
+}

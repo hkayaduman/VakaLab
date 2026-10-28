@@ -1,0 +1,213 @@
+{
+  "checks": 267,
+  "compared_excel_data_cells": 4857,
+  "tables": {
+    "raw": {
+      "cases": {
+        "rows": 6,
+        "columns": 11
+      },
+      "case_versions": {
+        "rows": 6,
+        "columns": 7
+      },
+      "participants": {
+        "rows": 7,
+        "columns": 6
+      },
+      "assignments": {
+        "rows": 41,
+        "columns": 5
+      },
+      "reports": {
+        "rows": 2,
+        "columns": 9
+      },
+      "research_notes": {
+        "rows": 1,
+        "columns": 6
+      },
+      "applications": {
+        "rows": 6,
+        "columns": 18
+      },
+      "events": {
+        "rows": 20,
+        "columns": 16
+      },
+      "server_events": {
+        "rows": 10,
+        "columns": 5
+      },
+      "visits": {
+        "rows": 18,
+        "columns": 10
+      },
+      "navigation_visits": {
+        "rows": 12,
+        "columns": 39
+      },
+      "navigation_activities": {
+        "rows": 15,
+        "columns": 45
+      },
+      "navigation_milestones": {
+        "rows": 2,
+        "columns": 7
+      },
+      "messages": {
+        "rows": 6,
+        "columns": 8
+      },
+      "labels": {
+        "rows": 4,
+        "columns": 8
+      },
+      "label_reviews": {
+        "rows": 1,
+        "columns": 5
+      },
+      "label_batches": {
+        "rows": 1,
+        "columns": 4
+      },
+      "drafts": {
+        "rows": 9,
+        "columns": 6
+      },
+      "snapshots": {
+        "rows": 7,
+        "columns": 6
+      },
+      "ai_requests": {
+        "rows": 3,
+        "columns": 11
+      },
+      "ai_attempts": {
+        "rows": 3,
+        "columns": 6
+      },
+      "analyses": {
+        "rows": 9,
+        "columns": 13
+      },
+      "decisions": {
+        "rows": 5,
+        "columns": 7
+      },
+      "definitions": {
+        "rows": 4,
+        "columns": 10
+      },
+      "dictionary": {
+        "rows": 37,
+        "columns": 2
+      }
+    },
+    "coded": {
+      "cases": {
+        "rows": 0,
+        "columns": 0
+      },
+      "case_versions": {
+        "rows": 0,
+        "columns": 0
+      },
+      "participants": {
+        "rows": 0,
+        "columns": 0
+      },
+      "assignments": {
+        "rows": 0,
+        "columns": 0
+      },
+      "reports": {
+        "rows": 0,
+        "columns": 0
+      },
+      "research_notes": {
+        "rows": 0,
+        "columns": 0
+      },
+      "applications": {
+        "rows": 6,
+        "columns": 7
+      },
+      "events": {
+        "rows": 20,
+        "columns": 14
+      },
+      "server_events": {
+        "rows": 10,
+        "columns": 5
+      },
+      "visits": {
+        "rows": 18,
+        "columns": 10
+      },
+      "navigation_visits": {
+        "rows": 12,
+        "columns": 39
+      },
+      "navigation_activities": {
+        "rows": 15,
+        "columns": 45
+      },
+      "navigation_milestones": {
+        "rows": 2,
+        "columns": 7
+      },
+      "messages": {
+        "rows": 6,
+        "columns": 8
+      },
+      "labels": {
+        "rows": 4,
+        "columns": 7
+      },
+      "label_reviews": {
+        "rows": 1,
+        "columns": 4
+      },
+      "label_batches": {
+        "rows": 1,
+        "columns": 4
+      },
+      "drafts": {
+        "rows": 9,
+        "columns": 6
+      },
+      "snapshots": {
+        "rows": 7,
+        "columns": 6
+      },
+      "ai_requests": {
+        "rows": 3,
+        "columns": 11
+      },
+      "ai_attempts": {
+        "rows": 3,
+        "columns": 6
+      },
+      "analyses": {
+        "rows": 9,
+        "columns": 13
+      },
+      "decisions": {
+        "rows": 5,
+        "columns": 6
+      },
+      "definitions": {
+        "rows": 0,
+        "columns": 0
+      },
+      "dictionary": {
+        "rows": 37,
+        "columns": 2
+      }
+    }
+  },
+  "working_database_opened": false,
+  "provider": "mock",
+  "outputs": "D:\\VakaLab\\tests/tmp/export-roundtrip-d2b2e311eaadcca29ab058749ef8bc8b"
+}

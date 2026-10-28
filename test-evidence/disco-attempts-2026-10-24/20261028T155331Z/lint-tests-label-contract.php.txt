@@ -1,0 +1,1 @@
+No syntax errors detected in D:\VakaLab\tests\label-contract.php

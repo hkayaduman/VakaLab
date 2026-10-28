@@ -1,0 +1,40 @@
+PASS 1 migration preserves applications
+PASS 2 migration preserves snapshots
+PASS 3 migration preserves messages
+PASS 4 migration preserves events
+PASS 5 migration preserves analysis_runs
+PASS 6 migration preserves reports
+PASS 7 migration idempotent
+PASS 8 other researcher cannot restart unowned work
+PASS 9 student cannot open attempt
+PASS 10 reason required
+PASS 11 inactive assignment denied
+PASS 12 new attempt starts at beginning
+PASS 13 new attempt completely blank
+PASS 14 same case version pinned
+PASS 15 no copied messages
+PASS 16 no copied snapshots
+PASS 17 no copied events
+PASS 18 no copied analysis_runs
+PASS 19 no copied reports
+PASS 20 first application unchanged
+PASS 21 old messages unchanged
+PASS 22 old snapshots unchanged
+PASS 23 old events unchanged
+PASS 24 old analysis_runs unchanged
+PASS 25 old reports unchanged
+PASS 26 student starts latest attempt
+PASS 27 closed collection grants personal access
+PASS 28 duplicate request returns same successor
+PASS 29 unfinished attempt cannot restart
+PASS 30 old submission stays locked
+PASS 31 student sees both attempts
+PASS 32 audit links attempts with reason
+PASS 33 student edits new attempt independently
+PASS 34 dashboard selects latest first
+PASS 35 second attempt can complete full workflow
+PASS 36 subsequent attempts numbered independently
+PASS 37 stale restart cannot create fourth attempt
+PASS 38 all historical attempts remain accessible
+PASS 39 foreign key integrity preserved
+OK 39 checks

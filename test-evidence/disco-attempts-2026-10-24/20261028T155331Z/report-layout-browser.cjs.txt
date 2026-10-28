@@ -1,0 +1,9 @@
+PASS overall score clearly labelled
+PASS each question includes student answer
+PASS each question includes labelled evaluation comment
+PASS question score clearly labelled
+PASS section total clearly labelled
+PASS report fits 1440px
+PASS report fits 390px
+PASS unscored section does not produce partial aggregate
+PASS student answers are escaped

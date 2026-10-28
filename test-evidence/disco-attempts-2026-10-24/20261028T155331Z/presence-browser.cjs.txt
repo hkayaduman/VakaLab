@@ -1,0 +1,19 @@
+PASS PRESENCE BROWSER 1 browser screenshot while focused does not itself fabricate an outside interval
+PASS PRESENCE BROWSER 2 real tab switch creates one outside interval
+PASS PRESENCE BROWSER 3 time in another tab is measured as outside
+PASS PRESENCE BROWSER 4 locked AI visit resumes separately after return
+PASS PRESENCE BROWSER 5 readable departure and return events persisted by server
+PASS PRESENCE BROWSER 6 locked access event is explicit in researcher log
+PASS PRESENCE BROWSER 7 section durations exclude entire outside interval
+PASS PRESENCE BROWSER 8 actual download includes outside activity
+PASS PRESENCE BROWSER 9 outside total and activity visible in researcher screen
+PASS PRESENCE BROWSER 10 real delayed response completes during one outside interval
+PASS PRESENCE BROWSER 11 live asynchronous flow preserves one question and one response
+PASS PRESENCE BROWSER 12 actual response timestamp lies inside outside interval
+PASS PRESENCE BROWSER 13 live AI wait never overlaps outside interval
+PASS PRESENCE BROWSER 14 no fake AI viewing during real outside response
+PASS PRESENCE BROWSER 15 hidden reply survives actual CSV download
+PASS PRESENCE BROWSER 16 return before delayed reply leaves the same request pending
+Error: real pending wait splits into two positive intervals across absence
+    at check (D:\VakaLab\tests\presence-browser.cjs:14:72)
+    at D:\VakaLab\tests\presence-browser.cjs:101:2

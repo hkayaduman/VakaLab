@@ -32,7 +32,7 @@ const check=(ok,name)=>{if(!ok)throw new Error(name);console.log(`PASS VALIDATIO
     check(await page.locator('#severity-required-error').isVisible(),'missing field has inline error');
     check(await page.locator('[data-section="profile"]').innerText().then(t=>t.includes('1 eksik')),'profile tab identifies missing field count');
     check(await page.locator('#validation-summary').count()===0,'no global missing-fields box in profile even after validation');
-    check(await page.locator('#submit').count()===0,'no submit control in profile before initial lock');check((await page.locator('[data-section="confirm"]').innerText()).includes('Kilitli'),'last tab is locked before initial confirmation');
+    check(await page.locator('#submit').count()===0,'no submit control in profile before initial lock');check((await page.locator('[data-section="confirm"]').getAttribute('aria-label')).includes('Kilitli'),'last tab is locked before initial confirmation');
     check(await page.locator('#severity').evaluate(e=>e.getBoundingClientRect().top>=document.querySelector('.workspace-top').getBoundingClientRect().bottom),'focused missing field is below sticky desktop navigation');
     await page.screenshot({path:path.join(tmp,'validation-missing-profile.png')});
     await page.locator('[data-section="initial"]').click();await page.locator('#initial').click();

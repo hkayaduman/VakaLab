@@ -1,0 +1,1 @@
+{"screens":28,"viewportWidths":[320,390,768,1440],"allSevenOrderedTabsVisible":true,"stickyMenu":true,"controlGeometry":true,"researcherStyleUnchanged":true,"screenshots":"D:\\VakaLab\\tests\\tmp\\student-ui-5cb88bf2-c5fc-4d7f-b08d-e6f547e8de1a"}

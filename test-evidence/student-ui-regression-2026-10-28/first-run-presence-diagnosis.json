@@ -1,0 +1,9 @@
+{
+  "failure": "exactly_two_wait_intervals_assumption",
+  "observed_wait_segments": 3,
+  "observed_absence_segments_during_request": 2,
+  "expected_inside_wait_seconds": 5.263,
+  "recorded_inside_wait_seconds": 5.263,
+  "duration_conservation_passed": true,
+  "product_code_modified": false
+}
