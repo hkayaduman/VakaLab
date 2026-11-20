@@ -2,6 +2,8 @@
 
 VakaLab, katılımcıların bir vakayı nasıl değerlendirdiğini ve kararlarını nasıl gerekçelendirdiğini incelemek için geliştirilmiş Türkçe bir eğitim ve araştırma uygulamasıdır. Katılımcılar önce kendi değerlendirmelerini yazar, ardından yapay zekâyla (AI) görüşür ve son kararlarını gerekçelendirir. Araştırmacılar yanıtları, sohbetleri ve bölüm geçişlerini aynı çalışma içinde inceleyebilir.
 
+Araştırma amaçlarından biri, katılımcıların **yapay zekâya duyduğu güveni (AI trust)** ve **karar verirken yapay zekânın önerilerine ne ölçüde dayandığını (AI reliance)** incelemektir. Araştırmacılar katılımcıların başlangıç ve nihai değerlendirmelerini, sohbet kayıtlarını ve yansıtma yanıtlarını birlikte inceleyerek hangi önerilerin benimsendiğini, uyarlandığını veya reddedildiğini ve bu tercihlerin nasıl gerekçelendirildiğini araştırabilir.
+
 Öğretmen eğitimi, üniversite dersleri, mesleki eğitim ve kurum içi eğitim gibi farklı ortamlarda kullanılabilir. Araştırmacılar vaka metinlerini, değerlendirme rubriklerini ve araştırma etiketlerini kendi alanlarına göre düzenleyebilir. Uygulamada katılımcı hesabı **Öğrenci** olarak adlandırılır.
 
 ## Öğrenci nasıl çalışır?
