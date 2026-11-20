@@ -87,6 +87,33 @@ foreach(['raw'=>0,'coded'=>1] as $mode=>$coded){
 $formulaRows=[['value'=>'=1+1'],['value'=>'+SUM(A1)'],['value'=>'@SUM(A1)'],['value'=>'-1+1']];
 $csv=Export::csv($formulaRows);$stream=fopen('php://temp','w+');fwrite($stream,substr($csv,3));rewind($stream);fgetcsv($stream,0,',','"','');
 foreach($formulaRows as $row)roundtripCheck(fgetcsv($stream,0,',','"','')[0]==="'".$row['value'],'CSV spreadsheet formula escaped: '.$row['value']);fclose($stream);
+$long=str_repeat('A',32766)."🙂\r\n".str_repeat('ş',10000).str_repeat('B',7228);
+$nested=['answer'=>$long,'second'=>str_repeat('B',35000)];
+Export::xlsx(['drafts'=>[['id'=>'fixture-draft','answer'=>$long,'body'=>$nested]]],$dir.'/long.xlsx');
+$reader=new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+$reader->setValueBinder((new \PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder())->setPreserveCr(true));
+$book=$reader->load($dir.'/long.xlsx');
+$sheet=$book->getSheetByName('drafts');
+$parts=$book->getSheetByName('Uzun metinler')->toArray();
+$combine=function(string $sheet,int $row,string $field)use(&$parts):string{
+    $matched=array_values(array_filter($parts,fn($part)=>[$part[0],$part[1],$part[2]]===[$sheet,(string)$row,$field]));
+    roundtripCheck(array_column($matched,3)===array_map('strval',range(1,count($matched))),'long cell parts have a complete sequence for '.$field);
+    return implode('',array_column($matched,4));
+};
+roundtripCheck($sheet->getCell('B2')->getValue()==='Uzun metinler!A2'&&$parts[1][5]==='fixture-draft','the main sheet points to the long cell and keeps the row identity');
+roundtripCheck($combine('drafts',2,'answer')===$long,'plain Unicode text including CRLF reconstructs exactly across an Excel cell boundary');
+roundtripCheck($combine('drafts',2,'body')===js($nested),'long nested JSON reconstructs byte for byte');
+$book->disconnectWorksheets();
+
+$report=['format'=>'student-v3','report_layout'=>'questions-v1','participant'=>'TEST','case_title'=>'Sentetik vaka','rubric_name'=>'Rubrik',
+    'total'=>1,'max'=>2,'overall_feedback'=>'Sentetik geri bildirim','profile'=>[],'sections'=>[
+        ['title'=>'Soru','section'=>'Bölüm','answer'=>$long,'total'=>1,'max'=>2,'feedback'=>'Geri bildirim','criteria'=>[]]
+    ]];
+Export::reportXlsx([['report'=>$report]],$dir.'/long-report.xlsx');
+$book=$reader->load($dir.'/long-report.xlsx');
+$parts=$book->getSheetByName('Uzun metinler')->toArray();
+roundtripCheck($combine('Öğrenci raporu',3,'Öğrencinin yanıtı')===$long,'student report XLSX preserves the complete long answer');
+$book->disconnectWorksheets();
 foreach($before as $table=>$rows)roundtripCheck($db->all('SELECT * FROM '.$table.' ORDER BY id')===$rows,'export preserves source table '.$table);
 $summary=['checks'=>$count,'compared_excel_data_cells'=>$cells,'tables'=>$summary,'working_database_opened'=>false,'provider'=>'mock','outputs'=>$dir];
 file_put_contents($dir.'/summary.json',js($summary));echo js($summary).PHP_EOL;

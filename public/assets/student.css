@@ -142,6 +142,32 @@ body[data-ui-role="student"] .chat { margin-top: 24px; padding: 0 4px 8px; max-h
 body[data-ui-role="student"] .message { padding: 18px 20px; margin: 16px 48px 16px 0; border-radius: 12px 12px 12px 3px; background: #f0f3ef; overflow-wrap: anywhere; }
 body[data-ui-role="student"] .message.user { margin: 16px 0 16px 48px; background: #e5f0e8; border-radius: 12px 12px 3px 12px; }
 body[data-ui-role="student"] .message strong { font-size: 12px; color: #476352; }
+.chat-waiting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin: 12px 0 4px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #f0f3ef;
+    color: #3b5548;
+    font-size: 13px;
+}
+.chat-waiting-dots { display: inline-flex; align-items: center; gap: 3px; }
+.chat-waiting-dots span {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: chat-waiting-dot 1.2s ease-in-out infinite;
+}
+.chat-waiting-dots span:nth-child(2) { animation-delay: 150ms; }
+.chat-waiting-dots span:nth-child(3) { animation-delay: 300ms; }
+@keyframes chat-waiting-dot {
+    0%, 65%, 100% { opacity: .45; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-3px); }
+}
 body[data-ui-role="student"] #question { min-height: 140px; }
 body[data-ui-role="student"] #section-body > .row.spaced { align-items: flex-start; gap: 16px; }
 body[data-ui-role="student"] #section-body > .row.spaced > small { flex: 1 1 240px; line-height: 1.7; }
@@ -198,4 +224,5 @@ body[data-ui-role="student"] footer { max-width: 1160px; line-height: 1.6; }
     body[data-ui-role="student"] input,
     body[data-ui-role="student"] textarea,
     body[data-ui-role="student"] select { transition: none; }
+    .chat-waiting-dots span { animation: none; }
 }

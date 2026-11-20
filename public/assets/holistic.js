@@ -3,7 +3,7 @@ const holisticDrafts=new Map();
 function holisticState(v){
     const reports=[...v.reports].filter(r=>processObject(r.body).review_version===3).sort((a,b)=>Number(b.version)-Number(a.version));
     const report=reports[0],body=processObject(report?.body),saved=holisticDrafts.get(v.application.id),draft=saved&&(saved.dirty||Number(saved.version)>=Number(report?.version||0))?saved:undefined;
-    const rubrics=dash.definitions.filter(d=>d.family==='rubric'&&!d.deleted_at&&!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id));
+    const rubrics=dash.definitions.filter(d=>d.owner_id===v.application.case_owner_id&&d.family==='rubric'&&!d.deleted_at&&!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id));
     const rubricId=draft?.rubricId||body.rubric_id||dash.cases.find(c=>c.id===v.application.case_id)?.rubric_id||rubrics[0]?.id||'';
     const definition=dash.definitions.find(d=>d.id===rubricId),rubric=definition?processObject(definition.body):body.rubric;
     return {report,body,draft,rubrics,rubricId,rubric,questions:v.review_questions||body.questions||[]};
@@ -42,7 +42,7 @@ function holisticProfile(d){return [['knowledge',null,'Ön bilgi'],['confidence'
 function holisticDirty(id){return !!holisticDrafts.get(id)?.dirty;}
 function bindHolisticReview(v,id){
     if(!document.querySelector('[data-holistic-app]'))return;
-    const state=holisticState(v),visible=()=>me?.role==='researcher'&&$('#process-data')?.dataset.appId===id;
+    const state=holisticState(v),visible=()=>(me?.role==='researcher'||isSuperAdmin())&&$('#process-data')?.dataset.appId===id;
     const remember=()=>{
         const reviews=Object.fromEntries(state.questions.map((q,index)=>[q.source_id,{feedback:getValue('holistic-feedback-'+index),scores:Object.fromEntries((state.rubric?.dimensions||[]).map((d,i)=>[d.id,{level:getValue('holistic-level-'+index+'-'+i),reason:getValue('holistic-reason-'+index+'-'+i)}]))}]));
         holisticDrafts.set(id,{rubricId:state.rubricId,text:getValue('holistic-report'),reviews,version:state.report?.version||0,dirty:true});

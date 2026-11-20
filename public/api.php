@@ -7,25 +7,45 @@ try{
     $config=cfg();demand($config['env']!=='production'||$config['https'],'Üretimde HTTPS zorunlu',503);
     $db=new Db($config);$auth=new Auth($db);$auth->session();$op=$_GET['op']??'me';$p=[];
     if($_SERVER['REQUEST_METHOD']==='POST'){$auth->csrf();demand((int)($_SERVER['CONTENT_LENGTH']??0)<=1048576,'İstek çok büyük',413);$p=obj(file_get_contents('php://input'));}
-    $writes=['login','logout','start','save','initial','submit','chat','events','onboarding','admin','new_run','step','decision','report','message_labels','holistic'];
+    $accountForms=['register','request_password_reset','reset_password'];
+    $writes=['login','logout','start','save','initial','submit','chat','events','onboarding','admin','new_run','step','decision','report','message_labels','holistic','update_profile','change_password','password_reset_code',...$accountForms];
     if(in_array($op,$writes,true))demand($_SERVER['REQUEST_METHOD']==='POST','POST gerekli',405);
-    if($op==='token'){$result=['csrf'=>$_SESSION['csrf']];}
+    if($op==='token'){Migration::verify($db);$result=['csrf'=>$_SESSION['csrf']];}
     elseif($op==='login'){$u=$auth->login($p['login']??'',$p['password']??'');$result=['role'=>$u['role'],'csrf'=>$_SESSION['csrf']];}
+    elseif(in_array($op,$accountForms,true)){
+        $auth->rateLimit('account:'.$op,60);
+        $accounts=new AccountAccess($db,$config['env']==='test');
+        $result=match($op){
+            'register'=>$accounts->register($p),
+            'request_password_reset'=>$accounts->requestReset($p),
+            'reset_password'=>$accounts->resetPassword($p),
+        };
+    }
     elseif($op==='logout'){$_SESSION=[];session_destroy();setcookie('vakalab','',['expires'=>1,'path'=>($config['base_path']?:'').'/','secure'=>$config['https'],'httponly'=>true,'samesite'=>'Strict']);$result=['ok'=>true];}
+    elseif($op==='change_password'){
+        $u=$auth->user();
+        $auth->rateLimit('change_password:'.$u['id'],15);
+        $hash=(new AccountAccess($db,$config['env']==='test'))->changePassword($u,$p);
+        $_SESSION['password_stamp']=Auth::passwordStamp($hash);
+        $result=['ok'=>true];
+    }
     else{
         $u=$auth->user();$session=$_SESSION['telemetry']??'';session_write_close(); // crucial: no PHP session lock in AI or DB work
         $app=new App($db,$config);$id=$p['app_id']??$_GET['app_id']??'';
         switch($op){
-        case 'me':$result=['id'=>$u['id'],'login'=>$u['login'],'name'=>$u['name'],'role'=>$u['role'],'metadata'=>array_intersect_key(obj($u['metadata']),array_flip(['program','year'])),'test'=>(bool)$u['test'],'config'=>array_intersect_key($config,array_flip(['timezone','autosave_ms','heartbeat_ms','idle_ms','consent_text'])),'mock'=>$config['ai']['provider']==='mock'];break;
+        case 'me':$result=['id'=>$u['id'],'login'=>$u['login'],'name'=>$u['name'],'role'=>$u['role'],'metadata'=>array_intersect_key(obj($u['metadata']),array_flip(['program','year'])),'test'=>(bool)$u['test'],'config'=>array_intersect_key($config,array_flip(['timezone','autosave_ms','heartbeat_ms','idle_ms','consent_text'])),'mock'=>$config['ai']['provider']==='mock'];if($u['role']==='student')$result['telemetry_session']=$session;break;
         case 'onboarding':demand($u['role']==='student','Öğrenci gerekli',403);$meta=obj($u['metadata']);foreach(['program','year'] as $k)$meta[$k]=substr((string)($p[$k]??''),0,3000);$db->q('UPDATE users SET metadata=? WHERE id=?',[js($meta),$u['id']]);$db->audit($u['id'],'onboarding',$u['id']);$result=['ok'=>true];break;
         case 'cases':$result=$db->all("SELECT c.id,c.title,c.position,c.practice,c.status,c.collection_closed_at,s.allow_late,a.id app_id,a.attempt_no,a.state,a.last_section FROM cases c JOIN assignments s ON s.case_id=c.id AND s.user_id=? AND s.active=1 LEFT JOIN applications a ON a.case_id=c.id AND a.user_id=s.user_id AND a.attempt_no=(SELECT MAX(ax.attempt_no) FROM applications ax WHERE ax.case_id=c.id AND ax.user_id=s.user_id) WHERE c.stop_access=0 AND (c.status='active' OR (c.status='closed' AND a.id IS NOT NULL)) ORDER BY c.position",[$u['id']]);break;
         case 'start':$result=$app->start($u,$p['case_id']);break;
         case 'view':$result=$app->view($u,$id);break;
-        case 'save':case 'initial':case 'submit':$result=$app->save($u,$id,$p,$op);break;
+        case 'save':case 'initial':case 'submit':$result=$app->save($u,$id,$p,$op,$session);break;
         case 'chat':$result=$app->chat($u,$id,$p);break;
         case 'events':$result=(new Telemetry($app))->ingest($u,$id,$p,$session);break;
         case 'dashboard':$result=(new Admin($app))->dashboard($u);break;
         case 'admin':$result=(new Admin($app))->mutate($u,$p['action'],$p);break;
+        case 'update_profile':$result=(new AccountAccess($db,$config['env']==='test'))->updateProfile($u,$p);break;
+        case 'password_reset_requests':$result=(new AccountAccess($db,$config['env']==='test'))->resetRequests($u);break;
+        case 'password_reset_code':$result=(new AccountAccess($db,$config['env']==='test'))->issueReset($u,$p);break;
         case 'new_run':$result=(new Analysis($app))->newRun($u,$id,$p['rubric_id'],(int)($p['review_version']??1));break;
         case 'step':$result=(new Analysis($app))->step($u,$p['run_id'],(int)$p['step'],!empty($p['repeat']));break;
         case 'decision':$result=(new Analysis($app))->decide($u,$p['step_id'],$p);break;

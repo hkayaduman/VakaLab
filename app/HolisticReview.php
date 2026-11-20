@@ -8,8 +8,8 @@ final class HolisticReview {
         demand(!is_array(json_decode($text,true)),'Rapor düz metin olmalı');return trim($text);
     }
     public function payload(array $u,string $id,string $rubricId): array {
-        $a=Scope::application($this->app->db,$u,$id);demand($a['state']==='submitted','Önce öğrenci teslimini tamamlamalı',409);
-        $definition=Scope::owned($this->app->db,$u,'definitions',$rubricId);
+        $a=$this->app->access($u,$id);demand($a['state']==='submitted','Önce öğrenci teslimini tamamlamalı',409);
+        $definition=Scope::workspaceDefinition($this->app->db,$u,$rubricId,$a['case_owner_id']);
         demand($definition['family']==='rubric'&&!$definition['archived']&&!$definition['deleted_at'],'Etkin bir rubrik seçin');
         $rubric=obj($definition['body']);Rules::rubric($rubric);$draft=obj($a['draft']);Rules::submitted($draft);
         $case=$this->app->db->one('SELECT body FROM case_versions WHERE id=?',[$a['version_id']]);$questions=[];$sources=[];
@@ -70,6 +70,7 @@ final class HolisticReview {
         $db->audit($u['id'],'report_create',$row['id'],'',['review_version'=>3,'mode'=>$mode,'version'=>$number]);return $db->one('SELECT * FROM reports WHERE id=?',[$row['id']]);
     }
     public function handle(array $u,array $p): array {
+        Auth::staff($u);
         $db=$this->app->db;$id=$p['app_id']??'';Scope::application($db,$u,$id);$action=$p['action']??'';
         if(in_array($action,['approve','show','hide'],true))return $db->tx(function()use($db,$u,$p,$id,$action){
             $db->lock($id);$this->idle($id);$r=$this->latest($id);demand($r&&$r['id']===($p['report_id']??null),'Güncel raporu seçin',409);$this->version($r,$p);

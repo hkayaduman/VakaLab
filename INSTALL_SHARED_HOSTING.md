@@ -1,5 +1,16 @@
 # Shared hosting kurulumu
 
+## Güncel kodu devreye alma
+
+Bu çalışma ağacındaki güncel kod, 001–005 şemasını kullanır. Uygulama dosyalarını devreye almadan önce web kökü dışında veritabanı yedeği alın ve geçişi ayrı bir kopyada doğrulayın. Dağıtım sırasında hedef veritabanında sırasıyla çalıştırın.
+
+~~~text
+php bin/console.php migrate
+php bin/console.php schema-check
+~~~
+
+İki komut da başarılı olduktan sonra yeni kodu erişime açın. Şema kontrolü sürüm kayıtlarını, parola yenileme tablosunun sütunlarını ve vaka metninin HTML sütununu doğrular. Eksik veya uyumsuz şemada komut hata kodu döndürür ve sayfa başlangıcında API HTTP 503 verir. SSH yoksa aşağıdaki phpMyAdmin adımlarını izleyin. Vaka dosyasını ve parola yenilemeyi ayrı test kurulumunda kontrol edin. Bu bölümün altındaki 0.3.2 ve önceki paket talimatları kendi tarihsel paketleri içindir.
+
 ## 0.3.2 · İnceleme düzeltmeleri
 
 Mevcut şema 001–003 kurulumu için `storage/releases/vakalab-duzeltmeler-0.3.2.zip` paketini `/domains/vakalab.techdocsolution.com/vakalab` dizinine yükleyip aynı dizine çıkarın; mevcut `app` ve `public` klasörleri birleşerek dosyaların üzerine yazılmalıdır. ZIP'in içinde yalnız bu iki klasörün 32 kod dosyası vardır. Yeni SQL, migration veya seed gerekmez. `config/local.php`, `vendor` ve `storage` korunur. Güncelleme öncesinde kod/veritabanı yedeğini public dışında alın; ardından siteyi Ctrl+F5 ile yenileyin. Güncel giriş sayfası `assets/app.js?v=0.3.2` kullanır.
@@ -75,7 +86,7 @@ INSERT INTO schema_migrations(version, applied_at)
 VALUES (1, DATE_FORMAT(UTC_TIMESTAMP(6), '%Y-%m-%dT%H:%i:%s.%fZ'));
 ```
 
-Migration mevcut veriyi sıfırlamaz. MySQL DDL atomik değildir: yarım kurulumda otomatik tekrar yapılmaz; ayrı test DB üzerinde hatayı düzeltin. Dolu üretim DB'sine schema.sql tekrar import etmeyin. Sürüm 001 mevcutken CLI veri değiştirmez.
+Migration mevcut veriyi sıfırlamaz. MySQL DDL ayrı ayrı commit edilebilir. Yarım kalan kurulumda önce şemayı ayrı test veritabanında inceleyin. Dolu üretim veritabanına 001.sql dosyasını tekrar içe aktarmayın. CLI eksik geçişleri uygular ve güncel şemayı doğrular.
 
 config/example.php → config/local.php kopyalayın. DSN, DB kullanıcı/parola, env, HTTPS, kurum onam metni, AI ayarlarını sunucuda girin. Bunları chat/ekran görüntüsü/git'e koymayın. Örnek `https=true`; yerel HTTP için yalnız testte false. Alt klasörde base_path=`/vakalab`, kökte boş. UI göreli URL kullandığından ters proxyde doğru klasörü koruyun. Session cookie path base_path ile eşleşir. HTTPS'i hosting panelinden zorlayın; secure cookie proxy arkasında da true olmalı.
 
@@ -98,6 +109,24 @@ Remove-Item Env:\VAKALAB_ADMIN_PASSWORD
 SSH yoksa yerelde aynı env değişkeniyle `php bin/console.php researcher-sql arastirmaci > researcher-install.sql` üretin. Hash içeren bu **özel** SQL'i phpMyAdmin'de bir kez import edin; dosyayı public dizine koymayın, erişimi kapatın. Bu komut DB bağlantısı gerektirmez. Varsayılan üretim parolası yoktur. Araştırmacı yeni öğrencinin parolasını panelden yenileyebilir; boş bırakırsa eskisi korunur.
 
 Kurulum kilidi, web kurucu olmaması + schema_migrations kaydı + benzersiz login ile sağlanır. Kurulum sonrası config salt okunur, CLI erişimi yöneticiyle sınırlı olsun. Test seed'ini üretime taşımayın.
+
+### Süper Admin hesabı
+
+VakaLab tek bir kullanıcı havuzu kullanır. Süper Admin **Kullanıcılar → Toplu kullanıcı ekle** üzerinden kullanıcı adı ve şifre girerek tek seferde öğrenci hesapları oluşturabilir. Süper Admin herhangi bir öğrenciyi herhangi bir vakaya atayabilir. Araştırmacının kullanıcı yönetiminde kendi eklediği hesaplar görünür. Kendi vakasına atanan diğer öğrencilerin vaka dosyalarını da açabilir.
+
+İlk Süper Admin hesabını sunucuda, yukarıdaki şekilde `VAKALAB_ADMIN_PASSWORD` ayarlandıktan sonra `php bin/console.php super-admin yonetici` ile oluşturun. SSH bulunmadığında `php bin/console.php super-admin-sql yonetici` çıktısını özel bir SQL dosyasına kaydedip içe aktarın. Bu rol mevcut kullanıcı tablosunu kullanır ve şema değişikliği gerektirmez.
+
+### Öğrenci kaydı ve parola yenileme
+
+001–003 geçişleri tamamlanmış bir kurulumda önce `004` (parola yenileme), ardından `005` (biçimli vaka metni) uygulanır. CLI varsa yedekten sonra `php bin/console.php migrate` ve `php bin/console.php schema-check` komutlarını çalıştırın.
+
+SSH yoksa phpMyAdmin'de `migrations/004.sql` dosyasını içe aktarın. `SHOW COLUMNS FROM password_resets` çıktısında `user_id`, `requested_at`, `token_hash`, `password_stamp` ve `expires_at` sütunlarını gördükten sonra yukarıdaki INSERT kalıbıyla sürüm 4 kaydını ekleyin. Ardından `migrations/005.sql` dosyasını içe aktarın. `SHOW COLUMNS FROM case_versions LIKE 'body_html'` çıktısında `LONGTEXT` sütununu gördükten sonra sürüm 5 kaydını ekleyin. Kod erişime açılmadan önce kontrol sorgusu `SELECT version FROM schema_migrations ORDER BY version` şema 1–5 kayıtlarını göstermeli.
+
+- **Kayıt ol** ile öğrenci kendi hesabını açar. Süper Admin, Kullanıcılar bölümünden yeni öğrenciyi bir araştırmacıya bağlar. Araştırmacı daha sonra vaka atar.
+- **Şifremi unuttum** ile kullanıcı talep oluşturur. Öğrenci talepleri bağlı araştırmacının ve Süper Admin’in Kullanıcılar sekmesinde görünür. Araştırmacı taleplerini Süper Admin işler. Hesap sahibini doğruladıktan sonra 30 dakika geçerli tek kullanımlık kodu özel olarak iletin. Parola yenilenince eski oturumlar geçersiz olur.
+- Süper Admin parolasını sunucuda `VAKALAB_ADMIN_PASSWORD` ile `php bin/console.php super-admin-password yonetici` komutunu kullanarak yenileyin. SSH yoksa `super-admin-password-sql` komutunun çıktısını özel olarak içe aktarın.
+
+**Profilim** ekranında kullanıcı ad soyadını ve mevcut parolasıyla yeni parolasını belirleyebilir. Parola değişikliği diğer oturumları sonlandırır.
 
 ## 5. İlk hosting doğrulaması
 
@@ -125,7 +154,7 @@ Yerel MariaDB smoke restore testi yapılır; gerçek hosting yedeği ve yedek sa
 
 ## 7. Güncelleme ve rollback
 
-Önce bakım bildirimi ve güncel özel yedek; aynı DB'nin ayrı kopyasında migration/regresyon. Kod + vendor + composer.lock birlikte sürümlenir. Henüz yalnız migration 001 vardır; sonraki sürüm geçmişi ezmeyen yeni migration eklemelidir. Değişen dosyaları yükleyin, config'i koruyun. Hata olursa önceki kod paketine dönün; yeni şema eski kodla uyumsuzsa **ayrı geri yüklenmiş DB** üzerinde doğrulayın. Otomatik destructive down migration yok. Veri toplama sırasında seed/reset çalıştırmayın.
+Önce bakım bildirimi ve güncel özel yedek alın. Veritabanının ayrı kopyasında şema geçişini ve regresyon testlerini çalıştırın. Kod, vendor ve composer.lock birlikte sürümlenir. Değişen dosyaları yükleyin ve config'i koruyun. Hata olursa önceki kod paketine dönün. Yeni şema eski kodla uyumsuzsa **ayrı geri yüklenmiş veritabanı** üzerinde doğrulayın. Veri toplama sırasında seed/reset çalıştırmayın.
 
 
 ### Öğrenci etiketleri için konu kapsamı (24 Ekim 2026)

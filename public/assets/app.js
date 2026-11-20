@@ -2,7 +2,64 @@
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let viewId=null,visitEditedFields=new Set();
 let me,csrf,work,section='case',saveTimer,saveChain=Promise.resolve(),dirty=false,saving=false,conflict=false,busy=false,readOnlyTab=false,events=[],seq=0,dash,leaseTimer,heartbeatTimer,lastInput=Date.now(),lastEvent=0;
-const tab=sessionStorage.getItem('vakalab:tab')||crypto.randomUUID();sessionStorage.setItem('vakalab:tab',tab);
+const pendingChats=new Map();
+let tab=sessionStorage.getItem('vakalab:tab')||crypto.randomUUID();sessionStorage.setItem('vakalab:tab',tab);
+const leaseOwner=crypto.randomUUID();
+const tabHandoffKey='vakalab:tab-handoff';
+let releaseTabClaim=null,tabIdentityReady=false;
+function tryClaimTabInStorage(key){
+    const owner=()=>JSON.parse(localStorage.getItem(key)||'null');
+    const old=owner();
+    if(old&&old.owner!==leaseOwner&&Date.now()-old.at<20000)return false;
+    const renew=()=>localStorage.setItem(key,JSON.stringify({owner:leaseOwner,at:Date.now()}));
+    renew();
+    const timer=setInterval(()=>{if(owner()?.owner===leaseOwner)renew();},5000);
+    releaseTabClaim=()=>{
+        clearInterval(timer);
+        if(owner()?.owner===leaseOwner)localStorage.removeItem(key);
+    };
+    return true;
+}
+async function tryClaimTabIdentity(){
+    const key='vakalab:tab-owner:'+tab;
+    if(navigator.locks?.request){
+        try{
+            return await new Promise((resolve,reject)=>{
+                navigator.locks.request(key,{ifAvailable:true},lock=>{
+                    if(!lock){resolve(false);return;}
+                    return new Promise(release=>{releaseTabClaim=release;resolve(true);});
+                }).catch(reject);
+            });
+        }catch{/* Try storage if the browser has restricted Web Locks. */}
+    }
+    try{return tryClaimTabInStorage(key);}catch{return true;}
+}
+function releaseTabIdentity(handoff=false){
+    if(handoff&&tabIdentityReady){
+        try{if(sessionStorage.getItem('vakalab:tab')===tab)sessionStorage.setItem(tabHandoffKey,tab);}catch{}
+    }
+    tabIdentityReady=false;
+    const release=releaseTabClaim;
+    releaseTabClaim=null;
+    release?.();
+}
+async function splitTabIdentity(preserveLocalWork=false){
+    releaseTabIdentity();
+    tab=crypto.randomUUID();
+    sessionStorage.setItem('vakalab:tab',tab);
+    if(!preserveLocalWork){
+        // The new browsing context inherited a copy. The original context keeps its own data.
+        for(const key of Object.keys(sessionStorage))if(key!=='vakalab:tab'&&key.startsWith('vakalab:'))sessionStorage.removeItem(key);
+    }
+    await tryClaimTabIdentity();
+    tabIdentityReady=true;
+}
+async function claimTabIdentity(preserveLocalWork=false){
+    const handoff=sessionStorage.getItem(tabHandoffKey)===tab;
+    sessionStorage.removeItem(tabHandoffKey);
+    if(!await tryClaimTabIdentity())await splitTabIdentity(preserveLocalWork||handoff);
+    tabIdentityReady=true;
+}
 const names={case:'Vaka',profile:'Vaka profili',initial:'Başlangıç değerlendirmesi',ai:'AI sohbeti',final:'Nihai değerlendirme',reflection:'Yansıtma',confirm:'Son teslim'};
 const stateName=s=>({initial:'Başlangıç aşamasında',working:'Devam ediyor',submitted:'Teslim edildi'}[s]||'Açmadı');
 const notify=t=>{ $('#notice').textContent=t;clearTimeout(notify.timer);notify.timer=setTimeout(()=>$('#notice').textContent='',9000);};
@@ -10,15 +67,83 @@ async function api(op,body,params={}){const r=await fetch('api.php?'+new URLSear
 const handler=(sel,fn)=>{const el=$(sel);if(el)el.addEventListener('click',()=>Promise.resolve(fn()).catch(e=>notify(e.message)));};
 const displayTime=value=>value&&Number.isFinite(new Date(value).getTime())?`<time datetime="${esc(value)}" title="Ham zaman: ${esc(value)}">${esc(formatTimestamp(value,me.config.timezone))}</time>`:'—';
 const pretty=x=>`<pre>${esc(JSON.stringify(typeof x==='string'?JSON.parse(x):x,null,2))}</pre>`;
-const field=(key,label,value='',type='text',disabled=false)=>`<label for="${key}">${label}</label>${type==='textarea'?`<textarea id="${key}" ${disabled?'disabled':''}>${esc(value)}</textarea>`:`<input id="${key}" type="${type}" value="${esc(value)}" ${disabled?'disabled':''}>`}`;
-const numberField=(key,label,value,disabled=false)=>`<label for="${key}">${label} <small>0–10 · Bir değer seçin</small></label><select id="${key}" ${disabled?'disabled':''}><option value="">Seçilmedi</option>${Array.from({length:11},(_,i)=>`<option value="${i}" ${value===i?'selected':''}>${i}</option>`).join('')}</select>`;
+const field=(key,label,value='',type='text',disabled=false,hint='')=>`<label for="${esc(key)}">${esc(label)}${hint?`<small>${esc(hint)}</small>`:''}</label>${type==='textarea'?`<textarea id="${esc(key)}" ${disabled?'disabled':''}>${esc(value)}</textarea>`:`<input id="${esc(key)}" type="${esc(type)}" value="${esc(value)}" ${disabled?'disabled':''}>`}`;
+const numberField=(key,label,value,disabled=false,hint='')=>`<label for="${esc(key)}">${esc(label)}${hint?`<small>${esc(hint)}</small>`:''} <small>0–10 · Bir değer seçin</small></label><select id="${esc(key)}" ${disabled?'disabled':''}><option value="">Seçilmedi</option>${Array.from({length:11},(_,i)=>`<option value="${i}" ${value===i?'selected':''}>${i}</option>`).join('')}</select>`;
 function getValue(key){return $('#'+key)?.value??'';}
 function download(params){window.open('api.php?'+new URLSearchParams({op:'download',...params}),'_blank','noopener');}
-async function init(){csrf=(await api('token')).csrf;try{me=await api('me');await home();}catch(e){if(e.status===401)login();else notify(e.message);}}
-function login(){delete document.body.dataset.uiRole;me=null;$('#identity').innerHTML='';$('#root').innerHTML=`<div class="card login"><div class="eyebrow">Pedagojik vaka araştırması</div><h1>Çalışma alanınıza<br>hoş geldiniz.</h1><p class="muted">Size verilen öğrenci numarası ve parola ile giriş yapın.</p><form id="login-form">${field('login','Öğrenci numarası / araştırmacı hesabı')}${field('password','Parola','','password')}<button>Giriş yap →</button></form></div>`;$('#login-form').onsubmit=async e=>{e.preventDefault();try{const r=await api('login',{login:getValue('login'),password:getValue('password')});csrf=r.csrf;me=await api('me');await home();}catch(e){notify(e.message);}};}
-function releaseLease(){clearInterval(leaseTimer);if(!me||!work)return;const key=`lease:${me.id}:${work.application.id}`;try{const old=JSON.parse(localStorage.getItem(key)||'null');if(old?.tab===tab)localStorage.removeItem(key);}catch{} }
-async function home(){document.body.dataset.uiRole=me.role;releaseLease();clearInterval(heartbeatTimer);work=null;$('#identity').innerHTML=`<span>${esc(me.login)} · ${me.role==='researcher'?'Araştırmacı':'Öğrenci'}</span><button class="secondary" id="logout">Çıkış</button>`;handler('#logout',async()=>{if(dirty&&!(await confirmStudent('Kaydedilmemiş metin var. Çıkışta bu sekmedeki kurtarma taslakları temizlenir. Çıkılsın mı?')))return;event('section_leave',{reason:'logout'});await drainEvents();await api('logout',{});releaseLease();clearInterval(heartbeatTimer);work=null;viewId=null;for(const k of Object.keys(sessionStorage))if(k.startsWith('vakalab:'))sessionStorage.removeItem(k);location.reload();});$('#banner').textContent=me.mock?'SENTETİK TEST ORTAMI · Mock yanıtlar gerçek AI değerlendirmesi değildir.':'';if(me.role==='researcher')await adminHome();else await studentHome();}
-async function studentHome(){const cases=await api('cases');$('#root').innerHTML=`<div class="eyebrow">Çalışma alanım</div><h1>Her vaka, yeni bir bakış açısı.</h1><p class="intro">Önce kendi değerlendirmenizi oluşturun. Ardından AI ile etkileşime geçip nihai kararınızı ve yansıtmanızı hazırlayın. Yanıtlarınız bölüm geçişlerinde korunur.</p><div class="toolbar"><h2>Vakalarım <span class="pill">${cases.length} atama</span></h2></div><div class="cards">${cases.map((c,i)=>`<article class="card"><div class="case-num"><strong>${String(i+1).padStart(2,'0')}</strong><span class="pill">${c.collection_closed_at&&!Number(c.allow_late)?'Veri toplama kapalı':esc(stateName(c.state))}</span></div><h2>${esc(c.title)}</h2><p class="muted">${c.practice?'Deneme vakası · Araştırma dışı':'Pedagojik vaka · Bireysel çalışma'}${c.attempt_no?' · Deneme '+c.attempt_no:''}</p><button data-case="${c.id}" ${c.collection_closed_at&&!Number(c.allow_late)&&!c.app_id?'disabled':''}>${c.state==='submitted'||(c.collection_closed_at&&!Number(c.allow_late))?'Görüntüle':c.app_id?'Devam et':'Başla'} →</button></article>`).join('')||'<div class="empty">Henüz atanmış aktif vaka yok.</div>'}</div>`;document.querySelectorAll('[data-case]').forEach(b=>b.onclick=async()=>{try{const a=await api('start',{case_id:b.dataset.case});await openWork(a.id);}catch(e){notify(e.message);}});}
+async function init(){await claimTabIdentity();csrf=(await api('token')).csrf;try{me=await api('me');await home();}catch(e){if(e.status===401)login();else notify(e.message);}}
+const accountPages={
+    login:{title:'Çalışma alanınıza hoş geldiniz.',help:'Öğrenci numaranız veya kullanıcı adınızla giriş yapın.',button:'Giriş yap →',op:'login'},
+    register:{title:'Kayıt ol',help:'Öğrenci numaranızla hesabınızı oluşturun. Vakalarınız atama yapıldığında görünür.',button:'Öğrenci hesabı oluştur',op:'register'},
+    recover:{title:'Şifremi unuttum',help:'Öğrenci numaranızı veya kullanıcı adınızı girin. Yenileme kodunu araştırmacınızdan veya Süper Admin’den alın.',button:'Yenileme talebi gönder',op:'request_password_reset'},
+    reset:{title:'Yeni parola belirle',help:'Yetkili kişinin verdiği tek kullanımlık yenileme kodunu girin. Süper Admin parolaları sunucudan yenilenir.',button:'Parolayı yenile',op:'reset_password'},
+};
+function login(mode='login',loginValue='',message=''){
+    delete document.body.dataset.uiRole;me=null;$('#identity').innerHTML='';
+    const screen=accountPages[mode],newPassword=mode==='register'||mode==='reset';
+    const loginLabel=mode==='register'?'Öğrenci numarası':'Öğrenci numarası / kullanıcı adı';
+    $('#root').innerHTML=`<div class="card login"><div class="eyebrow">Pedagojik vaka araştırması</div><h1>${screen.title}</h1><p class="muted">${screen.help}</p>
+    <p id="auth-feedback" role="status" ${message?'':'hidden'}>${esc(message)}</p>
+    <form id="login-form">${field('login',loginLabel,loginValue)}
+    ${mode==='register'?field('account-name','Ad soyad'):''}
+    ${mode==='reset'?field('account-code','Yenileme kodu'):''}
+    ${mode!=='recover'?field('password',newPassword?'Yeni parola (en az 12 karakter)':'Parola','','password'):''}
+    ${newPassword?field('password-confirm','Yeni parolayı tekrar girin','','password'):''}
+    <button id="auth-submit">${screen.button}</button></form>
+    <div class="auth-links">${mode==='login'?'<button type="button" class="secondary" id="auth-forgot">Şifremi unuttum</button><button type="button" class="secondary" id="auth-register">Kayıt ol</button>':
+        '<button type="button" class="secondary" id="auth-back">Girişe dön</button>'+ (mode==='recover'?'<button type="button" class="secondary" id="auth-reset">Yenileme kodum var</button>':'')}</div></div>`;
+    const form=$('#login-form');
+    for(const input of form.querySelectorAll('input')){
+        input.required=true;
+        input.autocomplete={login:'username','account-name':'name','account-code':'one-time-code',password:newPassword?'new-password':'current-password','password-confirm':'new-password'}[input.id];
+        if(input.id==='login')input.maxLength=100;
+        if(input.id==='account-name')input.maxLength=200;
+        if(input.id==='account-code'){input.maxLength=32;input.spellcheck=false;}
+        if(newPassword&&input.type==='password'){input.minLength=12;input.maxLength=72;}
+    }
+    handler('#auth-forgot',()=>login('recover',getValue('login')));
+    handler('#auth-register',()=>login('register',getValue('login')));
+    handler('#auth-reset',()=>login('reset',getValue('login')));
+    handler('#auth-back',()=>login('login',getValue('login')));
+    form.onsubmit=async e=>{
+        e.preventDefault();
+        const button=$('#auth-submit'),loginName=getValue('login'),password=getValue('password');
+        button.disabled=true;
+        try{
+            if(newPassword)demandUi(password===getValue('password-confirm'),'Parolalar eşleşmiyor.');
+            const input={login:loginName};
+            if(mode!=='recover')input.password=password;
+            if(mode==='reset')input.code=getValue('account-code');
+            if(mode==='register')input.name=getValue('account-name');
+            const r=await api(screen.op,input);
+            if(mode==='login'){csrf=r.csrf;me=await api('me');await home();}
+            else if(mode==='recover')login('reset',loginName,'Bu hesap uygunsa talep yetkili kişiye ulaştı. Kodu aldığınızda buraya girin.');
+            else login('login',r.login,mode==='register'?'Hesabınız oluşturuldu. Parolanızla giriş yapın.':'Parolanız yenilendi. Yeni parolanızla giriş yapın.');
+        }catch(e){notify(e.message);}
+        finally{button.disabled=false;}
+    };
+}
+function leaseKey(){return `lease:${me.id}:${work.application.id}`;}
+function ownsLease(){return !readOnlyTab&&JSON.parse(localStorage.getItem(leaseKey())||'null')?.owner===leaseOwner;}
+function releaseLease(){clearInterval(leaseTimer);if(!me||!work)return;const key=leaseKey();try{if(ownsLease())localStorage.removeItem(key);}catch{} }
+async function acquireLease(preserveLocalWork=false){
+    clearInterval(leaseTimer);
+    const key=leaseKey(),old=JSON.parse(localStorage.getItem(key)||'null');
+    readOnlyTab=!!old&&Date.now()-old.at<20000&&(old.owner?old.owner!==leaseOwner:old.tab!==tab);
+    if(readOnlyTab){
+        if(old.tab===tab)await splitTabIdentity(preserveLocalWork);
+        return;
+    }
+    const renew=()=>localStorage.setItem(key,JSON.stringify({owner:leaseOwner,tab,at:Date.now()}));
+    renew();
+    leaseTimer=setInterval(()=>{
+        if(ownsLease()){renew();return;}
+        clearInterval(leaseTimer);readOnlyTab=true;renderWork();
+    },5000);
+}
+async function home(){document.body.dataset.uiRole=me.role;releaseLease();clearInterval(heartbeatTimer);work=null;$('#identity').innerHTML=`<span>${esc(me.login)} · ${roleTitle(me.role)}</span><button class="secondary" id="my-profile">Profilim</button><button class="secondary" id="logout">Çıkış</button>`;handler('#my-profile',showProfile);handler('#logout',async()=>{if(dirty&&!(await confirmStudent('Kaydedilmemiş metin var. Çıkışta bu sekmedeki kurtarma taslakları temizlenir. Çıkılsın mı?')))return;event('section_leave',{reason:'logout'});await drainEvents();await api('logout',{});releaseLease();clearInterval(heartbeatTimer);work=null;viewId=null;for(const k of Object.keys(sessionStorage))if(k.startsWith('vakalab:')&&(!k.endsWith(':events')||sessionStorage.getItem(k)==='[]'))sessionStorage.removeItem(k);location.reload();});$('#banner').textContent=me.mock?'SENTETİK TEST ORTAMI · Mock yanıtlar gerçek AI değerlendirmesi değildir.':'';if(me.role==='researcher'||isSuperAdmin())await adminHome();else{await studentHome();replayTelemetry();}}
+async function studentHome(){const cases=await api('cases');$('#root').innerHTML=`<div class="eyebrow">Çalışma alanım</div><h1>Her vaka, yeni bir bakış açısı.</h1><p class="intro">Önce kendi değerlendirmenizi oluşturun. Ardından AI ile etkileşime geçip nihai kararınızı ve yansıtmanızı hazırlayın. Yanıtlarınız bölüm geçişlerinde korunur.</p><div class="toolbar"><h2>Vakalarım <span class="pill">${cases.length} atama</span></h2></div><div class="cards">${cases.map((c,i)=>`<article class="card"><div class="case-num"><strong>${String(i+1).padStart(2,'0')}</strong><span class="pill">${c.collection_closed_at&&!Number(c.allow_late)?'Veri toplama kapalı':esc(stateName(c.state))}</span></div><h2>${esc(c.title)}</h2><p class="muted">${c.practice?'Deneme vakası · Araştırma dışı':'Pedagojik vaka · Bireysel çalışma'}${c.attempt_no?' · Deneme '+c.attempt_no:''}</p><button data-case="${esc(c.id)}" ${c.collection_closed_at&&!Number(c.allow_late)&&!c.app_id?'disabled':''}>${c.state==='submitted'||(c.collection_closed_at&&!Number(c.allow_late))?'Görüntüle':c.app_id?'Devam et':'Başla'} →</button></article>`).join('')||'<div class="empty">Henüz atanmış aktif vaka yok.</div>'}</div>`;document.querySelectorAll('[data-case]').forEach(b=>b.onclick=async()=>{try{const a=await api('start',{case_id:b.dataset.case});await openWork(a.id);}catch(e){notify(e.message);}});}
+function caseBodyMarkup(version){return version?.body_html??esc(version?.body);}
 function showDialog(html,fn){
     const d=document.createElement('dialog');d.innerHTML=html+'<button class="secondary spaced" id="dialog-close">Kapat / İptal</button>';
     const error=document.createElement('div');error.id='dialog-error';error.className='dialog-error';error.setAttribute('role','alert');error.tabIndex=-1;error.hidden=true;
@@ -28,19 +153,115 @@ function showDialog(html,fn){
     return d;
 }
 function confirmStudent(message){return new Promise(resolve=>{const d=document.createElement('dialog');d.id='work-confirm';d.setAttribute('aria-labelledby','work-confirm-title');d.innerHTML=`<h2 id="work-confirm-title">Onay</h2><p>${esc(message)}</p><div class="row"><button id="work-confirm-accept">Onayla</button><button class="secondary" id="work-confirm-cancel" autofocus>Vazgeç</button></div>`;d.addEventListener('close',()=>{const accepted=d.returnValue==='confirm';d.remove();resolve(accepted);},{once:true});d.querySelector('#work-confirm-accept').onclick=()=>d.close('confirm');d.querySelector('#work-confirm-cancel').onclick=()=>d.close('cancel');document.body.append(d);d.showModal();});}
+function showProfile(){
+    const dialog=showDialog(`<h2>Profilim</h2><p>${esc(me.login)} · ${esc(roleTitle(me.role))}</p>
+    <form id="profile-form">${field('profile-name','Ad soyad',me.name)}<button class="spaced">Profili kaydet</button></form>
+    <h3>Parola değiştir</h3><form id="profile-password-form">
+    ${field('profile-current','Mevcut parola','','password')}
+    ${field('profile-new','Yeni parola (en az 12 karakter)','','password')}
+    ${field('profile-confirm','Yeni parolayı tekrar girin','','password')}
+    <button class="spaced">Parolayı değiştir</button></form>
+    <p id="profile-feedback" role="status"></p>`);
+    const feedback=dialog.querySelector('#profile-feedback');
+    for(const input of dialog.querySelectorAll('input')){
+        input.required=true;
+        input.autocomplete=input.id==='profile-name'?'name':input.id==='profile-current'?'current-password':'new-password';
+    }
+    const submit=(id,action)=>{
+        const form=dialog.querySelector(id);
+        form.onsubmit=async e=>{
+            e.preventDefault();
+            const button=form.querySelector('button');
+            button.disabled=true;feedback.textContent='';
+            try{feedback.textContent=await action(form);}
+            catch(e){feedback.textContent=e.message;}
+            finally{button.disabled=false;}
+        };
+    };
+    submit('#profile-form',async()=>{
+        const result=await api('update_profile',{name:dialog.querySelector('#profile-name').value});
+        me.name=result.name;
+        return 'Profil kaydedildi.';
+    });
+    submit('#profile-password-form',async form=>{
+        const password=dialog.querySelector('#profile-new').value;
+        demandUi(password===dialog.querySelector('#profile-confirm').value,'Parolalar eşleşmiyor.');
+        await api('change_password',{current_password:dialog.querySelector('#profile-current').value,password});
+        form.reset();
+        return 'Parola değiştirildi.';
+    });
+}
 function recoveryKey(){return `vakalab:${me.id}:${work.application.id}:${work.version.id}`;}
 function localSave(){if(work&&dirty)sessionStorage.setItem(recoveryKey(),JSON.stringify({revision:Number(work.application.revision),draft:work.draft}));}
-async function openWork(id){work=await api('view',undefined,{app_id:id});viewId=crypto.randomUUID();visitEditedFields=new Set();work.draft=JSON.parse(work.application.draft);validationScope=null;dirty=false;conflict=false;busy=!!work.application.active_request;section=work.application.last_section||'case';const key=`lease:${me.id}:${id}`;
-    const check=()=>{const old=JSON.parse(localStorage.getItem(key)||'null');readOnlyTab=!!old&&old.tab!==tab&&Date.now()-old.at<20000;if(!readOnlyTab)localStorage.setItem(key,JSON.stringify({tab,at:Date.now()}));};check();clearInterval(leaseTimer);leaseTimer=setInterval(check,5000);
-    events=JSON.parse(sessionStorage.getItem(recoveryKey()+':events')||'[]');seq=Math.max(Number(sessionStorage.getItem(recoveryKey()+':seq')||0),...events.map(e=>e.seq));
+let telemetryClock=null;
+async function openWork(id){
+    const sentAt=performance.now();
+    work=await api('view',undefined,{app_id:id});
+    const receivedAt=performance.now(),serverAt=Date.parse(work.telemetry_server_at);
+    telemetryClock=Number.isFinite(serverAt)?{sentAt,receivedAt,serverAt}:null;
+    viewId=crypto.randomUUID();visitEditedFields=new Set();work.draft=JSON.parse(work.application.draft);validationScope=null;dirty=false;conflict=false;busy=!!work.application.active_request||pendingChats.has(recoveryKey());section=work.application.last_section||'case';await acquireLease();
+    events=JSON.parse(sessionStorage.getItem(recoveryKey()+':events')||'[]');seq=events.reduce((highest,e)=>Math.max(highest,e.seq),Number(sessionStorage.getItem(recoveryKey()+':seq')||0));
+    if(events.length)persistTelemetry(me.id,id,events);
     const recovery=sessionStorage.getItem(recoveryKey());if(recovery&&work.application.state!=='submitted'&&!readOnlyTab){const r=JSON.parse(recovery);if(r.revision===Number(work.application.revision)&&(await confirmStudent('Bu hesap ve vaka için sunucuya ulaşmamış taslak bulundu. Kurtarılsın mı?'))){work.draft=r.draft;dirty=true;event('recovered');}else if(r.revision!==Number(work.application.revision))notify('Eski kurtarma taslağı korunuyor; sunucu sürümü değiştiği için otomatik uygulanmadı.');}
-    clearInterval(heartbeatTimer);if(work.application.state!=='submitted')heartbeatTimer=setInterval(()=>{event('heartbeat');flushEvents();if(busy)refreshChat().catch(()=>{});},me.config.heartbeat_ms);renderWork();event('section_open');flushEvents();if(dirty)scheduleSave();
+    const sentKey=sessionStorage.getItem(recoveryKey()+':request');
+    if(work.requests.some(r=>r.client_key===sentKey)&&clearSentQuestion(sentKey))dirty=true;
+    clearInterval(heartbeatTimer);if(work.application.state!=='submitted')heartbeatTimer=setInterval(()=>{event('heartbeat');flushEvents();if(busy)refreshChat().catch(()=>{});},me.config.heartbeat_ms);renderWork();event('section_open');
+    const observed=observedChat();
+    if(observed)recordResponse(work.requests.find(r=>r.attempt===observed.attempt_id));
+    flushEvents();if(dirty)scheduleSave();
 }
 function locked(){return work.application.state==='submitted'||(work.application.collection_closed_at&&!Number(work.application.allow_late))||readOnlyTab||conflict;}
 function sectionLocked(s){return !work.application.initial_at&&['ai','final','reflection','confirm'].includes(s);}
 function status(t,error=false){const e=$('#save-status');if(e){e.textContent=t;e.classList.toggle('error',error);}}
 function scheduleSave(){dirty=true;localSave();status('Kaydedilmemiş değişiklik var');updateValidationFeedback();clearTimeout(saveTimer);saveTimer=setTimeout(()=>save().catch(e=>notify(e.message)),me.config.autosave_ms);}
-async function save(action='save'){clearTimeout(saveTimer);const task=async()=>{if(!work||(!dirty&&action==='save'))return;demandUi(!conflict,'Sürüm çakışmasını çözmeden kayıt yapılamaz.');const id=work.application.id, snapshot=structuredClone(work.draft);saving=true;updateSubmitGate();status('Kaydediliyor…');try{const a=await api(action,{app_id:id,revision:Number(work.application.revision),draft:snapshot});work.application={...work.application,...a};dirty=JSON.stringify(work.draft)!==JSON.stringify(snapshot);if(!dirty)sessionStorage.removeItem(recoveryKey());else localSave();status(dirty?'Kaydedilmemiş değişiklik var':'Sunucuya kaydedildi');return a;}catch(e){localSave();if(e.status===409){conflict=true;notify('Sürüm çakışması / kilit değişimi. Taslağınız bu sekmede korunuyor; metninizi kopyalayıp yeniden yükleyin.');}status(navigator.onLine?e.message:'Bağlantı yok, sunucuya gönderilemedi',true);throw e;}finally{saving=false;updateValidationFeedback();}};saveChain=saveChain.catch(()=>{}).then(task);return saveChain;}
+async function save(action='save'){
+    clearTimeout(saveTimer);
+    const task=async()=>{
+        if(!work||(!dirty&&action==='save'))return;
+        demandUi(!conflict,'Sürüm çakışmasını çözmeden kayıt yapılamaz.');
+        demandUi(ownsLease(),'Bu vaka başka sekmede düzenleniyor. Taslağınız bu sekmede korunuyor.');
+        const target=work,id=work.application.id,owner=me.id,eventKey=recoveryKey()+':events';
+        saving=true;updateSubmitGate();status('Kaydediliyor…');
+        let batch=null;
+        try{
+            if(action==='submit'){
+                const stored=await readTelemetry(owner);
+                demandUi(work===target&&ownsLease(),'Teslim için vaka sekmesine dönün.');
+                const remaining=new Map((stored||[]).filter(row=>row.appId===id).map(row=>[row.event.key,row.event]));
+                for(const entry of events)remaining.set(entry.key,entry);
+                const ordered=[...remaining.values()].sort((a,b)=>a.at.localeCompare(b.at)||a.seq-b.seq);
+                const attachable=telemetryBatch(id,ordered,true).slice(-99);
+                submissionPending=true;
+                const marker=makeTelemetryEvent('workflow_confirmed',{kind:'submit',submitted:true});
+                storeEventSequence();
+                batch={events:attachable,marker,pending:pendingTelemetryRanges(ordered)};
+            }
+            const snapshot=structuredClone(work.draft);
+            const body={app_id:id,revision:Number(work.application.revision),draft:snapshot};
+            if(batch)body.submit_telemetry=batch;
+            const {telemetry_receipt,...a}=await api(action,body);
+            if(batch&&telemetry_receipt)await applyTelemetryReceipt(owner,id,eventKey,batch.events,telemetry_receipt);
+            target.application={...target.application,...a};
+            if(work!==target)return a;
+            dirty=JSON.stringify(work.draft)!==JSON.stringify(snapshot);
+            if(!dirty)sessionStorage.removeItem(recoveryKey());else localSave();
+            status(dirty?'Kaydedilmemiş değişiklik var':'Sunucuya kaydedildi');
+            return a;
+        }catch(e){
+            localSave();
+            if(e.status===409){
+                conflict=true;
+                notify('Sürüm çakışması / kilit değişimi. Taslağınız bu sekmede korunuyor; metninizi kopyalayıp yeniden yükleyin.');
+            }
+            status(navigator.onLine?e.message:'Bağlantı yok, sunucuya gönderilemedi',true);
+            throw e;
+        }finally{
+            submissionPending=false;saving=false;updateValidationFeedback();
+        }
+    };
+    saveChain=saveChain.catch(()=>{}).then(task);
+    return saveChain;
+}
 function demandUi(ok,text){if(!ok)throw new Error(text);}
 function bindFields(keys){for(const k of keys){const el=$('#'+k);if(!el)continue;el.oninput=()=>{work.draft[k]=el.tagName==='SELECT'?(el.value===''?null:Number(el.value)):el.value;lastInput=Date.now();const first=!visitEditedFields.has(k);visitEditedFields.add(k);event(k==='question'?'question_changed':el.tagName==='SELECT'?'profile_changed':'text_changed',{field:k},!first);scheduleSave();};el.onfocus=()=>event('field_focus',{field:k});el.onblur=()=>{if(dirty)save().catch(()=>{});};}}
 function studentTabHtml(key,label,index,initialLock){
@@ -49,13 +270,29 @@ function studentTabHtml(key,label,index,initialLock){
     const accessible=`${index+1}. ${label}${state?' · '+state:''}`;
     return `<button data-section="${key}" class="${section===key?'active':''}" aria-current="${section===key?'step':'false'}" aria-label="${esc(accessible)}" title="${esc(accessible)}"><span class="student-tab-number" aria-hidden="true">${index+1}</span><span class="student-tab-copy"><span class="student-tab-label">${shortNames[key]}</span>${state?`<span class="student-tab-state ${state==='Kilitli'?'is-locked':'is-readonly'}" aria-hidden="true">${state==='Kilitli'?'🔒 Kilitli':'Salt okunur'}</span>`:''}</span></button>`;
 }
+function chatHtml(){
+    const pending=pendingChats.get(recoveryKey());
+    const pendingMessage=pending?.text&&!work.requests.some(r=>r.client_key===pending.key);
+    const messages=work.messages.map(m=>`<div class="message ${m.role}" data-source="message:${m.id}"><strong>${m.role==='user'?'Siz':'AI'} · ${esc(m.status)} · #${m.seq}</strong>${esc(m.content)}</div>`).join('');
+    return `<div class="toolbar"><div><span class="eyebrow">Vaka ile bağımsız sohbet</span><h2>AI ile etkileşim</h2></div></div>
+    <p class="muted">Gerçek kişilere ait tanımlayıcı bilgi paylaşmayın. Yalnız vaka ve bu sohbette gönderdiğiniz mesajlar AI'a iletilir.</p>
+    <div class="chat" id="chat">${messages}${pendingMessage?`<div class="message user" data-pending-message><strong>Siz</strong>${esc(pending.text)}</div>`:''}
+    ${busy?'<div class="chat-waiting" role="status">AI yanıt hazırlıyor… <span class="chat-waiting-dots" aria-hidden="true"><span></span><span></span><span></span></span></div>':!messages?'<p class="empty">Henüz mesaj yok.</p>':''}</div>
+    ${field('question','Mesaj taslağı',busy?'':work.draft.question,'textarea',locked()||busy)}
+    <div class="row spaced"><button id="send" ${locked()||busy?'disabled':''}>Mesajı gönder</button><small>Yanıt tamamlandığında gösterilir. Yanıtı beklerken diğer bölümlerde çalışabilirsiniz.</small></div>`;
+}
 function renderWork(){const a=work.application,d=work.draft,initialLock=!!a.initial_at||locked();$('#root').innerHTML=`<div class="student-work-heading"><div class="toolbar"><div><div class="eyebrow">Vaka çalışma alanı · sürüm ${work.version.version} · Deneme ${a.attempt_no}</div><h1>${esc(a.case_title||'Pedagojik vaka')}</h1></div><div class="row"><span class="pill">${esc(stateName(a.state))}</span><span id="save-status" class="status">${dirty?'Kaydedilmemiş değişiklik var':'Sunucudaki sürüm yüklendi'}</span><button id="back" class="secondary">← Vakalarım</button></div></div>${work.attempts?.length>1?`<div class="row" aria-label="Vaka denemeleri">${work.attempts.map(t=>`<button class="secondary" data-student-attempt="${t.id}" ${t.id===a.id?'disabled':''}>Deneme ${t.attempt_no} · ${esc(stateName(t.state))}</button>`).join('')}</div>`:''}</div><div class="workspace-top"><nav class="tabs" aria-label="Çalışma bölümleri">${Object.entries(names).map(([k,v],i)=>studentTabHtml(k,v,i,initialLock)).join('')}</nav></div><div class="section">${a.collection_closed_at&&!Number(a.allow_late)?'<p class="warning">Bu vakada veri toplama kapalı. Kayıtlarınızı görüntüleyebilirsiniz; değişiklik yapılamaz.</p>':''}${readOnlyTab?'<p class="warning">Bu vaka başka sekmede açık. Bu sekme salt okunur. Diğer sekmeyi kapattıktan 20 saniye sonra yeniden yükleyin.</p>':''}${conflict?'<p class="warning">Sürüm çakışması: taslağı kopyalayıp sunucu sürümünü yeniden yükleyin.</p>':''}${section==='confirm'?'<div id="validation-summary" class="validation-summary" role="alert" hidden></div>':''}<div class="card" id="section-body"></div>${section==='confirm'?reportLinks():''}</div>`;
     let html='';if(sectionLocked(section))html='<h2>Bu bölüm henüz açık değil</h2><p>Başlangıç değerlendirmenizi kesinleştirdiğinizde AI sohbeti, nihai değerlendirme, yansıtma ve son teslim bölümleri açılacaktır.</p>';
-    else if(section==='case')html=`<span class="eyebrow">Vaka metni · sürüm ${work.version.version}</span><h2>Durumu inceleyin</h2><div class="prose" data-source="case">${esc(work.version.body)}</div><p class="prose">${esc(work.version.instructions)}</p>`;
-    else if(section==='profile')html=`<span class="eyebrow">Başlangıç profili</span><h2>Bu vakaya ilişkin görüşünüz</h2><p class="muted">Her alan başlangıçta boştur. Profiliniz başlangıç yanıtınızla birlikte kesinleşir.</p><div class="grid">${[['knowledge','Ön bilgi: Bu konu hakkında ne kadar bilginiz var?'],['confidence','Başlangıç güveni: Uygun karar verebileceğinize ne kadar güveniyorsunuz?'],['difficulty','Algılanan zorluk'],['severity','Yanlış kararın sonucunun ciddiyeti']].map(([k,l])=>`<div>${numberField(k,l,d[k],initialLock)}</div>`).join('')}</div>`;
-    else if(section==='initial')html=`<span class="eyebrow">AI öncesi muhakeme</span><h2>Başlangıç değerlendirmeniz</h2><p class="muted">Kararınızı etkileyen vaka bilgilerini, kişileri, olası riskleri veya sonuçları belirtiniz.</p>${a.initial_at?'<p class="warning">Başlangıç yanıtınız kesinleştirildi. Bu bölüm yalnızca görüntülenebilir.</p>':''}${field('problem','Bu vakadaki temel problemi nasıl değerlendiriyorsunuz?',d.problem,'textarea',initialLock)}${field('decision','Kararınız nedir?',d.decision,'textarea',initialLock)}${field('reason','Bu kararı neden veriyorsunuz?',d.reason,'textarea',initialLock)}<button class="spaced" id="initial" ${initialLock?'disabled':''}>Başlangıç yanıtımı kesinleştir ve AI sohbetini aç</button>`;
-    else if(section==='ai')html=`<div class="toolbar"><div><span class="eyebrow">Vaka ile bağımsız sohbet</span><h2>AI ile etkileşim</h2></div><span class="pill" id="ai-status">${busy?'Yanıt üretiliyor':'Tam yanıt aktarımı'}</span></div><p class="muted">Gerçek kişilere ait tanımlayıcı bilgi paylaşmayın. Yalnız vaka ve bu sohbette gönderdiğiniz mesajlar AI'a iletilir.</p><div class="chat" id="chat">${work.messages.map(m=>`<div class="message ${m.role}" data-source="message:${m.id}"><strong>${m.role==='user'?'Siz':'AI'} · ${esc(m.status)} · #${m.seq}</strong>${esc(m.content)}</div>`).join('')||'<p class="empty">Henüz mesaj yok.</p>'}</div>${field('question','Mesaj taslağı',d.question,'textarea',locked())}<div class="row spaced"><button id="send" ${locked()||busy?'disabled':''}>Mesajı gönder</button><small>Akış ölçümü yok; yanıt tamamlandığında gösterilir. Yanıt sürerken diğer bölümlerde yazabilirsiniz.</small></div>`;
-    else if(section==='final')html=`<span class="eyebrow">Nihai muhakeme</span><h2>Son kararınız ve gerekçeniz</h2>${field('final_decision','Nihai kararınız nedir?',d.final_decision,'textarea',locked())}${field('final_reason','Nihai kararınızın gerekçesi nedir?',d.final_reason,'textarea',locked())}${numberField('final_confidence','Nihai kararınıza ne kadar güveniyorsunuz?',d.final_confidence,locked())}${numberField('final_difficulty','Son değerlendirmenize göre bu vakada karar vermek size ne kadar zor geliyor?',d.final_difficulty,locked())}${numberField('final_severity','Son değerlendirmenize göre, bu vakada yanlış karar vermenin sonuçları ne kadar ciddidir?',d.final_severity,locked())}`;
+    else if(section==='case')html=`<span class="eyebrow">Vaka metni · sürüm ${work.version.version}</span><h2>Durumu inceleyin</h2><div class="prose case-body" data-source="case">${caseBodyMarkup(work.version)}</div><p class="prose">${esc(work.version.instructions)}</p>`;
+    else if(section==='profile')html=`<span class="eyebrow">Başlangıç profili</span><h2>Bu vakaya ilişkin görüşünüz</h2><p class="muted">Her alan başlangıçta boştur. Profiliniz başlangıç yanıtınızla birlikte kesinleşir.</p><div class="grid">${[
+        ['knowledge','Ön bilgi — Vakada geçen konular, kavramlar ve kurallar hakkında ne kadar bilginiz var?','Puan verirken vakayla ilgili konularda önceden bildiklerinizi düşünün. Örneğin grup çalışmasında görevlerin nasıl paylaşıldığı, grup üyelerinin katkılarının nasıl adil değerlendirildiği veya bir ödevde yapay zekâ kullanımına hangi kuralların uygulandığı gibi.'],
+        ['confidence','Başlangıç güveni — Bu vakada uygun bir karar verebileceğinize ne kadar güveniyorsunuz?'],
+        ['difficulty','Algılanan zorluk — Bu vakada karar vermek size ne kadar zor geliyor?'],
+        ['severity','Yanlış kararın sonucunun ciddiyeti — Bu vakada yanlış bir karar verirseniz, doğabilecek sonuçlar sizce ne kadar ciddi olur?']
+    ].map(([key,label,hint])=>`<div>${numberField(key,label,d[key],initialLock,hint)}</div>`).join('')}</div>`;
+    else if(section==='initial')html=`<span class="eyebrow">AI öncesi muhakeme</span><h2>Başlangıç değerlendirmeniz</h2><p class="muted">Kararınızı etkileyen vaka bilgilerini, kişileri, olası riskleri veya sonuçları belirtiniz.</p>${a.initial_at?'<p class="warning">Başlangıç yanıtınız kesinleştirildi. Bu bölüm yalnızca görüntülenebilir.</p>':''}${field('problem','Bu vakadaki temel problemi nasıl değerlendiriyorsunuz?',d.problem,'textarea',initialLock)}${field('decision','Kararınız nedir?',d.decision,'textarea',initialLock,'Bu durumla karşılaşsaydınız ne yapardınız? Vereceğiniz kararı ve nasıl bir yol izleyeceğinizi açıklayın.')}${field('reason','Bu kararı neden veriyorsunuz?',d.reason,'textarea',initialLock,'Kararınızı etkileyen vaka bilgilerini ve gerekçelerinizi açıklayın.')}<button class="spaced" id="initial" ${initialLock?'disabled':''}>Başlangıç yanıtımı kesinleştir ve AI sohbetini aç</button>`;
+    else if(section==='ai')html=chatHtml();
+    else if(section==='final')html=`<span class="eyebrow">AI sonrası muhakeme</span><h2>Son kararınız ve gerekçeniz</h2>${field('final_decision','Bu vakada ne yapmaya karar verdiniz?',d.final_decision,'textarea',locked(),'Nihai kararınızı ve nasıl bir yol izleyeceğinizi açıklayın.')}${field('final_reason','Nihai kararınızı neden verdiniz?',d.final_reason,'textarea',locked(),'Bu kararı vermenizde etkili olan gerekçeleri açıklayın.')}${numberField('final_confidence','Nihai kararınıza ne kadar güveniyorsunuz?',d.final_confidence,locked())}${numberField('final_difficulty','Son değerlendirmenize göre bu vakada karar vermek size ne kadar zordu?',d.final_difficulty,locked())}${numberField('final_severity','Son değerlendirmenize göre bu vakada yanlış bir karar verirseniz, doğabilecek sonuçlar ne kadar ciddi olur?',d.final_severity,locked())}`;
     else if(section==='reflection')html=`<span class="eyebrow">Süreç üzerine düşünme</span><h2>Yansıtmanız</h2>${field('reflection',"AI ile etkileşiminiz nihai kararınızı nasıl etkiledi? AI'ın hangi önerisini kabul ettiniz, değiştirdiniz veya reddettiniz? Neden?",d.reflection,'textarea',locked())}`;
     else if(section==='confirm')html=`<div class="toolbar"><div><span class="eyebrow">Çalışmayı tamamla</span><h2>Son teslim</h2><p class="muted">Nihai yanıt ve yansıtma birlikte kilitlenir. Sürecinizi sonrasında görüntüleyebilirsiniz.</p></div><button id="submit" aria-describedby="submit-help" ${!canSubmit()?'disabled':''}>Vakayı tamamla ve tüm yanıtlarımı kesinleştir</button></div><div id="submit-help" class="submit-help" aria-live="polite"></div>${a.submitted_at?`<p>Teslim: ${displayTime(a.submitted_at)}</p>`:''}`;
     if(section==='ai'&&!sectionLocked(section))html+=(work.requests||[]).filter(r=>r.status==='failed').map(r=>`<p class="warning">Başarısız AI isteği ${esc(r.id.slice(0,8))}. Öğrenci mesajı korunuyor. <button class="secondary" data-retry-request="${r.id}" ${locked()||busy?'disabled':''}>Aynı mesajı yeniden dene</button></p>`).join('');
@@ -63,8 +300,14 @@ function renderWork(){const a=work.application,d=work.draft,initialLock=!!a.init
     document.querySelectorAll('[data-section]').forEach(b=>{b.onpointerdown=e=>{if(dirty&&e.button===0)e.preventDefault();};b.onclick=async()=>{const old=section;try{if(dirty)await save();section=b.dataset.section;scrolls[old]=window.scrollY;renderWork();window.scrollTo(0,scrolls[section]||0);event('section_open',{locked:sectionLocked(section)});}catch(e){notify(e.message);}};});
     document.querySelectorAll('[data-student-attempt]').forEach(b=>b.onclick=async()=>{try{if(dirty)await save();event('section_leave',{reason:'home'});await drainEvents();releaseLease();clearInterval(heartbeatTimer);await openWork(b.dataset.studentAttempt);}catch(e){notify(e.message);}});
     handler('#back',async()=>{if(dirty)await save();event('section_leave',{reason:'home'});await drainEvents();await home();});handler('#initial',async()=>{if(!validateBeforeConfirm('initial'))return;if(!(await confirmStudent('Başlangıç yanıtınız ve vaka profili yanıtlarınız bundan sonra değiştirilemeyecek. Devam etmek istiyor musunuz?')))return;if(!validateBeforeConfirm('initial'))return;await save('initial');event('workflow_confirmed',{kind:'initial'});validationScope=null;section='ai';renderWork();event('section_open');});
-    handler('#submit',async()=>{if(!validateBeforeConfirm('submit'))return;if(!canSubmit()){notify('Teslim için kayıt ve AI işlemlerinin tamamlanmasını bekleyin.');return;}if(!(await confirmStudent('Yeni mesaj ve düzenleme yapılamayacak; tüm süreci görüntüleyebileceksiniz. Teslim edilsin mi?')))return;if(!validateBeforeConfirm('submit')||!canSubmit())return;await save('submit');event('workflow_confirmed',{kind:'submit'});clearInterval(heartbeatTimer);await drainEvents();validationScope=null;renderWork();notify('Vaka teslim edildi.');});handler('#send',sendChat);
-    if($('#chat'))$('#chat').onscroll=()=>event('scroll',{},true);document.querySelectorAll('[data-report]').forEach(b=>b.onclick=()=>download({report_ids:b.dataset.report,format:b.dataset.format}));bindStudentReports();
+    handler('#submit',async()=>{if(!validateBeforeConfirm('submit'))return;if(!canSubmit()){notify('Teslim için kayıt ve AI işlemlerinin tamamlanmasını bekleyin.');return;}if(!(await confirmStudent('Yeni mesaj ve düzenleme yapılamayacak; tüm süreci görüntüleyebileceksiniz. Teslim edilsin mi?')))return;if(!validateBeforeConfirm('submit')||!canSubmit())return;await save('submit');clearInterval(heartbeatTimer);await drainEvents();validationScope=null;renderWork();notify('Vaka teslim edildi.');});handler('#send',sendChat);
+    const chat=$('#chat');
+    if(chat){
+        chat.scrollTop=chat.scrollHeight;
+        let initialScroll=chat.scrollTop;
+        chat.onscroll=()=>{if(chat.scrollTop!==initialScroll)event('scroll',{},true);initialScroll=null;};
+    }
+    document.querySelectorAll('[data-report]').forEach(b=>b.onclick=()=>download({report_ids:b.dataset.report,format:b.dataset.format}));bindStudentReports();
     document.querySelectorAll('[data-retry-request]').forEach(b=>b.onclick=()=>retryChat(b.dataset.retryRequest));
     updateValidationFeedback();
     const activeTab=document.querySelector('[data-section="'+section+'"]');
@@ -100,42 +343,269 @@ function studentReportHtml(r){
 
 function reportLinks(){return (work.reports||[]).length?`<div class="card"><h2>Yayımlanan raporlar</h2>${[...work.reports].sort((a,b)=>Number(b.version)-Number(a.version)).map(r=>`<p>Sürüm ${r.version} <button class="secondary" data-student-report="${r.id}">Raporu görüntüle</button> <button class="secondary" data-report="${r.id}" data-format="docx">Word</button> <button class="secondary" data-report="${r.id}" data-format="pdf">PDF</button></p>`).join('')}</div>`:'';}
 const recordedResponses=new Set();
-function recordResponse(r){if(!work||!['completed','partial','failed'].includes(r?.status))return;const key=work.application.id+'/'+r.id+'/'+r.status+'/'+(r.completed_at||'');if(recordedResponses.has(key))return;recordedResponses.add(key);event('response_visible',{request:r.id,status:r.status,quality:'full_response_only',in_ai:section==='ai'});}
-async function refreshChat(){const target=work;if(!target)return;const pendingRequest=target.application.active_request;const updated=await api('view',undefined,{app_id:target.application.id});if(work!==target)return;target.messages=updated.messages;target.requests=updated.requests;target.application.active_request=updated.application.active_request;const wasBusy=busy;busy=!!updated.application.active_request;updateSubmitGate();if(wasBusy&&!busy){if(section==='ai')renderWork();const completed=target.requests.find(r=>r.id===pendingRequest);if(completed)recordResponse(completed);notify('AI işlemi tamamlandı. Sohbet bölümünden görüntüleyebilirsiniz.');}}
-async function sendChat(){if(busy||locked())return;const target=work,draftAtSend=target.draft.question,text=draftAtSend.trim();if(!text)return;await save();if(work!==target||locked()||busy)return;const keyName=recoveryKey()+':request',textKey=keyName+':text';busy=true;updateSubmitGate();const previousKey=sessionStorage.getItem(keyName),previousText=sessionStorage.getItem(textKey);const key=previousKey&&(previousText===text||previousText===null)?previousKey:crypto.randomUUID();sessionStorage.setItem(keyName,key);sessionStorage.setItem(textKey,text);if($('#send'))$('#send').disabled=true;notify('AI yanıtı hazırlanıyor. Diğer bölümlerde çalışmaya devam edebilirsiniz.');
-    event('message_send',{request_key:key});
-    try{const r=await api('chat',{app_id:target.application.id,text,key});sessionStorage.removeItem(keyName);sessionStorage.removeItem(textKey);if(work!==target){notify('Önceki vakadaki AI işlemi tamamlandı.');return;}await refreshChat();if(work!==target)return;if(!busy&&target.draft.question===draftAtSend){target.draft.question='';scheduleSave();}if(section==='ai')renderWork();else notify(`AI işlemi: ${r.status}. Sohbet bölümünden görüntüleyebilirsiniz.`);recordResponse(r);
-    }catch(e){if(e.status===409){sessionStorage.removeItem(keyName);sessionStorage.removeItem(textKey);}notify(e.message+' Ağ belirsizliğinde aynı mesajı tekrar gönderebilirsiniz.');if(work===target){busy=false;updateSubmitGate();if($('#send'))$('#send').disabled=false;}}}
+function observedChat(){return JSON.parse(sessionStorage.getItem(recoveryKey()+':observed-chat')||'null');}
+function recordResponse(r){
+    if(!work||readOnlyTab||!['completed','partial','failed'].includes(r?.status))return;
+    const key=work.application.id+'/'+(r.attempt||r.id+'/'+r.status+'/'+(r.completed_at||''));
+    if(recordedResponses.has(key))return;
+    recordedResponses.add(key);
+    event('response_visible',{request:r.id,attempt_id:r.attempt||null,status:r.status,quality:'full_response_only',in_ai:section==='ai'});
+    if(observedChat()?.attempt_id===r.attempt)sessionStorage.removeItem(recoveryKey()+':observed-chat');
+}
+function clearSentQuestion(key){
+    const keyName=recoveryKey()+':request',textKey=keyName+':text';
+    if(!key||sessionStorage.getItem(keyName)!==key)return false;
+    const text=sessionStorage.getItem(textKey);
+    const matches=text!==null&&work.draft.question.trim()===text;
+    if(matches&&locked())return false;
+    sessionStorage.removeItem(keyName);
+    sessionStorage.removeItem(textKey);
+    if(matches)work.draft.question='';
+    return matches;
+}
+async function refreshChat(){
+    const target=work;if(!target)return;
+    const pendingRequest=target.application.active_request;
+    const updated=await api('view',undefined,{app_id:target.application.id});
+    if(work!==target)return;
+    target.messages=updated.messages;target.requests=updated.requests;
+    target.application.active_request=updated.application.active_request;
+    const wasBusy=busy;
+    busy=!!updated.application.active_request||pendingChats.has(recoveryKey());
+    updateSubmitGate();
+    if(wasBusy&&!busy){
+        const completed=target.requests.find(r=>r.id===pendingRequest);
+        if(completed){
+            if(clearSentQuestion(completed.client_key))scheduleSave();
+            recordResponse(completed);
+        }
+        if(section==='ai')renderWork();
+        else notify('AI işlemi tamamlandı. Sohbet bölümünden görüntüleyebilirsiniz.');
+    }
+}
+async function requestChat(payload){
+    const target=work,scope=recoveryKey(),keyName=scope+':request',textKey=keyName+':text',observationKey=scope+':observed-chat';
+    const currentCase=()=>work&&recoveryKey()===scope;
+    pendingChats.set(scope,payload);
+    busy=true;updateSubmitGate();if(section==='ai')renderWork();
+    let result, attempting=false;
+    try{
+        if(payload.text!==undefined){
+            await save();
+            if(work!==target||locked()||target.application.active_request)return;
+            sessionStorage.setItem(keyName,payload.key);
+            sessionStorage.setItem(textKey,payload.text);
+        }
+        demandUi(work===target&&ownsLease(),'Bu vaka başka sekmede düzenleniyor.');
+        attempting=true;
+        sessionStorage.setItem(observationKey,JSON.stringify({key:payload.key,attempt_id:payload.attempt_id,retry_request:payload.retry_request,retry_from:payload.retry_from}));
+        event('message_send',{request_key:payload.key,attempt_id:payload.attempt_id,retry:!!payload.retry_request});
+        flushEvents();
+        const {retry_from,...request}=payload;
+        result=await api('chat',{app_id:target.application.id,...request});
+        if(!currentCase())return;
+        if(payload.text!==undefined&&clearSentQuestion(payload.key))scheduleSave();
+        if(result.status==='running')work.application.active_request=result.id;
+        else if(work.application.active_request===result.id)work.application.active_request=null;
+        recordResponse(result);
+        await refreshChat();
+        if(currentCase()){
+            if(result.status!=='running'&&section!=='ai')notify('AI işlemi tamamlandı. Sohbet bölümünden görüntüleyebilirsiniz.');
+        }
+    }catch(e){
+        if(attempting&&!result&&payload.text!==undefined&&e.status===409){
+            sessionStorage.removeItem(keyName);sessionStorage.removeItem(textKey);
+        }
+        if(attempting&&!result&&e.status===409)sessionStorage.removeItem(observationKey);
+        if(currentCase())notify(e.message+(attempting&&!result&&payload.text!==undefined?' Ağ belirsizliğinde aynı mesajı tekrar gönderebilirsiniz.':''));
+    }finally{
+        pendingChats.delete(scope);
+        if(currentCase()){
+            busy=!!work.application.active_request;updateSubmitGate();
+            if(section==='ai')renderWork();
+        }
+    }
+}
+async function sendChat(){
+    if(busy||locked())return;
+    const text=work.draft.question.trim();if(!text)return;
+    const keyName=recoveryKey()+':request';
+    const previousKey=sessionStorage.getItem(keyName),previousText=sessionStorage.getItem(keyName+':text');
+    const key=previousKey&&(previousText===text||previousText===null)?previousKey:crypto.randomUUID();
+    const previous=observedChat();
+    await requestChat({text,key,attempt_id:previous?.key===key&&!previous.retry_request?previous.attempt_id:crypto.randomUUID()});
+}
 async function retryChat(requestId){
     const target=work;if(!target||busy||locked())return;
     const request=target.requests.find(r=>r.id===requestId);if(!request)return;
     if(!(await confirmStudent('Sağlayıcıda önceki isteğin maliyeti oluşmuş olabilir. Yeni deneme yapılsın mı? Öğrenci mesajı çoğaltılmayacak.'))||work!==target||busy||locked())return;
-    busy=true;updateSubmitGate();if(section==='ai')renderWork();event('message_send',{request_key:request.client_key});
-    try{
-        const result=await api('chat',{app_id:target.application.id,key:request.client_key,retry_request:request.id});
-        if(work!==target)return;
-        await refreshChat();if(work!==target)return;
-        recordResponse(result);if(section==='ai')renderWork();else notify('Yeniden deneme tamamlandı.');
-    }catch(e){if(work===target){busy=false;updateSubmitGate();if(section==='ai')renderWork();notify(e.message);}}
+    const previous=observedChat();
+    const attempt=previous?.retry_request===request.id&&previous.retry_from===request.attempt?previous.attempt_id:crypto.randomUUID();
+    await requestChat({key:request.client_key,retry_request:request.id,retry_from:request.attempt,attempt_id:attempt});
 }
-function event(type,payload={},throttle=false){if(!work||me?.role!=='student'||(work.application.state==='submitted'&&!(type==='workflow_confirmed'&&payload.kind==='submit')))return;if(type==='section_open')visitEditedFields=new Set();if(throttle&&Date.now()-lastEvent<700)return;if(throttle)lastEvent=Date.now();events.push({key:crypto.randomUUID(),tab,seq:++seq,at:new Date().toISOString(),type,section,payload:{...payload,view_id:viewId,navigation_version:2,pending_request:work.application.active_request||null,app_active:!document.hidden&&document.hasFocus(),locked:sectionLocked(section),read_only_tab:readOnlyTab,submitted:work.application.state==='submitted',visible:!document.hidden,focused:document.hasFocus(),interactive:Date.now()-lastInput<me.config.idle_ms}});sessionStorage.setItem(recoveryKey()+':events',JSON.stringify(events));sessionStorage.setItem(recoveryKey()+':seq',String(seq));if(events.length>=20)flushEvents();}
-let flushTask=null;
-async function flushEvents(){if(flushTask)return flushTask;if(!work||!events.length)return;const target=work,queued=events,chunk=queued.slice(0,100),id=target.application.id,key=recoveryKey()+':events';flushTask=(async()=>{try{const r=await api('events',{app_id:id,events:chunk}),remaining=(work===target?events:queued).filter(e=>!r.accepted.includes(e.key));if(work===target)events=remaining;sessionStorage.setItem(key,JSON.stringify(remaining));}catch(e){/* retain queue for authenticated retry */}finally{flushTask=null;}})();return flushTask;}
-async function drainEvents(){for(let i=0;work&&events.length&&i<20;i++){const before=events.length;await flushEvents();if(events.length>=before)break;}}
-function flushExitEvents(){if(!work||me?.role!=='student'||work.application.state==='submitted')return;event('page_exit',{reason:'pagehide'});let chunk=events.slice(-50),body=JSON.stringify({app_id:work.application.id,events:chunk});while(new TextEncoder().encode(body).length>60000&&chunk.length>1){chunk=chunk.slice(1);body=JSON.stringify({app_id:work.application.id,events:chunk});}fetch('api.php?op=events',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},credentials:'same-origin',body,keepalive:true}).catch(()=>{});}
-window.addEventListener('pagehide',flushExitEvents);
-window.addEventListener('pageshow',e=>{if(e.persisted&&work&&work.application.state!=='submitted'){viewId=crypto.randomUUID();event('section_open');flushEvents();}});
+let submissionPending=false;
+function collectingEvents(){
+    const a=work?.application;
+    return !!a&&me?.role==='student'&&a.state!=='submitted'&&(!a.collection_closed_at||Number(a.allow_late));
+}
+
+function makeTelemetryEvent(type,payload){
+    const pending=work.application.active_request;
+    const pendingAttempt=pending&&work.requests?.find(r=>r.id===pending)?.attempt;
+    const elapsed=performance.now();
+    const capture=telemetryClock?{
+        capture_from:new Date(telemetryClock.serverAt+elapsed-telemetryClock.receivedAt-1).toISOString(),
+        capture_until:new Date(telemetryClock.serverAt+elapsed-telemetryClock.sentAt+1).toISOString()
+    }:{};
+    return fitTelemetryEvent({key:crypto.randomUUID(),tab,session:me.telemetry_session,seq:++seq,at:new Date().toISOString(),type,section,payload:{
+        ...capture,
+        view_id:viewId,navigation_version:3,pending_request:pending||null,...(pendingAttempt?{pending_attempt:pendingAttempt}:{}),
+        app_active:!document.hidden&&document.hasFocus(),locked:sectionLocked(section),read_only_tab:readOnlyTab,submitted:false,
+        visible:!document.hidden,focused:document.hasFocus(),interactive:Date.now()-lastInput<me.config.idle_ms,...payload
+    }});
+}
+
+function storeEventSequence(){
+    try{sessionStorage.setItem(recoveryKey()+':seq',String(seq));}catch{}
+}
+
+function event(type,payload={},throttle=false){
+    if(!tabIdentityReady||!collectingEvents()||submissionPending)return;
+    if(type==='section_open')visitEditedFields=new Set();
+    if(throttle&&Date.now()-lastEvent<700)return;
+    if(throttle)lastEvent=Date.now();
+    const entry=makeTelemetryEvent(type,payload);
+    events.push(entry);
+    persistTelemetry(me.id,work.application.id,[entry]);
+    try{sessionStorage.setItem(recoveryKey()+':events',JSON.stringify(events));}catch{}
+    storeEventSequence();
+    if(events.length>=20)flushEvents();
+}
+
+async function sendTelemetryChunk(appId,queued){
+    let chunk=telemetryBatch(appId,queued);
+    for(;;){
+        try{return {chunk,receipt:await api('events',{app_id:appId,events:chunk})};}
+        catch(error){
+            if(error.status!==413)throw error;
+            if(chunk.length===1)return {chunk,receipt:{accepted:[],rejected:[{index:0,reason:'Olay sunucu istek sınırını aşıyor'}]}};
+            chunk=chunk.slice(0,Math.ceil(chunk.length/2));
+        }
+    }
+}
+
+async function applyTelemetryReceipt(owner,appId,key,chunk,receipt){
+    const rejected=(receipt.rejected||[]).filter(item=>Number.isInteger(item.index)&&item.index>=0&&item.index<chunk.length);
+    const processed=new Set([...receipt.accepted,...(receipt.quarantined||[]),...rejected.map(item=>chunk[item.index].key)]);
+    const current=work&&me?.id===owner&&work.application.id===appId;
+    key??=current?recoveryKey()+':events':null;
+    if(key){
+        try{
+            const stored=sessionStorage.getItem(key);
+            if(current||stored!==null){
+                const remaining=(current?events:JSON.parse(stored)).filter(entry=>!processed.has(entry.key));
+                if(current)events=remaining;
+                sessionStorage.setItem(key,JSON.stringify(remaining));
+            }
+        }catch{}
+    }
+    if(current&&receipt.collection_closed_at&&collectingEvents()){
+        work.application.collection_closed_at=receipt.collection_closed_at;
+        work.application.allow_late=0;
+        renderWork();
+    }
+    await deleteTelemetry(owner,appId,processed);
+    if(current&&rejected.length)notify('Olay günlüğüne alınamayan kayıt: '+rejected.length+'. '+rejected[0].reason);
+    return processed;
+}
+
+const eventFlushes=new Map();
+async function flushEvents(){
+    if(!work||!events.length)return;
+    const id=work.application.id,owner=me.id,key=recoveryKey()+':events';
+    if(eventFlushes.has(key))return eventFlushes.get(key);
+    const task=(async()=>{
+        try{
+            const {chunk,receipt}=await sendTelemetryChunk(id,events);
+            await applyTelemetryReceipt(owner,id,key,chunk,receipt);
+        }catch{
+            // Unacknowledged events remain available to retry.
+        }
+    })();
+    eventFlushes.set(key,task);
+    try{await task;}finally{eventFlushes.delete(key);}
+}
+
+let telemetryReplay;
+async function replayTelemetry(){
+    if(me?.role!=='student'||telemetryReplay)return;
+    const account=me;
+    telemetryReplay=(async()=>{
+        const pending=await readTelemetry(account.id);
+        const byApp=new Map();
+        for(const {appId,event} of pending||[]){
+            if(!byApp.has(appId))byApp.set(appId,[]);
+            byApp.get(appId).push(event);
+        }
+        for(const [appId,queue] of byApp){
+            let remaining=queue.sort((a,b)=>a.at.localeCompare(b.at)||a.seq-b.seq);
+            while(remaining.length&&me===account){
+                try{
+                    const {chunk,receipt}=await sendTelemetryChunk(appId,remaining);
+                    const processed=await applyTelemetryReceipt(account.id,appId,null,chunk,receipt);
+                    if(!processed.size)break;
+                    remaining=remaining.filter(entry=>!processed.has(entry.key));
+                }catch{break;}
+            }
+        }
+    })();
+    try{await telemetryReplay;}finally{telemetryReplay=null;}
+}
+
+async function drainEvents(){
+    for(let i=0;work&&events.length&&i<20;i++){
+        const before=events.length;
+        await flushEvents();
+        if(events.length>=before)break;
+    }
+}
+function flushExitEvents(){
+    if(!collectingEvents()||submissionPending)return;
+    event('page_exit',{reason:'pagehide'});
+    const id=work.application.id,chunk=telemetryBatch(id,events,true);
+    if(!chunk.length)return;
+    const body=JSON.stringify({app_id:id,events:chunk});
+    fetch('api.php?op=events',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},credentials:'same-origin',body,keepalive:true}).catch(()=>{});
+}
+window.addEventListener('pagehide',()=>{
+    try{releaseLease();flushExitEvents();}finally{releaseTabIdentity(true);}
+});
+window.addEventListener('pageshow',async e=>{
+    if(!e.persisted)return;
+    await claimTabIdentity(true);
+    if(!work||work.application.state==='submitted')return;
+    const wasReadOnly=readOnlyTab;
+    await acquireLease(true);
+    if(readOnlyTab!==wasReadOnly)renderWork();
+    viewId=crypto.randomUUID();event('section_open');flushEvents();
+});
 
 let lastPresence=null;
 function recordPresence(){if(!work)return;const active=!document.hidden&&document.hasFocus(),key=viewId+'/'+active;if(lastPresence===key)return;lastPresence=key;event('app_presence',{app_active:active});flushEvents();}
 document.addEventListener('visibilitychange',()=>{event('visibility');recordPresence();});
-window.addEventListener('focus',()=>{event('focus');recordPresence();});window.addEventListener('blur',()=>{event('focus');recordPresence();});window.addEventListener('offline',()=>{event('offline');status('Bağlantı yok, sunucuya gönderilemedi',true);updateSubmitGate();});window.addEventListener('online',()=>{event('online');flushEvents();updateSubmitGate();if(dirty)save().catch(e=>notify(e.message));});
+window.addEventListener('focus',()=>{event('focus');recordPresence();});window.addEventListener('blur',()=>{event('focus');recordPresence();});window.addEventListener('offline',()=>{event('offline');status('Bağlantı yok, sunucuya gönderilemedi',true);updateSubmitGate();});window.addEventListener('online',()=>{event('online');flushEvents();replayTelemetry();updateSubmitGate();if(dirty)save().catch(e=>notify(e.message));});
 window.addEventListener('beforeunload',e=>{if(dirty){localSave();e.preventDefault();e.returnValue='';}});
 document.addEventListener('paste',e=>{if(e.target.matches('textarea,input'))event('paste',{field:e.target.id});});
-document.addEventListener('copy',()=>{if(!work)return;const el=document.activeElement;let source=section,quote='',start=null,end=null;if(el?.matches('textarea,input')){start=el.selectionStart;end=el.selectionEnd;quote=el.value.slice(start,end);source=el.id;}else{const s=window.getSelection();quote=s?.toString()||'';const node=s?.anchorNode?.parentElement?.closest('[data-source]');source=node?.dataset.source||section;if(s?.rangeCount){const range=s.getRangeAt(0);if(node&&node.contains(range.startContainer)&&node.contains(range.endContainer)){const pre=range.cloneRange();pre.selectNodeContents(node);pre.setEnd(range.startContainer,range.startOffset);start=pre.toString().length;end=start+quote.length;}}}event('copy',{source,version:work.version.id,revision:work.application.revision,start,end,length:quote.length,quote:quote.slice(0,6000)});});
+document.addEventListener('copy',()=>{if(!work)return;const el=document.activeElement;let source=section,quote='',start=null,end=null;if(el?.matches('textarea,input')){start=el.selectionStart;end=el.selectionEnd;quote=el.value.slice(start,end);source=el.id;}else{const s=window.getSelection();quote=s?.toString()||'';const node=s?.anchorNode?.parentElement?.closest('[data-source]');source=node?.dataset.source||section;if(s?.rangeCount){const range=s.getRangeAt(0);if(node&&node.contains(range.startContainer)&&node.contains(range.endContainer)){const pre=range.cloneRange();pre.selectNodeContents(node);pre.setEnd(range.startContainer,range.startOffset);start=pre.toString().length;end=start+quote.length;
+            if(source==='case'&&work.version.body_html&&!work.version.body.startsWith(quote,start)){
+                const match=work.version.body.indexOf(quote);
+                start=match>=0&&match===work.version.body.lastIndexOf(quote)?match:null;
+                end=start===null?null:start+quote.length;
+            }}}}event('copy',{source,version:work.version.id,revision:work.application.revision,start,end,length:quote.length,quote});});
 let adminTab='overview',currentAnalysisView=null;
-async function processView(id,guard=null,loaded=null){rememberProcessUi();const v=loaded||await api('view',undefined,{app_id:id}),a=v.application,u=dash.users.find(u=>u.id===a.user_id),c=dash.cases.find(c=>c.id===a.case_id);if(guard&&!guard())return;$('#root').innerHTML=`<div class="toolbar"><div><div class="eyebrow">Öğrenci-vaka dosyası · ${esc(a.id)}</div><h1>${esc(u.login)} · ${esc(c.title)}</h1><span class="pill">${esc(stateName(a.state))}</span></div><button class="secondary" id="admin-back">← Genel durum</button></div><div class="card"><h2>Özet ve veri bütünlüğü</h2><p>Deneme ${a.attempt_no} · Vaka sürümü ${v.version.version} · Başlangıç ${displayTime(a.initial_at)} · Teslim ${displayTime(a.submitted_at)}</p><div class="row">${v.attempts.map(t=>`<button class="secondary" data-attempt="${t.id}" ${t.id===a.id?'disabled':''}>Deneme ${t.attempt_no} · ${esc(stateName(t.state))}</button>`).join('')}<button id="new-attempt" ${a.state!=='submitted'||v.attempts[0].id!==a.id?'disabled':''}>Yeni deneme aç</button><button class="secondary" id="exclude">${Number(a.excluded)?'Analize dahil et':'Analiz dışı işaretle'}</button><button class="secondary" id="process-json">Ham JSON indir</button><button class="secondary" id="process-disco">Disco: geçişler ve süreler</button><button class="secondary" id="process-disco-events">Disco: ayrıntılı olaylar ve AI</button></div></div>${processDataHtml(v)}<div class="card"><div class="toolbar"><h2>Değerlendirme ve rapor</h2></div>${renderAnalysisRuns(v)}</div>`;
-    currentAnalysisView=v;bindProcessData(v,id);bindReviewV2(v,id);bindHolisticReview(v,id);watchAnalysis(id,v);
+async function processView(id,guard=null,loaded=null){rememberProcessUi();const v=loaded||await api('view',undefined,{app_id:id}),a=v.application,u=caseStudent(a.user_id),c=dash.cases.find(c=>c.id===a.case_id),global=isSuperAdmin();if(guard&&!guard())return;$('#root').innerHTML=`<div class="toolbar"><div><div class="eyebrow">Öğrenci-vaka dosyası · ${esc(a.id)}</div><h1>${esc(u?.login||a.user_id)} · ${esc(c?.title||a.case_title)}</h1>${global?`<p class="muted">Araştırmacı · ${esc(ownerName(a.case_owner_id))}</p>`:''}<span class="pill">${esc(stateName(a.state))}</span></div><button class="secondary" id="admin-back">← Genel durum</button></div><div class="card"><h2>Özet ve veri bütünlüğü</h2><p>Deneme ${a.attempt_no} · Vaka sürümü ${v.version.version} · Başlangıç ${displayTime(a.initial_at)} · Teslim ${displayTime(a.submitted_at)}</p><div class="row">${v.attempts.map(t=>`<button class="secondary" data-attempt="${t.id}" ${t.id===a.id?'disabled':''}>Deneme ${t.attempt_no} · ${esc(stateName(t.state))}</button>`).join('')}<button id="new-attempt" ${a.state!=='submitted'||v.attempts[0].id!==a.id?'disabled':''}>Yeni deneme aç</button><button class="secondary" id="exclude">${Number(a.excluded)?'Analize dahil et':'Analiz dışı işaretle'}</button><button class="secondary" id="process-json">Ham JSON indir</button><button class="secondary" id="process-disco">Disco: geçişler ve süreler</button><button class="secondary" id="process-disco-events">Disco: ayrıntılı olaylar ve AI</button></div><label class="inline-check"><input id="process-disco-all-data" type="checkbox">Disco çıktısına test, pratik ve analiz dışı denemeyi de dahil et</label></div>${processDataHtml(v)}<div class="card"><div class="toolbar"><h2>Değerlendirme ve rapor</h2></div>${renderAnalysisRuns(v)}${global&&v.reports.length+v.steps.length>0?`<details class="spaced"><summary>Değerlendirme ve rapor geçmişi</summary>${assessmentHistory(v)}</details>`:''}</div>`;
+    currentAnalysisView=v;bindProcessData(v,id);
+    bindReviewV2(v,id);bindHolisticReview(v,id);watchAnalysis(id,v);
     document.querySelectorAll('[data-attempt]').forEach(b=>b.onclick=()=>processView(b.dataset.attempt).catch(e=>notify(e.message)));
     handler('#new-attempt',()=>showDialog(`<h2>Yeni deneme aç</h2><p>Öğrenci bu vakayı boş yanıtlarla baştan dolduracak. Önceki teslim, sohbet ve değerlendirmeler ayrı kayıtta korunacak. Vaka metni aynı kalacak. Veri toplama kapalıysa bu öğrenciye ek süre açılacak.</p>${field('reason','Yeni deneme açma gerekçesi','','textarea')}<button id="commit" class="spaced">Yeni deneme aç</button>`,async()=>{const next=await api('admin',{action:'new_attempt',app_id:id,reason:getValue('reason')});dash=await api('dashboard');await processView(next.id);notify('Yeni deneme açıldı. Öğrenci Vakalarım üzerinden başlayabilir.');}));
     document.querySelectorAll('[data-current-report]').forEach(b=>b.onclick=()=>download({report_ids:b.dataset.currentReport,student_view:1,format:b.dataset.format}));
@@ -169,7 +639,7 @@ function watchAnalysis(appId,view){
     const pending=v=>analysisWorkPending(v,appId);
     if(!pending(view))return;
     const newRun=$('#new-run');if(newRun)newRun.disabled=true;
-    const visible=()=>me?.role==='researcher'&&$('#process-data')?.dataset.appId===appId;
+    const visible=()=>(me?.role==='researcher'||isSuperAdmin())&&$('#process-data')?.dataset.appId===appId;
     analysisObserver=observeAnalysis({initial:view,isCurrent:visible,hasWork:pending,load:()=>api('view',undefined,{app_id:appId}),onChange:async next=>{
         // Do not destroy an open researcher edit or confirmation dialog.
         if(document.querySelector('dialog[open]')||holisticDirty(appId))return false;
@@ -185,7 +655,7 @@ async function startAnalysisSequence(runId,appId){
     if(activeAnalysisSequence)return;
     if(analysisWorkPending(currentAnalysisView,appId)){watchAnalysis(appId,currentAnalysisView);notify('Değerlendirme sürüyor; sonuçlar otomatik güncellenecek.');return;}
     activeAnalysisSequence={runId,appId,step:null};
-    const visible=()=>me?.role==='researcher'&&$('#process-data')?.dataset.appId===appId;
+    const visible=()=>(me?.role==='researcher'||isSuperAdmin())&&$('#process-data')?.dataset.appId===appId;
     try{
         await processView(appId,visible);
         const result=await runSequentialAnalysis(runId,{
@@ -250,7 +720,7 @@ async function recalculateReviewStep(s,appId){
     if(activeAnalysisSequence)return;
     if(analysisWorkPending(currentAnalysisView,appId)){watchAnalysis(appId,currentAnalysisView);notify('Değerlendirme sürüyor; sonuçlar otomatik güncellenecek.');return;}
     activeAnalysisSequence={runId:s.run_id,appId,step:Number(s.step),mode:'repeat'};
-    const visible=()=>me?.role==='researcher'&&$('#process-data')?.dataset.appId===appId;
+    const visible=()=>(me?.role==='researcher'||isSuperAdmin())&&$('#process-data')?.dataset.appId===appId;
     try{await processView(appId,visible);const result=await api('step',{run_id:s.run_id,step:Number(s.step),repeat:true});if(visible())notify(result.status==='completed'?'Yeni sonuç hazır. Bu kartı yeniden inceleyip kararınızı kaydedin.':'Yeniden hesaplanamadı; önceki sonuç korundu.');}
     catch(e){if(visible())notify(e.message);}
     finally{activeAnalysisSequence=null;if(visible()){try{await processView(appId,visible);}catch(e){notify(e.message);}}}
@@ -281,7 +751,7 @@ function labelNames(ids){return ids.length?ids.map(id=>{const d=dash.definitions
 function labelCurrent(mid,v){const state=labelReviewState(v,mid);return `<p class="label-current"><b>Güncel araştırmacı seçimi:</b> ${esc(state.history.length?labelNames(state.current):'Henüz karar verilmedi')}</p>${state.aiKnown?`<p class="muted"><b>AI önerisi (araştırmacı seçimi değildir):</b> ${esc(labelNames(state.ai))}</p>`:'<p class="muted">AI etiket önerisi henüz hazırlanmadı.</p>'}`;}
 function labelForm(mid,v,id){
     const state=labelReviewState(v,mid),message=v.messages.find(m=>m.id===mid),selected=state.history.length?state.current:state.ai;
-    const labels=dash.definitions.filter(d=>d.family==='label'&&JSON.parse(d.body).target_role===message.role&&!d.deleted_at&&(!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id)||state.current.includes(d.id)));
+    const labels=dash.definitions.filter(d=>d.owner_id===v.application.case_owner_id&&d.family==='label'&&JSON.parse(d.body).target_role===message.role&&!d.deleted_at&&(!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id)||state.current.includes(d.id)));
     showDialog(`<h2>Mesaj etiketlerini düzenle</h2><p><b>#${message.seq} · ${message.role==='user'?'Öğrenci':'AI'} mesajı</b></p><blockquote class="label-context">${esc(message.content)}</blockquote>${labelCurrent(mid,v)}<fieldset class="label-options"><legend>Yeni seçim</legend><p class="muted">Araştırmacı seçimi varsa o seçim, yoksa AI önerileri işaretlidir. Eklemek için işaretleyin, kaldırmak için işareti kaldırın. Hiçbiri seçili değilse etiketler temizlenir.</p>${labels.map(l=>`<label class="inline-check"><input type="checkbox" data-choose-label="${esc(l.id)}" ${selected.includes(l.id)?'checked':''}>${esc(l.name)} · v${l.version}</label>`).join('')}</fieldset><div id="label-change-preview" class="label-change" aria-live="polite"></div>${field('reason','Değişiklik gerekçesi (zorunlu)','','textarea')}<p class="muted">Kaydetmek için seçiminizi açıklayan kısa bir gerekçe yazın.</p><button id="commit" class="spaced">Etiket değişikliğini kaydet</button><details class="label-history"><summary>Değişiklik geçmişi (${state.history.length} karar)</summary>${state.history.length?[...state.history].reverse().map((r,i)=>`<article class="label-review"><h3>Karar ${state.history.length-i}${i===0?' · Güncel':''}</h3><p>${displayTime(r.created_at)} · ${esc(dash.users.find(u=>u.id===r.actor)?.login||r.actor)}</p><p><b>Önceki seçim:</b> ${esc(labelNames(r.before))}</p><p><b>Yeni seçim:</b> ${esc(labelNames(r.ids))}</p><p><b>Eklenenler:</b> ${esc(labelNames(r.added))}</p><p><b>Kaldırılanlar:</b> ${esc(labelNames(r.removed))}</p><p><b>Gerekçe:</b> ${esc(r.reason)}</p></article>`).join(''):'<p>Henüz araştırmacı kararı kaydedilmedi.</p>'}</details>`,async()=>{const ids=[...document.querySelectorAll('[data-choose-label]:checked')].map(e=>e.dataset.chooseLabel);await api('admin',{action:'labels',message_id:mid,labels:ids,reason:getValue('reason')});await processView(id);notify('Etiketler kaydedildi. Güncel seçim: '+labelNames(ids));});
     const preview=()=>{const ids=[...document.querySelectorAll('[data-choose-label]:checked')].map(e=>e.dataset.chooseLabel),added=ids.filter(x=>!state.current.includes(x)),removed=state.current.filter(x=>!ids.includes(x));$('#label-change-preview').innerHTML=`<h3>Kaydedilecek değişiklik</h3><p><b>Önce:</b> ${esc(labelNames(state.current))}</p><p><b>Sonra:</b> ${esc(labelNames(ids))}</p><p><b>Eklenenler:</b> ${esc(labelNames(added))}</p><p><b>Kaldırılanlar:</b> ${esc(labelNames(removed))}</p>${!added.length&&!removed.length?'<p>Seçim değişmedi.</p>':''}`;};
     document.querySelectorAll('[data-choose-label]').forEach(el=>el.addEventListener('change',preview));preview();

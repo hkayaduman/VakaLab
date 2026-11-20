@@ -2,13 +2,21 @@
 declare(strict_types=1);
 final class Scope {
     public static function owned(Db $db,array $u,string $table,string $id): array {
-        Auth::researcher($u);demand(in_array($table,['users','cases','definitions'],true),'Geçersiz kapsam');
+        Auth::staff($u);demand(in_array($table,['users','cases','definitions'],true),'Geçersiz kapsam');
         $row=$db->one('SELECT * FROM '.$table.' WHERE id=?',[$id]);
-        $allowed=$row&&$row['owner_id']===$u['id'];
+        $allowed=$row&&(Auth::isSuperAdmin($u)||$row['owner_id']===$u['id']);
         demand($allowed,'Bu kayıt çalışma alanınıza ait değil',403);return $row;
     }
+    public static function workspaceDefinition(Db $db,array $u,string $id,?string $owner): array {
+        $definition=self::owned($db,$u,'definitions',$id);
+        demand($owner!==null&&$definition['owner_id']===$owner,'Tanım bu çalışma alanına ait değil',403);
+        return $definition;
+    }
     public static function application(Db $db,array $u,string $id): array {
-        Auth::researcher($u);$a=$db->one('SELECT a.* FROM applications a JOIN cases c ON c.id=a.case_id WHERE a.id=? AND c.owner_id=?',[$id,$u['id']]);
+        Auth::staff($u);
+        $a=Auth::isSuperAdmin($u)
+            ?$db->one('SELECT * FROM applications WHERE id=?',[$id])
+            :$db->one('SELECT a.* FROM applications a JOIN cases c ON c.id=a.case_id WHERE a.id=? AND c.owner_id=?',[$id,$u['id']]);
         demand((bool)$a,'Bu çalışma alanına erişemezsiniz',403);return $a;
     }
     public static function run(Db $db,array $u,string $rid): array {

@@ -25,6 +25,19 @@ presenceCheck(count(Navigation::build(presenceEvents($end))['visits'])===3,'subm
 // Actual request and message identifiers are used by the same API/export paths as the UI.
 $c=require __DIR__.'/../config/example.php';$c['dsn']='sqlite::memory:';$c['db_user']='';$c['db_password']='';$c['https']=false;
 $db=new Db($c);Migration::run($db);Seed::run($db,$c,uid());$app=new App($db,$c);$ex=new Export($app);
+$queueStudent=$db->one("SELECT * FROM users WHERE id='test-student-1'");
+$queueApp=$app->start($queueStudent,'test-case-2');
+$telemetry=new Telemetry($app);
+$baseEvent=['type'=>'section_open','section'=>'case','tab'=>'tab-1','at'=>now()];
+$first=$baseEvent+['key'=>uid(),'seq'=>1];
+$oversize=['type'=>'copy','payload'=>['quote'=>str_repeat('ş',6100)]]+$baseEvent+['key'=>uid(),'seq'=>2];
+$last=['section'=>'profile']+$baseEvent+['key'=>uid(),'seq'=>3];
+$batch=['events'=>[$first,$oversize,$last]];
+$receipt=$telemetry->ingest($queueStudent,$queueApp['id'],$batch,'test-session');
+presenceCheck($receipt['accepted']===[$first['key'],$last['key']]&&array_column($receipt['rejected'],'index')===[1],'oversize copy receives a permanent rejection while both section events are accepted');
+$saved=$db->all('SELECT client_key,section FROM events WHERE app_id=? ORDER BY client_seq',[$queueApp['id']]);
+presenceCheck(array_column($saved,'client_key')===$receipt['accepted']&&$saved[1]['section']==='profile','normal section transition after oversize copy is saved');
+presenceCheck($telemetry->ingest($queueStudent,$queueApp['id'],$batch,'test-session')===$receipt&&$db->all('SELECT client_key,section FROM events WHERE app_id=? ORDER BY client_seq',[$queueApp['id']])===$saved,'retry acknowledges saved events without duplicating them');
 $u=$db->one("SELECT * FROM users WHERE id='test-student-3'");$r=$db->one("SELECT * FROM users WHERE id='test-researcher'");$a=$db->one('SELECT * FROM applications WHERE user_id=?',[$u['id']]);
 $request=$app->chat($u,$a['id'],['text'=>'SENTETİK bilgi sorusu','key'=>uid()]);
 $aiSpec=[['section_open','ai','10:00:00',[]],['message_send','ai','10:00:20',['request_key'=>$request['client_key']]],['app_presence','ai','10:00:30',['app_active'=>false]],['app_presence','ai','10:01:30',['pending_request'=>$request['id']]],['response_visible','ai','10:01:40',['request'=>$request['id'],'status'=>'completed']],['section_open','final','10:02:00',[]]];
@@ -38,7 +51,7 @@ presenceCheck(count(array_filter($parts,fn($v)=>($v['activity_type']??'')==='ai_
 presenceCheck(array_sum(array_column(array_filter($view['navigation']['visits'],fn($v)=>$v['section']==='ai'),'duration_seconds'))===60.0,'AI section total is sixty seconds excluding outside minute');
 presenceCheck(count(array_unique(array_column($parts,'activity_id')))===count($parts),'presence segments keep unique export identities');
 $parse=function($csv){$f=fopen('php://temp','w+');fwrite($f,substr($csv,3));rewind($f);$h=fgetcsv($f,0,',','"','');$rows=[];while(($line=fgetcsv($f,0,',','"',''))!==false)$rows[]=array_combine($h,$line);return $rows;};
-$rows=$parse($ex->disco($r,['app_id'=>$a['id']]));
+$rows=$parse($ex->disco($r,['include_test'=>1,'app_id'=>$a['id']]));
 presenceCheck(array_column(array_values(array_filter($rows,fn($v)=>$v['Activity Code']==='AI_WAIT')),'Duration Seconds')===['10','10'],'Disco exports two bounded waits');
 $outside=current(array_filter($rows,fn($v)=>$v['Activity Code']==='APP_OUTSIDE'));
 presenceCheck($outside['Duration Seconds']==='60'&&$outside['Section']==='Vaka sekmesi etkin değil','Disco contains explicit outside duration');
@@ -64,7 +77,7 @@ presenceCheck(array_column(array_values(array_filter($parts,fn($v)=>($v['activit
 presenceCheck(array_sum(array_column(array_filter($repeatView['navigation']['visits'],fn($v)=>$v['section']==='ai'),'duration_seconds'))===70.0,'two absences excluded from AI total exactly');
 presenceCheck(array_sum(array_column(array_filter($repeatView['navigation']['visits'],fn($v)=>$v['section']==='outside'),'duration_seconds'))===50.0,'outside intervals total fifty seconds');
 presenceCheck(count(array_filter($parts,fn($v)=>($v['activity_type']??'')==='ai_question'))===1,'repeated returns never duplicate question');
-$repeatCsv=$parse($ex->disco($r,['app_id'=>$a['id']]));
+$repeatCsv=$parse($ex->disco($r,['include_test'=>1,'app_id'=>$a['id']]));
 presenceCheck(count(array_unique(array_column($repeatCsv,'Event ID')))===count($repeatCsv),'all repeated wait CSV rows have unique event IDs');
 $exact=true;foreach($repeatCsv as $row)if($row['Duration Seconds']!=='')$exact=$exact&&abs((float)$row['Duration Seconds']-(Navigation::time($row['Complete UTC raw'])-Navigation::time($row['Start UTC raw'])))<0.000001;
 presenceCheck($exact,'every CSV duration equals its own end minus start');
@@ -82,13 +95,13 @@ $longVisits=Navigation::build(presenceEvents($long))['visits'];presenceCheck(arr
 $legacy=presenceEvents($spec);foreach($legacy as &$e){$p=obj($e['payload']);unset($p['app_active']);$p['visible']=!in_array($e['client_seq'],[2,3],true);$e['payload']=js($p);}unset($e);
 presenceCheck(array_column(array_slice(Navigation::build($legacy)['visits'],0,3),'duration_seconds')===[60.0,180.0,120.0],'legacy visibility boundaries preserve exact observed durations');
 $clock=presenceEvents($spec);$clock[3]['client_at']='2026-10-21T10:00:30Z';$clockVisits=Navigation::build($clock)['visits'];presenceCheck(current(array_filter($clockVisits,fn($v)=>$v['section']==='outside'))['duration_seconds']===null,'backward return timestamp is unknown instead of negative duration');
-$missing=presenceEvents($spec);$missing[3]['client_seq']=7;$missing[4]['client_seq']=8;$missing[5]['client_seq']=9;$missingVisits=Navigation::build($missing)['visits'];presenceCheck($missingVisits[1]['missing_events']&&$missingVisits[1]['duration_seconds']===180.0,'missing middle observations are flagged; known outside boundaries stay exact');
+$missing=presenceEvents($spec);$missing[3]['client_seq']=7;$missing[4]['client_seq']=8;$missing[5]['client_seq']=9;$missingVisits=Navigation::build($missing)['visits'];presenceCheck($missingVisits[1]['missing_events']&&$missingVisits[1]['quality']==='event_gap'&&$missingVisits[1]['duration_seconds']===null,'missing middle observations retain boundaries but cannot establish exact outside duration');
 $rapid=presenceEvents([['section_open','ai','10:00:00',[]],['app_presence','ai','10:00:00',['app_active'=>false]],['app_presence','ai','10:00:00',[]],['section_leave','ai','10:00:01',['reason'=>'home']]]);presenceCheck(array_column(Navigation::build($rapid)['visits'],'duration_seconds')===[0.0,0.0,1.0],'same-timestamp transitions never produce negative or inflated seconds');
 $submitted=presenceEvents([['section_open','confirm','10:00:00',[]],['workflow_confirmed','confirm','10:00:10',['kind'=>'submit','submitted'=>true]],['app_presence','confirm','10:00:20',['app_active'=>false,'submitted'=>true]],['app_presence','confirm','10:01:20',['submitted'=>true]]]);presenceCheck(count(Navigation::build($submitted)['visits'])===1,'departure and return after final submission produce no new durations');
 $clockAI=$aiSpec;$clockAI[3][2]='10:00:25';$load($clockAI);$clockView=$app->view($r,$a['id']);$clockWaits=array_values(array_filter($clockView['navigation']['activities'],fn($v)=>($v['activity_type']??'')==='ai_wait'));
 presenceCheck(count($clockWaits)>0&&array_sum(array_column($clockWaits,'duration_seconds'))<=80.0,'backward clock at return cannot inflate AI preparation time');
 presenceCheck(count(array_filter($clockWaits,fn($v)=>$v['duration_seconds']===null))>0,'AI duration crossing a backward clock is explicitly unknown');
-$clockCsv=$parse($ex->disco($r,['app_id'=>$a['id']]));presenceCheck(count(array_filter($clockCsv,fn($v)=>$v['Activity Code']==='AI_WAIT'))===0,'unreliable AI wait is excluded from duration CSV instead of exported as numeric time');
+$clockCsv=$parse($ex->disco($r,['include_test'=>1,'app_id'=>$a['id']]));presenceCheck(count(array_filter($clockCsv,fn($v)=>$v['Activity Code']==='AI_WAIT'))===0,'unreliable AI wait is excluded from duration CSV instead of exported as numeric time');
 presenceCheck(count(array_filter($clockView['navigation']['visits'],fn($v)=>!empty($v['invalid_clock'])&&$v['duration_seconds']!==null))===0,'all affected section intervals are unknown after backward clock');
 $gapSpec=[['section_open','case','10:00:00',['view_id'=>'gap-first']],['section_leave','case','10:01:00',['reason'=>'home','view_id'=>'gap-first']],['section_open','initial','10:04:00',['view_id'=>'gap-second']],['section_leave','initial','10:05:00',['reason'=>'home','view_id'=>'gap-second']]];
 $gapVisits=Navigation::build(presenceEvents($gapSpec))['visits'];presenceCheck(array_column($gapVisits,'section')===['case','away','initial'],'home and reopening produce a separate case-away interval');presenceCheck(array_column($gapVisits,'duration_seconds')===[60.0,180.0,60.0],'case-away seconds preserve exact home/reopening boundaries');presenceCheck($gapVisits[1]['activity_code']==='CASE_AWAY'&&$gapVisits[1]['presence_source']==='home_and_reopen','case absence never mislabeled as application absence');presenceCheck(count(Navigation::build(presenceEvents(array_slice($gapSpec,0,2)))['visits'])===1,'unobserved reopening does not fabricate an away end');

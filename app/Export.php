@@ -3,30 +3,46 @@ declare(strict_types=1);
 final class Export {
     public function __construct(private App $app) {}
     public function reportData(array $u,string $id,bool $studentPreview=false): array {
-        $db=$this->app->db;$r=$db->one('SELECT * FROM reports WHERE id=?',[$id]);demand((bool)$r,'Rapor yok',404);$access=$this->app->access($u,$r['app_id']);
-        if($u['role']!=='researcher')demand($r['approved_at']&&$r['published_at']&&Scope::collectionClosed($access),'Rapor henüz yayımlanmadı',403);
-        if($u['role']!=='researcher'){$latest=$db->one('SELECT id,body FROM reports WHERE app_id=? ORDER BY version DESC LIMIT 1',[$r['app_id']]);if($latest&&(obj($latest['body'])['review_version']??1)>=2)demand($latest['id']===$r['id'],'Güncel raporu kullanın',403);}
-        $body=obj($r['body']);if($u['role']!=='researcher'||$studentPreview){$a=$db->one('SELECT draft FROM applications WHERE id=?',[$r['app_id']]);$body=StudentReport::projection($body,obj($a['draft']));}return ['id'=>$r['id'],'version'=>$r['version'],'created_at'=>$r['created_at'],'approved_at'=>$r['approved_at'],'published_at'=>$r['published_at'],'report'=>$body];
+        $db=$this->app->db;$staff=Auth::isStaff($u);$r=$db->one('SELECT * FROM reports WHERE id=?',[$id]);demand((bool)$r,'Rapor yok',404);$access=$this->app->access($u,$r['app_id']);
+        if(!$staff)demand($r['approved_at']&&$r['published_at']&&Scope::collectionClosed($access),'Rapor henüz yayımlanmadı',403);
+        if(!$staff){$latest=$db->one('SELECT id,body FROM reports WHERE app_id=? ORDER BY version DESC LIMIT 1',[$r['app_id']]);if($latest&&(obj($latest['body'])['review_version']??1)>=2)demand($latest['id']===$r['id'],'Güncel raporu kullanın',403);}
+        $body=obj($r['body']);if(!$staff||$studentPreview){$a=$db->one('SELECT draft FROM applications WHERE id=?',[$r['app_id']]);$body=StudentReport::projection($body,obj($a['draft']));}return ['id'=>$r['id'],'version'=>$r['version'],'created_at'=>$r['created_at'],'approved_at'=>$r['approved_at'],'published_at'=>$r['published_at'],'report'=>$body];
     }
-    public function dataset(array $u,array $p): array {
-        Auth::researcher($u);$db=$this->app->db;$where=['c.owner_id=?'];$args=[$u['id']];
+    public function dataset(array $u,array $p,?string $disco=null): array {
+        Auth::staff($u);$db=$this->app->db;$global=Auth::isSuperAdmin($u);
+        $scopeArgs=$global?[]:[$u['id']];$caseScope=$global?'':' WHERE c.owner_id=?';
+        $ownerScope=$global?'':' WHERE owner_id=?';
+        $where=$global?[]:['c.owner_id=?'];$args=$scopeArgs;
         if(empty($p['include_test']))$where[]='u.test=0 AND c.test=0';if(empty($p['include_practice']))$where[]='c.practice=0';if(empty($p['include_excluded']))$where[]='a.excluded=0';
         if(!empty($p['case_id'])){Scope::owned($db,$u,'cases',$p['case_id']);$where[]='c.id=?';$args[]=$p['case_id'];}if(!empty($p['app_id'])){$where[]='a.id=?';$args[]=$p['app_id'];}if(!empty($p['user_id'])){$where[]='a.user_id=?';$args[]=$p['user_id'];}
-        $apps=$db->all('SELECT a.*,u.login,u.name FROM applications a JOIN users u ON u.id=a.user_id JOIN cases c ON c.id=a.case_id WHERE '.implode(' AND ',$where),$args);$coded=!empty($p['coded']);
-        $out=['cases'=>[],'case_versions'=>[],'participants'=>[],'assignments'=>[],'reports'=>[],'research_notes'=>[],'applications'=>[],'events'=>[],'server_events'=>[],'visits'=>[],'navigation_visits'=>[],'navigation_activities'=>[],'navigation_milestones'=>[],'messages'=>[],'labels'=>[],'label_reviews'=>[],'label_batches'=>[],'drafts'=>[],'snapshots'=>[],'ai_requests'=>[],'ai_attempts'=>[],'analyses'=>[],'decisions'=>[],'definitions'=>[],'dictionary'=>[['field'=>'times','meaning'=>'UTC ISO 8601; client_at ayrı, received_at sunucu'],['field'=>'quality','meaning'=>'Gözlenen görünürlük okuma/düşünme değildir; AI süreleri öğrenciyle toplanmaz'],['field'=>'coded','meaning'=>'Kodlanmış çıktı metinleri ve kimlik eşlemesini içermez']]];
+        $discoFields=$disco===null?'':',u.test AS student_test,c.test AS case_test,c.practice AS practice';
+        $apps=$db->all('SELECT a.*,u.login,u.name'.$discoFields.' FROM applications a JOIN users u ON u.id=a.user_id JOIN cases c ON c.id=a.case_id'.($where?' WHERE '.implode(' AND ',$where):''),$args);$coded=!empty($p['coded']);
+        $out=['cases'=>[],'case_versions'=>[],'participants'=>[],'assignments'=>[],'reports'=>[],'research_notes'=>[],'applications'=>[],'events'=>[],'server_events'=>[],'visits'=>[],'navigation_visits'=>[],'navigation_activities'=>[],'navigation_milestones'=>[],'navigation_coverage'=>[],'messages'=>[],'labels'=>[],'label_reviews'=>[],'label_batches'=>[],'drafts'=>[],'snapshots'=>[],'ai_requests'=>[],'ai_attempts'=>[],'analyses'=>[],'decisions'=>[],'definitions'=>[],'dictionary'=>[['field'=>'times','meaning'=>'UTC ISO 8601; client_at ayrı, received_at sunucu'],['field'=>'quality','meaning'=>'Gözlenen görünürlük okuma/düşünme değildir; AI süreleri öğrenciyle toplanmaz'],['field'=>'coded','meaning'=>'Kodlanmış çıktı metinleri ve kimlik eşlemesini içermez']]];
         if(!$coded){
-            $out['cases']=array_values(array_filter($db->all('SELECT * FROM cases WHERE owner_id=?',[$u['id']]),fn($c)=>(empty($p['case_id'])||$c['id']===$p['case_id'])&&(empty($p['app_id'])||in_array($c['id'],array_column($apps,'case_id'),true))&&(!empty($p['include_test'])||!$c['test'])&&(!empty($p['include_practice'])||!$c['practice'])));
+            $out['cases']=array_values(array_filter($db->all('SELECT * FROM cases'.$ownerScope,$scopeArgs),fn($c)=>(empty($p['case_id'])||$c['id']===$p['case_id'])&&(empty($p['app_id'])||in_array($c['id'],array_column($apps,'case_id'),true))&&(!empty($p['include_test'])||!$c['test'])&&(!empty($p['include_practice'])||!$c['practice'])));
             $cids=array_column($out['cases'],'id');
-            $out['case_versions']=array_values(array_filter($db->all('SELECT v.* FROM case_versions v JOIN cases c ON c.id=v.case_id WHERE c.owner_id=?',[$u['id']]),fn($v)=>in_array($v['case_id'],$cids,true)));
-            $out['assignments']=array_values(array_filter($db->all('SELECT s.* FROM assignments s JOIN cases c ON c.id=s.case_id WHERE c.owner_id=?',[$u['id']]),fn($s)=>in_array($s['case_id'],$cids,true)&&(empty($p['user_id'])||$s['user_id']===$p['user_id'])&&(empty($p['app_id'])||in_array($s['user_id'],array_column($apps,'user_id'),true))));
-            $sids=array_column($out['assignments'],'user_id');
-            $out['participants']=array_values(array_filter($db->all("SELECT id,login,name,status,metadata,test FROM users WHERE owner_id=? AND role='student'",[$u['id']]),fn($s)=>in_array($s['id'],$sids,true)));
+            $out['case_versions']=array_values(array_filter($db->all('SELECT v.* FROM case_versions v JOIN cases c ON c.id=v.case_id'.$caseScope,$scopeArgs),fn($v)=>in_array($v['case_id'],$cids,true)));
+            $out['assignments']=array_values(array_filter($db->all('SELECT s.* FROM assignments s JOIN cases c ON c.id=s.case_id'.$caseScope,$scopeArgs),fn($s)=>in_array($s['case_id'],$cids,true)&&(empty($p['user_id'])||$s['user_id']===$p['user_id'])&&(empty($p['app_id'])||in_array($s['user_id'],array_column($apps,'user_id'),true))));
+            $sids=array_fill_keys(array_merge(array_column($out['assignments'],'user_id'),array_column($apps,'user_id')),true);
+            $activeIds=array_fill_keys(array_merge(
+                array_column(array_filter($out['assignments'],fn($a)=>(bool)$a['active']),'user_id'),
+                array_column($apps,'user_id')
+            ),true);
+            foreach($db->all("SELECT id,login,name,status,metadata,test,owner_id FROM users WHERE role='student'") as $student){
+                if(!isset($sids[$student['id']]))continue;
+                if(!$global&&$student['owner_id']!==$u['id']){
+                    if(!isset($activeIds[$student['id']]))continue;
+                    $student['metadata']='{}';
+                }
+                unset($student['owner_id']);
+                $out['participants'][]=$student;
+            }
         }
         $out['dictionary']=array_merge($out['dictionary'],EventLabels::dictionary());
-        foreach($apps as $a){$id=$a['id'];foreach($db->all("SELECT id,detail,created_at FROM audit WHERE target=? AND action='message_labels_ai' ORDER BY created_at,id",[$id]) as $batch){if($coded)$batch['detail']=js(array_intersect_key(obj($batch['detail']),array_flip(['batch_id','labels','target_role','message_scope'])));$out['label_batches'][]=$batch+['app_id'=>$id];}if(!$coded){foreach(['reports','research_notes'] as $t)foreach($db->all('SELECT * FROM '.$t.' WHERE app_id=?',[$id]) as $row)$out[$t][]=$row;}$code='P-'.substr(hash('sha256',$a['user_id']),0,12);$out['applications'][]=$coded?['app_id'=>$id,'participant'=>$code,'case_id'=>$a['case_id'],'attempt_no'=>(int)$a['attempt_no'],'state'=>$a['state'],'revision'=>$a['revision'],'submitted_at'=>$a['submitted_at']]:$a;
+        foreach($apps as $a){$id=$a['id'];foreach($db->all("SELECT id,detail,created_at FROM audit WHERE target=? AND action='message_labels_ai' ORDER BY created_at,id",[$id]) as $batch){if($coded)$batch['detail']=js(array_intersect_key(obj($batch['detail']),array_flip(['batch_id','labels','target_role','message_scope'])));$out['label_batches'][]=$batch+['app_id'=>$id];}if(!$coded){foreach(['reports','research_notes'] as $t)foreach($db->all('SELECT * FROM '.$t.' WHERE app_id=?',[$id]) as $row)$out[$t][]=$row;}$code='P-'.substr(hash('sha256',$a['user_id']),0,12);$out['applications'][]=$coded?['app_id'=>$id,'participant'=>$code,'case_id'=>$a['case_id'],'attempt_no'=>(int)$a['attempt_no'],'state'=>$a['state'],'revision'=>$a['revision'],'submitted_at'=>$a['submitted_at']]+($disco===null?[]:['test'=>(bool)($a['student_test']||$a['case_test']),'practice'=>(bool)$a['practice'],'excluded'=>(bool)$a['excluded']]):$a;
             foreach($db->all('SELECT id,action,target,detail,created_at FROM audit WHERE target=? ORDER BY created_at',[$id]) as $serverEvent){if($coded)$serverEvent['detail']='[çıkarıldı]';$out['server_events'][]=$serverEvent;}
             foreach($db->all('SELECT t.* FROM ai_attempts t JOIN ai_requests r ON r.id=t.request_id WHERE r.app_id=?',[$id]) as $attempt)$out['ai_attempts'][]=$attempt;
-            $events=$db->all('SELECT * FROM events WHERE app_id=? ORDER BY received_at,client_seq',[$id]);$navigation=Navigation::build($events,$a['submitted_at']);foreach($navigation['visits'] as $v)$out['navigation_visits'][]=['app_id'=>$id]+$v;foreach($navigation['milestones'] as $m)$out['navigation_milestones'][]=['app_id'=>$id]+$m;foreach($events as $e){$e=EventLabels::describe($e);if($coded){$e['payload']='[metin ve cihaz ayrıntıları çıkarıldı]';unset($e['session_id'],$e['tab_id']);}$out['events'][]=$e;}
+            $events=$db->all('SELECT * FROM events WHERE app_id=? ORDER BY received_at,client_seq',[$id]);$order=$disco==='events'?Navigation::clientOrder(array_filter($events,[Telemetry::class,'researchEvent'])):[];$navigation=Navigation::build($events,$a['submitted_at']);$out['navigation_coverage'][]=['app_id'=>$id]+$navigation['coverage'];foreach($navigation['visits'] as $v)$out['navigation_visits'][]=['app_id'=>$id]+$v;foreach($navigation['milestones'] as $m)$out['navigation_milestones'][]=['app_id'=>$id]+$m;foreach($events as $e){if(isset($order[$e['id']])){$pEvent=obj($e['payload']);$e['disco']=$order[$e['id']]+['trace_id'=>substr(hash('sha256',Telemetry::traceKey($e,$pEvent)),0,20),'capture_version'=>(int)($pEvent['navigation_version']??1),'submitted'=>!empty($pEvent['submitted']),'terminal'=>$e['type']==='workflow_confirmed'&&($pEvent['kind']??null)==='submit'];}$e=EventLabels::describe($e);if($coded){$e['payload']='[metin ve cihaz ayrıntıları çıkarıldı]';unset($e['session_id'],$e['tab_id']);}$out['events'][]=$e;}
             foreach(Telemetry::visits($events)['visits'] as $v)$out['visits'][]=['app_id'=>$id]+$v;
             foreach($db->all('SELECT * FROM messages WHERE app_id=? ORDER BY seq',[$id]) as $m){if($coded)$m['content']='[kodlanmış çıktıda metin çıkarıldı]';$out['messages'][]=$m;
                 foreach($db->all('SELECT * FROM message_labels WHERE message_id=?',[$m['id']]) as $l){if($coded){unset($l['actor']);$l['reason']='[çıkarıldı]';}$out['labels'][]=$l;}
@@ -37,40 +53,66 @@ final class Export {
         }
         if(!$coded){
             $ids=array_merge(array_column($out['labels'],'definition_id'),array_column($out['analyses'],'rubric_id'),array_column($out['cases'],'rubric_id'));
-            $defs=$db->all('SELECT * FROM definitions WHERE owner_id=?',[$u['id']]);
+            $defs=$db->all('SELECT * FROM definitions'.$ownerScope,$scopeArgs);
             do{$before=count($ids);foreach($defs as $d)if(in_array($d['id'],$ids,true)&&$d['parent_id']&&!in_array($d['parent_id'],$ids,true))$ids[]=$d['parent_id'];}while(count($ids)>$before);
             $out['definitions']=array_values(array_filter($defs,fn($d)=>in_array($d['id'],$ids,true)));
         }
-        $navigationDefinitions=$db->all("SELECT id,name FROM definitions WHERE owner_id=? AND family='label'",[$u['id']]);$out['navigation_visits']=Navigation::labelVisits($out['navigation_visits'],$out,$navigationDefinitions);$out['navigation_activities']=Navigation::activities($out['navigation_visits'],$out,$navigationDefinitions);
+        $navigationDefinitions=$this->labelNames($u);$out['navigation_visits']=Navigation::labelVisits($out['navigation_visits'],$out,$navigationDefinitions);$out['navigation_activities']=Navigation::activities($out['navigation_visits'],$out,$navigationDefinitions);
         $db->audit($u['id'],'export','dataset','',['coded'=>$coded,'count'=>count($apps),'include_test'=>!empty($p['include_test'])]);return $out;
+    }
+    private function labelNames(array $u): array {
+        $global=Auth::isSuperAdmin($u);
+        return $this->app->db->all("SELECT id,name FROM definitions WHERE family='label'".($global?'':' AND owner_id=?'),$global?[]:[$u['id']]);
     }
     public static function csv(array $rows): string {
         $f=fopen('php://temp','w+');fwrite($f,"\xEF\xBB\xBF");$keys=[];foreach($rows as $r)$keys=array_values(array_unique(array_merge($keys,array_keys($r))));fputcsv($f,$keys,',','"','');
         foreach($rows as $r)fputcsv($f,array_map(fn($k)=>Rules::csv(is_array($r[$k]??null)?js($r[$k]):(string)($r[$k]??'')),$keys),',','"','');rewind($f);return stream_get_contents($f);
     }
+    private static function discoFlags(array $app): array {
+        return ['Test'=>$app['test']?'yes':'no','Practice'=>$app['practice']?'yes':'no','Excluded'=>$app['excluded']?'yes':'no'];
+    }
     public function disco(array $u,array $p): string {
-        $view=$p['view']??'visits';demand(in_array($view,['visits','events'],true),'Disco görünümü geçersiz');if($view==='visits')return $this->navigationCsv($u,$p);
+        $view=$p['view']??'visits';
+        demand(in_array($view,['visits','events'],true),'Disco görünümü geçersiz');
+        if(!empty($p['all_data']))$p+=['include_test'=>1,'include_practice'=>1,'include_excluded'=>1];
+        $p['coded']=1;
+        if($view==='visits')return $this->navigationCsv($u,$p);
         // One process instance is one student application, never the pedagogical case alone.
-        $data=$this->dataset($u,$p+['include_test'=>1,'include_practice'=>1,'include_excluded'=>1,'coded'=>1]);
-        $apps=array_column($data['applications'],null,'app_id');$rows=[];$definitions=array_column($this->app->db->all("SELECT id,name FROM definitions WHERE family='label' AND owner_id=?",[$u['id']]),'name','id');
+        $data=$this->dataset($u,$p,'events');
+        $apps=array_column($data['applications'],null,'app_id');$rows=[];$clientSubmissions=[];$definitions=array_column($this->labelNames($u),'name','id');
         $append=function(array $a,string $activity,string $start,string $end,string $resource,string $event,string $quality,string $source,int $seq=0,array $extra=[])use(&$rows){
             try{$s=new DateTimeImmutable($start);$e=new DateTimeImmutable($end);}catch(Throwable){return;}
             $fmt=fn($d)=>$d->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s.v');
             $extra+=['Message ID'=>'','Message Role'=>'','AI Labels'=>'','Researcher Labels'=>'','Effective Labels'=>'','Label Source'=>'','Label Status'=>''];
             $rows[]=['Case ID'=>$a['app_id'],'Activity'=>$activity,'Start Timestamp'=>$fmt($s),'Complete Timestamp'=>$fmt($e),'Resource'=>$resource,
                 'Vaka ID'=>$a['case_id'],'Deneme numarası'=>(int)$a['attempt_no'],'Participant'=>$a['participant'],'Event ID'=>$event,'Sequence'=>$seq,'Time Zone'=>'UTC',
-                'Time Source'=>$source,'Quality'=>$quality,'Start UTC raw'=>$start,'Complete UTC raw'=>$end]+$extra;
+                'Time Source'=>$source,'Quality'=>$quality,'Start UTC raw'=>$start,'Complete UTC raw'=>$end]+self::discoFlags($a)+$extra;
         };
         foreach($data['events'] as $event){
-            $finished=$apps[$event['app_id']]['submitted_at']??null;$eventTime=Navigation::time($event['client_at']);if($finished&&($eventTime===null||$eventTime>Navigation::time($finished)))continue;
-            if(!in_array($event['type'],['section_open','text_changed','profile_changed','question_changed','copy','paste','response_visible','recovered'],true))continue;
-            $time=$event['client_at'];$source='client_at';
-            if(!$time||!preg_match('/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/',$time)){$time=$event['received_at'];$source='received_at_fallback';}
-            try{new DateTimeImmutable($time);}catch(Throwable){$time=$event['received_at'];$source='received_at_fallback';}
-            $a=$apps[$event['app_id']];$append($a,$event['section_tr'].' · '.$event['type_tr'],$time,$time,$a['participant'],$event['id'],$event['quality'],$source,(int)$event['client_seq']);
+            if(!Telemetry::researchEvent($event))continue;
+            $a=$apps[$event['app_id']];
+            $trace=$event['disco'];
+            $eventTime=$event['quality']==='invalid_client_time'?null:Navigation::time($event['client_at']);
+            if($trace['terminal']&&$trace['capture_version']>=3&&$eventTime!==null&&!$trace['invalid_clock'])$clientSubmissions[$a['app_id']]=$event;
+            if($trace['submitted']||($a['submitted_at']&&$trace['capture_version']<3&&($eventTime===null||$eventTime>Navigation::time($a['submitted_at']))))continue;
+            if(!in_array($event['type'],['section_open','text_changed','profile_changed','question_changed','copy','paste','response_visible','recovered','app_presence','message_send','section_leave','page_exit'],true))continue;
+            $fallback=$eventTime===null||$trace['invalid_clock'];
+            $time=$fallback?$event['received_at']:$event['client_at'];
+            $quality=$fallback?($eventTime===null?'invalid_client_time':'invalid_clock'):$event['quality'];
+            $append($a,$event['section_tr'].' · '.$event['type_tr'],$time,$time,$a['participant'],$event['id'],$quality,$fallback?'received_at_fallback':'client_at',(int)$event['client_seq'],[
+                'Trace ID'=>$trace['trace_id'],'Stream ID'=>$trace['stream_id'],'Client Sequence'=>(int)$event['client_seq'],
+                'Client UTC raw'=>$event['client_at'],'Received UTC raw'=>$event['received_at'],'_order_at'=>$trace['order_at']
+            ]);
         }
         foreach($data['snapshots'] as $snap){
-            $a=$apps[$snap['app_id']];$append($a,$snap['kind']==='initial'?'Başlangıç kesinleştirildi':'Son teslim yapıldı',$snap['created_at'],$snap['created_at'],$a['participant'],$snap['id'],'server_confirmed','server');
+            $a=$apps[$snap['app_id']];
+            $marker=$snap['kind']==='submit'?($clientSubmissions[$snap['app_id']]??null):null;
+            $at=$marker['client_at']??$snap['created_at'];
+            $trace=$marker['disco']??null;
+            $metadata=$marker?['Trace ID'=>$trace['trace_id'],'Stream ID'=>$trace['stream_id'],'Client Sequence'=>(int)$marker['client_seq'],
+                'Client UTC raw'=>$at,'Received UTC raw'=>$marker['received_at'],'Server Confirmation UTC'=>$snap['created_at'],'_order_at'=>$trace['order_at']]:[];
+            $append($a,$snap['kind']==='initial'?'Başlangıç kesinleştirildi':'Son teslim yapıldı',$at,$at,$a['participant'],$snap['id'],
+                'server_confirmed',$marker?'client_confirmation':'server',(int)($marker['client_seq']??0),$metadata);
         }
         foreach($data['messages'] as $message){
             $a=$apps[$message['app_id']];$state=MessageLabels::state($message['id'],$data['labels'],$data['label_reviews'],array_values(array_filter($data['label_batches'],fn($b)=>$b['app_id']===$a['app_id'])));
@@ -85,34 +127,92 @@ final class Export {
                 $append($a,'AI yanıtı · '.$attempt['status'],$attempt['started_at'],$attempt['completed_at'],'AI',$attempt['id'],'server_provider_interval','server');
             }
         }
-        usort($rows,fn($a,$b)=>[$a['Case ID'],$a['Start Timestamp'],$a['Sequence'],$a['Event ID']]<=>[$b['Case ID'],$b['Start Timestamp'],$b['Sequence'],$b['Event ID']]);
-        if(!$rows){$f=fopen('php://temp','w+');fwrite($f,"\xEF\xBB\xBF");fputcsv($f,['Case ID','Activity','Start Timestamp','Complete Timestamp','Resource','Vaka ID','Deneme numarası','Participant','Event ID','Sequence','Time Zone','Time Source','Quality','Start UTC raw','Complete UTC raw','Message ID','Message Role','AI Labels','Researcher Labels','Effective Labels','Label Source','Label Status'],',','"','');rewind($f);return stream_get_contents($f);}
+        usort($rows,fn($a,$b)=>[$a['Case ID'],$a['_order_at']??Navigation::time($a['Start UTC raw']),$a['Stream ID']??'',$a['Sequence'],$a['Event ID']]<=>[$b['Case ID'],$b['_order_at']??Navigation::time($b['Start UTC raw']),$b['Stream ID']??'',$b['Sequence'],$b['Event ID']]);
+        $coverage=array_column($data['navigation_coverage'],null,'app_id');
+        foreach($rows as &$row){unset($row['_order_at']);$row+=self::discoCoverage($coverage[$row['Case ID']]);}unset($row);
+        if(!$rows){$f=fopen('php://temp','w+');fwrite($f,"\xEF\xBB\xBF");fputcsv($f,['Case ID','Activity','Start Timestamp','Complete Timestamp','Resource','Vaka ID','Deneme numarası','Participant','Event ID','Sequence','Time Zone','Time Source','Quality','Start UTC raw','Complete UTC raw','Message ID','Message Role','AI Labels','Researcher Labels','Effective Labels','Label Source','Label Status','Test','Practice','Excluded','Trace ID','Stream ID','Client Sequence','Client UTC raw','Received UTC raw','Server Confirmation UTC','Expected Missing Events','Withheld Events','Incomplete Prefix Streams','Pending Ranges Truncated'],',','"','');rewind($f);return stream_get_contents($f);}
         return self::csv($rows);
     }
+    private static function discoCoverage(array $c): array {
+        return ['Expected Missing Events'=>$c['expected_missing_events'],'Withheld Events'=>$c['withheld_events'],
+            'Incomplete Prefix Streams'=>$c['incomplete_prefix_streams'],'Pending Ranges Truncated'=>$c['pending_ranges_truncated']?'yes':'no'];
+    }
     private function navigationCsv(array $u,array $p): string {
-        $data=$this->dataset($u,$p+['include_test'=>1,'include_practice'=>1,'include_excluded'=>1,'coded'=>1]);$apps=array_column($data['applications'],null,'app_id');$rows=[];
+        $data=$this->dataset($u,$p,'visits');$apps=array_column($data['applications'],null,'app_id');$rows=[];
         $format=fn($t)=>(new DateTimeImmutable($t))->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s.v');
         foreach($data['navigation_activities'] as $v){
-            if($v['duration_seconds']===null&&($v['activity_type']??'')!=='ai_question_legacy')continue;$a=$apps[$v['app_id']];$questions=$v['ai_question_count']??0;
-            $rows[]=['Case ID'=>$v['app_id'],'Activity'=>$v['activity'],'Start Timestamp'=>$format($v['start_at']),'Complete Timestamp'=>$format($v['end_at']??$v['start_at']),'Resource'=>$a['participant'],'Vaka ID'=>$a['case_id'],'Deneme numarası'=>(int)$a['attempt_no'],'Participant'=>$a['participant'],'Event ID'=>$v['activity_id']??$v['visit_id'],'Parent Visit ID'=>$v['visit_id'],'Message ID'=>$v['message_id']??'','Message Sequence'=>$v['message_sequence']??'','Activity Code'=>$v['activity_code'],'Row Type'=>$v['activity_type']??'visit','Measurement Version'=>$v['measurement_version']??'legacy_message','Presence Source'=>$v['presence_source']??'unobserved','Timeline Lane'=>$v['timeline_lane']??'student','Response Section'=>$v['response_section']??'','Duration Seconds'=>$v['duration_seconds'],'Section'=>EventLabels::SECTIONS[$v['section']]??$v['section'],'Edited Fields'=>implode(' | ',$v['edited_fields']),'Trace ID'=>$v['trace_id'],'Visit Number'=>$v['visit_number'],'Sequence'=>$v['sequence'],'_order'=>$v['start_sequence'],'_boundary_order'=>$v['boundary_order']??0,'End Reason'=>$v['end_reason'],'Next Section'=>$v['next_section']??'','Next Section Name'=>$v['next_section_name']??'','Locked'=>$v['locked']?'yes':'no','Time Zone'=>'UTC','Time Source'=>$v['timestamp_source']??'client_navigation','Quality'=>$v['quality'],'Background Observed'=>$v['background_seen']===null?'unknown':($v['background_seen']?'yes':'no'),'Read Only Tab'=>$v['read_only_tab']?'yes':'no','Overlapping Tab'=>$v['overlapping_tab']?'yes':'no','AI Question Count'=>$questions,'Response Arrival Observed'=>isset($v['response_observed'])?($v['response_observed']?'yes':'no'):'not_applicable','AI Label Match Quality'=>($v['activity_type']??'')==='ai_question_legacy'?'server_message_matched':(!empty($v['message_id'])?'request_key_matched':'not_observed_for_this_visit'),'AI Labels'=>implode(' | ',$v['ai_labels']??[]),'Researcher Labels'=>implode(' | ',$v['researcher_labels']??[]),'Effective Labels'=>implode(' | ',$v['effective_labels']??[]),'Label Source'=>implode(' | ',$v['label_sources']??[]),'Start UTC raw'=>$v['start_at'],'Complete UTC raw'=>$v['end_at']??$v['start_at']];
+            if(Navigation::time($v['start_at'])===null||!empty($v['invalid_clock'])||($v['duration_seconds']===null&&($v['activity_type']??'')!=='ai_question_legacy'))continue;$a=$apps[$v['app_id']];$questions=$v['ai_question_count']??0;
+            $rows[]=['Case ID'=>$v['app_id'],'Activity'=>$v['activity'],'Start Timestamp'=>$format($v['start_at']),'Complete Timestamp'=>$format($v['end_at']??$v['start_at']),'Resource'=>$a['participant'],'Vaka ID'=>$a['case_id'],'Deneme numarası'=>(int)$a['attempt_no'],'Participant'=>$a['participant'],'Event ID'=>$v['activity_id']??$v['visit_id'],'Parent Visit ID'=>$v['visit_id'],'Message ID'=>$v['message_id']??'','Message Sequence'=>$v['message_sequence']??'','Activity Code'=>$v['activity_code'],'Row Type'=>$v['activity_type']??'visit','Measurement Version'=>$v['measurement_version']??'legacy_message','Presence Source'=>$v['presence_source']??'unobserved','Timeline Lane'=>$v['timeline_lane']??'student','Response Section'=>$v['response_section']??'','Duration Seconds'=>$v['duration_seconds'],'Section'=>EventLabels::SECTIONS[$v['section']]??$v['section'],'Edited Fields'=>implode(' | ',$v['edited_fields']),'Trace ID'=>$v['trace_id'],'Visit Number'=>$v['visit_number'],'Sequence'=>$v['sequence'],'_order'=>$v['start_sequence'],'_boundary_order'=>$v['boundary_order']??0,'End Reason'=>$v['end_reason'],'Next Section'=>$v['next_section']??'','Next Section Name'=>$v['next_section_name']??'','Locked'=>$v['locked']?'yes':'no','Time Zone'=>'UTC','Time Source'=>$v['timestamp_source']??'client_navigation','Quality'=>$v['quality'],'Trace Prefix Incomplete'=>!empty($v['missing_before'])?'yes':'no','Background Observed'=>$v['background_seen']===null?'unknown':($v['background_seen']?'yes':'no'),'Read Only Tab'=>$v['read_only_tab']?'yes':'no','Overlapping Tab'=>$v['overlapping_tab']?'yes':'no','AI Question Count'=>$questions,'Response Arrival Observed'=>isset($v['response_observed'])?($v['response_observed']?'yes':'no'):'not_applicable','AI Label Match Quality'=>($v['activity_type']??'')==='ai_question_legacy'?'server_message_matched':(!empty($v['message_id'])?'request_key_matched':'not_observed_for_this_visit'),'AI Labels'=>implode(' | ',$v['ai_labels']??[]),'Researcher Labels'=>implode(' | ',$v['researcher_labels']??[]),'Effective Labels'=>implode(' | ',$v['effective_labels']??[]),'Label Source'=>implode(' | ',$v['label_sources']??[]),'Start UTC raw'=>$v['start_at'],'Complete UTC raw'=>$v['end_at']??$v['start_at']]+self::discoFlags($a)+(isset($v['attempt_id'])?['AI Attempt ID'=>$v['attempt_id']]:[]);
         }
 
         foreach($apps as $id=>$a){
-            foreach(['initial','submit'] as $kind){$client=array_values(array_filter($data['navigation_milestones'],fn($m)=>$m['app_id']===$id&&$m['kind']===$kind));$snapshot=current(array_filter($data['snapshots'],fn($s)=>$s['app_id']===$id&&$s['kind']===$kind));$m=$client[0]??($snapshot?['id'=>$snapshot['id'],'at'=>$snapshot['created_at'],'trace_id'=>'','source'=>'server_snapshot']:null);if(!$m||Navigation::time($m['at'])===null)continue;
-                $rows[]=['Case ID'=>$id,'Activity'=>$kind==='initial'?'Başlangıcı kesinleştirme':'Teslim','Start Timestamp'=>$format($m['at']),'Complete Timestamp'=>$format($m['at']),'Resource'=>$a['participant'],'Vaka ID'=>$a['case_id'],'Deneme numarası'=>(int)$a['attempt_no'],'Participant'=>$a['participant'],'Event ID'=>$m['id'],'Activity Code'=>$kind==='initial'?'INITIAL_CONFIRMED':'SUBMITTED','Duration Seconds'=>0,'Section'=>$kind==='initial'?'Başlangıç değerlendirmesi':'Son teslim','Trace ID'=>$m['trace_id'],'Visit Number'=>'','Sequence'=>0,'End Reason'=>'confirmed','Time Zone'=>'UTC','Time Source'=>$m['source'],'Quality'=>'confirmed_milestone','Start UTC raw'=>$m['at'],'Complete UTC raw'=>$m['at'],'_order'=>$m['sequence']??PHP_INT_MAX];
+            foreach(['initial','submit'] as $kind){$client=array_values(array_filter($data['navigation_milestones'],fn($m)=>$m['app_id']===$id&&$m['kind']===$kind));$snapshot=current(array_filter($data['snapshots'],fn($s)=>$s['app_id']===$id&&$s['kind']===$kind));$client=array_values(array_filter($client,fn($m)=>empty($m['invalid_clock'])&&Navigation::time($m['at'])!==null));$m=$client[0]??($snapshot?['id'=>$snapshot['id'],'at'=>$snapshot['created_at'],'trace_id'=>'','source'=>'server_snapshot']:null);if(!$m||Navigation::time($m['at'])===null)continue;
+                $rows[]=['Case ID'=>$id,'Activity'=>$kind==='initial'?'Başlangıcı kesinleştirme':'Teslim','Start Timestamp'=>$format($m['at']),'Complete Timestamp'=>$format($m['at']),'Resource'=>$a['participant'],'Vaka ID'=>$a['case_id'],'Deneme numarası'=>(int)$a['attempt_no'],'Participant'=>$a['participant'],'Event ID'=>$m['id'],'Activity Code'=>$kind==='initial'?'INITIAL_CONFIRMED':'SUBMITTED','Duration Seconds'=>0,'Section'=>$kind==='initial'?'Başlangıç değerlendirmesi':'Son teslim','Trace ID'=>$m['trace_id'],'Visit Number'=>'','Sequence'=>0,'End Reason'=>'confirmed','Time Zone'=>'UTC','Time Source'=>$m['source'],'Quality'=>'confirmed_milestone','Start UTC raw'=>$m['at'],'Complete UTC raw'=>$m['at'],'_order'=>$m['sequence']??PHP_INT_MAX]+self::discoFlags($a);
             }
         }
         // At equal boundaries a completed visit precedes its marker, which precedes the next visit.
         usort($rows,fn($a,$b)=>[$a['Case ID'],Navigation::time($a['Start UTC raw']),$a['_order'],$a['_boundary_order']??0,$a['Event ID']]<=>[$b['Case ID'],Navigation::time($b['Start UTC raw']),$b['_order'],$b['_boundary_order']??0,$b['Event ID']]);
-        $sequence=[];foreach($rows as $i=>&$row){$id=$row['Case ID'];unset($row['_order'],$row['_boundary_order']);$row['Sequence']=($sequence[$id]??0)+1;$sequence[$id]=$row['Sequence'];$row['Previous Activity']=$i&&$rows[$i-1]['Case ID']===$id?$rows[$i-1]['Activity']:'';$row['Next Activity']=isset($rows[$i+1])&&$rows[$i+1]['Case ID']===$id?$rows[$i+1]['Activity']:'';$row['Excluded Unclosed Visits']=count(array_filter($data['navigation_visits'],fn($v)=>$v['app_id']===$id&&$v['duration_seconds']===null));}unset($row);
-        if(!$rows){$f=fopen('php://temp','w+');fwrite($f,"\xEF\xBB\xBF");fputcsv($f,['Case ID','Activity','Start Timestamp','Complete Timestamp','Resource','Vaka ID','Deneme numarası','Participant','Activity Code','Duration Seconds','Sequence','Effective Labels'],',','"','');rewind($f);return stream_get_contents($f);}
+        $sequence=[];$coverage=array_column($data['navigation_coverage'],null,'app_id');foreach($rows as $i=>&$row){$id=$row['Case ID'];unset($row['_order'],$row['_boundary_order']);$row+=self::discoCoverage($coverage[$id]);$row['Sequence']=($sequence[$id]??0)+1;$sequence[$id]=$row['Sequence'];$row['Previous Activity']=$i&&$rows[$i-1]['Case ID']===$id?$rows[$i-1]['Activity']:'';$row['Next Activity']=isset($rows[$i+1])&&$rows[$i+1]['Case ID']===$id?$rows[$i+1]['Activity']:'';$row['Excluded Unclosed Visits']=count(array_filter($data['navigation_visits'],fn($v)=>$v['app_id']===$id&&$v['duration_seconds']===null));}unset($row);
+        if(!$rows){$f=fopen('php://temp','w+');fwrite($f,"\xEF\xBB\xBF");fputcsv($f,['Case ID','Activity','Start Timestamp','Complete Timestamp','Resource','Vaka ID','Deneme numarası','Participant','Activity Code','Duration Seconds','Sequence','Effective Labels','Test','Practice','Excluded','Trace Prefix Incomplete','Expected Missing Events','Withheld Events','Incomplete Prefix Streams','Pending Ranges Truncated'],',','"','');rewind($f);return stream_get_contents($f);}
         return self::csv($rows);
     }
     public static function xlsx(array $data,string $path): void {
-        demand(class_exists('PhpOffice\\PhpSpreadsheet\\Spreadsheet'),'Vendor kurulmadı',503);$book=new \PhpOffice\PhpSpreadsheet\Spreadsheet();$index=0;
-        foreach($data as $name=>$rows){$sheet=$index++===0?$book->getActiveSheet():$book->createSheet();$sheet->setTitle(substr($name,0,31));$keys=[];foreach($rows as $r)$keys=array_values(array_unique(array_merge($keys,array_keys($r))));$all=[$keys];foreach($rows as $r)$all[]=array_map(fn($k)=>is_array($r[$k]??null)?js($r[$k]):(string)($r[$k]??''),$keys);
-            foreach($all as $ri=>$row)foreach($row as $ci=>$value)$sheet->setCellValueExplicit([$ci+1,$ri+1],$value,\PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);$sheet->freezePane('A2');$sheet->getDefaultColumnDimension()->setWidth(24);}
-        (new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($book))->save($path);$book->disconnectWorksheets();clearstatcache(true,$path);
+        demand(class_exists('PhpOffice\\PhpSpreadsheet\\Spreadsheet'),'Vendor kurulmadı',503);
+        $book=new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $book->setValueBinder((new \PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder())->setPreserveCr(true));
+        $textType=\PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING;
+        $cellLimit=\PhpOffice\PhpSpreadsheet\Cell\DataType::MAX_STRING_LENGTH;
+        $longText=null;
+        $partRow=2;
+        $index=0;
+        try{
+            foreach($data as $name=>$rows){
+                $sheet=$index++===0?$book->getActiveSheet():$book->createSheet();
+                $sheet->setTitle(mb_substr($name,0,31));
+                $keys=[];
+                foreach($rows as $row)$keys+=array_fill_keys(array_keys($row),true);
+                $keys=array_keys($keys);
+                foreach($keys as $column=>$key)$sheet->setCellValueExplicit([$column+1,1],(string)$key,$textType);
+                $sheetRow=2;
+                foreach($rows as $row){
+                    foreach($keys as $column=>$key){
+                        $value=$row[$key]??'';
+                        $value=is_array($value)?js($value):(string)$value;
+                        if(strlen($value)>$cellLimit){
+                            $utf16=mb_convert_encoding($value,'UTF-16LE','UTF-8');
+                            if(strlen($utf16)>$cellLimit*2){
+                                if($longText===null){
+                                    $longText=new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($book,'Uzun metinler');
+                                    foreach(['Sayfa','Satır','Alan','Parça sırası','Metin','Kayıt kimliği'] as $i=>$header)
+                                        $longText->setCellValueExplicit([$i+1,1],$header,$textType);
+                                    $longText->freezePane('A2');
+                                    $longText->getColumnDimension('E')->setWidth(80);
+                                }
+                                $reference=$longText->getTitle().'!A'.$partRow;
+                                $recordId=(string)($row['id']??$row['activity_id']??$row['visit_id']??$row['app_id']??'');
+                                $partNumber=1;
+                                for($offset=0;$offset<strlen($utf16);$offset+=strlen($part)){
+                                    $part=mb_strcut($utf16,$offset,$cellLimit*2,'UTF-16LE');
+                                    $values=[$sheet->getTitle(),(string)$sheetRow,(string)$key,(string)$partNumber++,mb_convert_encoding($part,'UTF-8','UTF-16LE'),$recordId];
+                                    foreach($values as $i=>$partValue)$longText->setCellValueExplicit([$i+1,$partRow],$partValue,$textType);
+                                    $partRow++;
+                                }
+                                $value=$reference;
+                            }
+                        }
+                        $sheet->setCellValueExplicit([$column+1,$sheetRow],$value,$textType);
+                    }
+                    $sheetRow++;
+                }
+                $sheet->freezePane('A2');
+                $sheet->getDefaultColumnDimension()->setWidth(24);
+            }
+            if($longText!==null)$book->addSheet($longText);
+            (new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($book))->save($path);
+        }finally{
+            $book->disconnectWorksheets();
+        }
+        clearstatcache(true,$path);
     }
     public static function reportXlsx(array $reports,string $path): void {
         $rows=[];

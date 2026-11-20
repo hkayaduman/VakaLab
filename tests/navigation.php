@@ -19,21 +19,21 @@ $long=[$events[0],$events[1]];$long[1]['client_at']='2026-10-20T12:00:00Z';navCh
 $background=$events;$background[2]['type']='visibility';$background[2]['payload']=js(['view_id'=>'fixture-view','visible'=>false]);navCheck(count(array_filter(Navigation::build($background)['visits'],fn($v)=>$v['section']==='outside'))===1,'background state creates a separate outside interval');
 $c=require __DIR__.'/../config/example.php';$c['dsn']='sqlite::memory:';$c['db_user']='';$c['db_password']='';$c['https']=false;$db=new Db($c);Migration::run($db);Seed::run($db,$c,uid());$app=new App($db,$c);$r=$db->one("SELECT * FROM users WHERE id='test-researcher'");$u=$db->one("SELECT * FROM users WHERE id='test-student-1'");$a=$app->start($u,'test-case-1');
 foreach($events as $event){$event['app_id']=$a['id'];$db->insert('events',$event);}
-$ex=new Export($app);$csv=$ex->disco($r,['app_id'=>$a['id']]);$f=fopen('php://temp','w+');fwrite($f,substr($csv,3));rewind($f);$header=fgetcsv($f,0,',','"','');$rows=[];while(($row=fgetcsv($f,0,',','"',''))!==false)$rows[]=array_combine($header,$row);
+$ex=new Export($app);$csv=$ex->disco($r,['include_test'=>1,'app_id'=>$a['id']]);$f=fopen('php://temp','w+');fwrite($f,substr($csv,3));rewind($f);$header=fgetcsv($f,0,',','"','');$rows=[];while(($row=fgetcsv($f,0,',','"',''))!==false)$rows[]=array_combine($header,$row);
 navCheck(count($rows)===15,'CSV partitions AI visit at send boundary plus two milestones');navCheck($rows[0]['Duration Seconds']==='120'&&$rows[0]['Next Activity']==='Vaka profili güncelleme','CSV exposes elapsed seconds and next activity');navCheck($rows[0]['Start Timestamp']==='2026-10-20 10:00:00.000'&&$rows[0]['Complete Timestamp']==='2026-10-20 10:02:00.000','Disco start and completion are actual visit boundaries');navCheck($rows[0]['Next Section']==='profile'&&$rows[0]['Next Section Name']==='Vaka profili'&&$rows[0]['Locked']==='no','CSV separates destination tab and lock state from activity');navCheck($rows[count($rows)-1]['Activity']==='Teslim','submission is final exported activity');navCheck(!str_contains($csv,'fixture-session')&&!str_contains($csv,'fixture-tab')&&!str_contains($csv,'TEST-OGR-01'),'CSV has no login or raw session/tab identifiers');
-$db->q('DELETE FROM events WHERE app_id=?',[$a['id']]);$event=$events[0];$event['app_id']=$a['id'];$db->insert('events',$event);$openCsv=$ex->disco($r,['app_id'=>$a['id']]);navCheck(count(explode("\n",trim($openCsv)))===1,'open visit omitted from duration CSV rather than given fake zero');
+$db->q('DELETE FROM events WHERE app_id=?',[$a['id']]);$event=$events[0];$event['app_id']=$a['id'];$db->insert('events',$event);$openCsv=$ex->disco($r,['include_test'=>1,'app_id'=>$a['id']]);navCheck(count(explode("\n",trim($openCsv)))===1,'open visit omitted from duration CSV rather than given fake zero');
 $submitted='2026-10-20T10:11:00Z';$db->q("UPDATE applications SET state='submitted',submitted_at=? WHERE id=?",[$submitted,$a['id']]);$tele=new Telemetry($app);$batch=[['key'=>uid(),'type'=>'section_open','section'=>'case','tab'=>'new-tab','seq'=>1,'at'=>'2026-10-20T10:12:00Z','payload'=>[]],['key'=>uid(),'type'=>'text_changed','section'=>'final','tab'=>'new-tab','seq'=>2,'at'=>'2026-10-20T10:10:00Z','payload'=>['field'=>'final_reason']],['key'=>uid(),'type'=>'workflow_confirmed','section'=>'confirm','tab'=>'new-tab','seq'=>3,'at'=>'2026-10-20T10:11:00.100Z','payload'=>['kind'=>'submit']]];$tele->ingest($u,$a['id'],['events'=>$batch],'new-session');
 navCheck(!$db->one('SELECT id FROM events WHERE client_key=?',[$batch[0]['key']]),'backend discards newly reported post-submission browsing');navCheck((bool)$db->one('SELECT id FROM events WHERE client_key=?',[$batch[1]['key']]),'delayed pre-submission event retained');navCheck((bool)$db->one('SELECT id FROM events WHERE client_key=?',[$batch[2]['key']]),'first successful client submission confirmation accepted');$batch[2]['key']=uid();$tele->ingest($u,$a['id'],['events'=>[$batch[2]]],'new-session');navCheck(!$db->one('SELECT id FROM events WHERE client_key=?',[$batch[2]['key']]),'repeated confirmation does not extend completed workflow');
 $working=$db->one("SELECT * FROM applications WHERE user_id='test-student-4' AND case_id='test-case-1'");$request=$db->one('SELECT * FROM ai_requests WHERE app_id=?',[$working['id']]);(new MessageLabels($app))->generate($r,$working['id']);
 foreach([['section_open','ai','09:00:00',[]],['message_send','ai','09:00:10',['request_key'=>$request['client_key']]],['section_open','final','09:01:00',[]]] as $i=>[$type,$section,$at,$payload]){$e=$events[0];$e['id']=uid();$e['client_key']=uid();$e['app_id']=$working['id'];$e['type']=$type;$e['section']=$section;$e['client_at']='2026-10-20T'.$at.'Z';$e['client_seq']=$i+1;$e['payload']=js($payload+['view_id'=>'request-match']);$db->insert('events',$e);}
-$matched=$ex->disco($r,['app_id'=>$working['id']]);navCheck(str_contains($matched,'request_key_matched'),'AI labels match visit by request key despite different client/server clocks');navCheck(str_contains($matched,'Bilgi istedi'),'matched current AI intent labels available in visit CSV');navCheck(str_contains($matched,'Edited Fields'),'visit CSV retains edited-field metadata for later sequence coding');
+$matched=$ex->disco($r,['include_test'=>1,'app_id'=>$working['id']]);navCheck(str_contains($matched,'request_key_matched'),'AI labels match visit by request key despite different client/server clocks');navCheck(str_contains($matched,'Bilgi istedi'),'matched current AI intent labels available in visit CSV');navCheck(str_contains($matched,'Edited Fields'),'visit CSV retains edited-field metadata for later sequence coding');
 $view=$app->view($r,$working['id']);$aiVisit=current(array_filter($view['navigation']['visits'],fn($v)=>$v['section']==='ai'));
 navCheck($aiVisit['activity']==='AI sohbeti · Bilgi istedi','researcher view puts effective message intent in AI activity');
 navCheck(str_contains($matched,'AI sohbeti · Bilgi istedi'),'Disco Activity contains same intent as researcher view');
 $mid=$db->one("SELECT id FROM messages WHERE request_id=? AND role='user'",[$request['id']])['id'];
 (new Admin($app))->mutate($r,'labels',['message_id'=>$mid,'labels'=>['test-label-3'],'reason'=>'Synthetic intent correction']);$changed=$app->view($r,$working['id']);$changedVisit=current(array_filter($changed['navigation']['visits'],fn($v)=>$v['section']==='ai'));
 navCheck($changedVisit['activity']==='AI sohbeti · Eleştiri istedi','researcher label correction renames activity');
-navCheck(str_contains($ex->disco($r,['app_id'=>$working['id']]),'AI sohbeti · Eleştiri istedi'),'corrected intent also used in Disco Activity');
+navCheck(str_contains($ex->disco($r,['include_test'=>1,'app_id'=>$working['id']]),'AI sohbeti · Eleştiri istedi'),'corrected intent also used in Disco Activity');
 (new Admin($app))->mutate($r,'labels',['message_id'=>$mid,'labels'=>[],'reason'=>'Synthetic removal']);$empty=$app->view($r,$working['id']);$emptyVisit=current(array_filter($empty['navigation']['visits'],fn($v)=>$v['section']==='ai'));
 navCheck($emptyVisit['activity']==='AI sohbeti · Mesaj gönderdi · Etiket seçilmedi','explicit empty review never falls back to AI intent or viewing');
 $draftVisit=$aiVisit;$draftVisit['request_keys']=[];$draftVisit['edited_fields']=['question'];
@@ -60,7 +60,7 @@ navCheck(current(array_filter($two['navigation']['visits'],fn($v)=>$v['section']
 navCheck($parts[1]['end_reason']==='message_sent'&&$parts[1]['next_activity']==='AI yanıtı hazırlanıyor'&&$parts[2]['end_reason']==='missing_response','question and section transitions preserve actual destination');
 navCheck(count(array_unique(array_column($parts,'activity_id')))===5&&count(array_unique(array_column($parts,'visit_id')))===1,'segments have unique identities and share original visit');
 $parse=function($csv){$f=fopen('php://temp','w+');fwrite($f,substr($csv,3));rewind($f);$h=fgetcsv($f,0,',','"','');$rows=[];while(($line=fgetcsv($f,0,',','"',''))!==false)$rows[]=array_combine($h,$line);return $rows;};
-$exportParts=array_values(array_filter($parse($ex->disco($r,['app_id'=>$working['id']])),fn($row)=>in_array($row['Activity Code'],['AI_VIEW','AI_MESSAGE'],true)));
+$exportParts=array_values(array_filter($parse($ex->disco($r,['include_test'=>1,'app_id'=>$working['id']])),fn($row)=>in_array($row['Activity Code'],['AI_VIEW','AI_MESSAGE'],true)));
 navCheck(array_column($exportParts,'Activity')===['AI sohbeti görüntüleme','AI sohbeti · Bilgi istedi','AI sohbeti · Eleştiri istedi'],'Disco has separate sequential intent activities instead of combined parent');
 navCheck(array_column($exportParts,'Duration Seconds')===['10','0','0']&&$exportParts[1]['Next Activity']==='AI sohbeti · Eleştiri istedi','Disco preserves per-question durations and next activity');
 $repeat=$two['navigation']['visits'];foreach($repeat as &$v)if($v['section']==='ai')$v['message_activities'][1]['activity']='AI sohbeti · Bilgi istedi';unset($v);$repeatParts=array_values(array_filter(Navigation::activities($repeat),fn($v)=>$v['section']==='ai'));
@@ -76,7 +76,7 @@ navCheck(array_column($answerParts,'activity')===$expectedActivities,'question, 
 navCheck(array_column($answerParts,'duration_seconds')===[10.0,0.0,10.0,0.0,10.0,0.0,15.0,0.0,15.0],'each question ends on its response; viewing after response measured separately');
 navCheck(array_sum(array_column($answerParts,'duration_seconds'))===60.0,'responses are point events and do not inflate visit duration');
 navCheck($answerParts[2]['end_reason']==='response_arrived'&&$answerParts[4]['end_reason']==='next_question'&&$answerParts[8]['next_section']==='final','question/view/exit close at correct boundaries');
-$answerCsv=array_values(array_filter($parse($ex->disco($r,['app_id'=>$working['id']])),fn($row)=>in_array($row['Activity Code'],['AI_VIEW','AI_MESSAGE','AI_WAIT','AI_RESPONSE'],true)));
+$answerCsv=array_values(array_filter($parse($ex->disco($r,['include_test'=>1,'app_id'=>$working['id']])),fn($row)=>in_array($row['Activity Code'],['AI_VIEW','AI_MESSAGE','AI_WAIT','AI_RESPONSE'],true)));
 navCheck(array_column($answerCsv,'Activity')===$expectedActivities,'Disco preserves question-response-view chronology at identical timestamps');
 navCheck(array_column($answerCsv,'Duration Seconds')===['10','0','10','0','10','0','15','0','15'],'Disco carries distinct wait and viewing durations');
 $other=$answerParts[8];$other['section']='final';$other['activity']='Nihai değerlendirme görüntüleme';$other['message_sends']=[];$other['response_events']=[['request_id'=>'outside','status'=>'completed','at'=>'2026-10-20T09:00:50Z','event_id'=>'outside-response','sequence'=>10]];
@@ -90,7 +90,7 @@ $legacy=$app->view($r,$working['id']);$legacyQuestions=array_values(array_filter
 navCheck(count($legacyQuestions)===2,'legacy user questions remain visible without message_send telemetry');
 navCheck(array_column($legacyQuestions,'activity')===['AI sohbeti · Bilgi istedi','AI sohbeti · Eleştiri istedi'],'legacy questions use current researcher labels');
 navCheck(array_column($legacyQuestions,'duration_seconds')===[null,null]&&array_column($legacyQuestions,'timestamp_source')===['server_message','server_message'],'legacy question times retain explicit server source and unknown duration');
-$legacyCsv=array_values(array_filter($parse($ex->disco($r,['app_id'=>$working['id']])),fn($v)=>$v['Row Type']==='ai_question_legacy'));
+$legacyCsv=array_values(array_filter($parse($ex->disco($r,['include_test'=>1,'app_id'=>$working['id']])),fn($v)=>$v['Row Type']==='ai_question_legacy'));
 navCheck(count($legacyCsv)===2&&array_column($legacyCsv,'Activity')===array_column($legacyQuestions,'activity'),'Disco includes legacy intent question points');
 navCheck(array_column($legacyCsv,'Duration Seconds')===['','']&&$legacyCsv[0]['Time Source']==='server_message'&&$legacyCsv[0]['Start Timestamp']===$legacyCsv[0]['Complete Timestamp'],'legacy Disco points do not fabricate wait duration');
 $admin->mutate($r,'labels',['message_id'=>$secondMessage['id'],'labels'=>[],'reason'=>'Synthetic legacy empty review']);$noLabel=$app->view($r,$working['id']);$legacyEmpty=array_values(array_filter($noLabel['navigation']['activities'],fn($v)=>($v['activity_type']??'')==='ai_question_legacy'));
@@ -107,6 +107,36 @@ navCheck($waits[0]['timeline_lane']==='ai_wait'&&current(array_filter($crossPart
 navCheck(count(array_filter($crossParts,fn($v)=>$v['activity']==='AI sohbeti görüntüleme'))===1,'reply outside AI does not create a false return to viewing');
 navCheck(count(array_filter($answerParts,fn($v)=>$v['activity_type']==='ai_question'&&$v['duration_seconds']===0.0))===2&&count(array_filter($answerParts,fn($v)=>$v['activity_type']==='ai_wait'))===2,'each question is one point plus one independent preparation interval');
 $db->q('DELETE FROM events WHERE app_id=?',[$working['id']]);foreach($cross as $item){$item['id']=uid();$item['client_key']=uid();$item['app_id']=$working['id'];$db->insert('events',$item);}
-$crossCsv=$parse($ex->disco($r,['app_id'=>$working['id']]));$exportWait=current(array_filter($crossCsv,fn($v)=>$v['Activity Code']==='AI_WAIT'));
+$crossCsv=$parse($ex->disco($r,['include_test'=>1,'app_id'=>$working['id']]));$exportWait=current(array_filter($crossCsv,fn($v)=>$v['Activity Code']==='AI_WAIT'));
 navCheck($exportWait['Activity']==='AI yanıtı hazırlanıyor'&&$exportWait['Duration Seconds']==='40'&&$exportWait['Timeline Lane']==='ai_wait'&&$exportWait['Response Section']==='final','Disco exports full 40-second concurrent preparation with explicit separate lane');
+$initialAttempt=$request['attempt'];$retryAttempt=uid();
+$db->insert('ai_attempts',['id'=>$retryAttempt,'request_id'=>$request['id'],'status'=>'completed','started_at'=>now(),'completed_at'=>now()]);
+$seq=0;$events=[];
+$firstSend=['request_key'=>$request['client_key'],'attempt_id'=>$initialAttempt,'retry'=>false];
+$failedReply=['request'=>$request['id'],'attempt_id'=>$initialAttempt,'status'=>'failed'];
+$retrySend=['request_key'=>$request['client_key'],'attempt_id'=>$retryAttempt,'retry'=>true];
+$continued=['view_id'=>'reloaded','pending_attempt'=>$retryAttempt,'pending_request'=>$request['id']];
+$add('section_open','ai','11:00:00');
+$add('message_send','ai','11:00:02',$firstSend);
+$add('response_visible','ai','11:00:05',$failedReply);
+$add('message_send','ai','11:00:06',$retrySend);
+$add('message_send','ai','11:00:07',$retrySend);
+$add('page_exit','ai','11:00:10',['reason'=>'pagehide']);
+$add('section_open','ai','11:00:14',$continued);
+$add('app_presence','ai','11:00:16',$continued+['app_active'=>false]);
+$add('app_presence','ai','11:00:18',$continued+['app_active'=>true]);
+$add('response_visible','ai','11:00:21',$continued+['request'=>$request['id'],'attempt_id'=>$retryAttempt,'status'=>'completed']);
+$add('section_open','final','11:00:25',$continued);
+$db->q('DELETE FROM events WHERE app_id=?',[$working['id']]);
+foreach($events as $item){$item['id']=uid();$item['client_key']=uid();$item['app_id']=$working['id'];$db->insert('events',$item);}
+$view=$app->view($r,$working['id']);$activities=$view['navigation']['activities'];
+$byCode=fn(string $code)=>array_values(array_filter($activities,fn($activity)=>$activity['activity_code']===$code));
+navCheck(count(array_filter($byCode('AI_MESSAGE'),fn($question)=>($question['attempt_id']??null)===$initialAttempt))===1&&count($byCode('AI_RETRY'))===1,'same message remains one question and one distinct retry even if the retry POST is repeated');
+$firstWait=array_values(array_filter($byCode('AI_WAIT'),fn($wait)=>($wait['attempt_id']??null)===$initialAttempt));
+$retryWait=array_values(array_filter($byCode('AI_WAIT'),fn($wait)=>($wait['attempt_id']??null)===$retryAttempt));
+navCheck(array_column($firstWait,'duration_seconds')===[3.0]&&array_column($retryWait,'duration_seconds')===[4.0,null,2.0,3.0],'retry wait survives reload and excludes both the unobserved gap and unfocused time');
+navCheck($retryWait[1]['end_reason']==='view_gap'&&$retryWait[1]['quality']==='unobserved_view_gap'&&$retryWait[3]['response_observed'],'reload gap is marked unknown and the resumed response is observed');
+navCheck(array_column($view['navigation']['visits'],'duration_seconds')===[10.0,2.0,2.0,7.0,null],'AI attempt boundaries leave section and focus visits unchanged');
+$waitCsv=array_values(array_filter($parse($ex->disco($r,['include_test'=>1,'app_id'=>$working['id']])),fn($row)=>$row['Activity Code']==='AI_WAIT'&&$row['AI Attempt ID']===$retryAttempt));
+navCheck(array_column($waitCsv,'Duration Seconds')===['4','2','3'],'Disco exports the three observed retry intervals under the same attempt ID');
 echo "TOTAL NAV $n checks passed. Synthetic example; no real working database used.\n";

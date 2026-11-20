@@ -81,7 +81,10 @@ try:
     check(connection.execute('select count(*) from messages where app_id=?',(aid,)).fetchone()[0]==2,'only one user and one assistant message')
     # Failure and explicit retry: one immutable student message, separate attempts.
     config_write('error');badkey=uuid.uuid4().hex;status,res=student.call('chat',{'app_id':aid,'key':badkey,'text':'SENTETİK hata sorusu'});req=res['data'];check(req['status']=='failed','mock provider error recorded')
-    config_write('normal');status,res=student.call('chat',{'app_id':aid,'key':badkey,'retry_request':req['id']});check(status==200 and res['data']['status']=='completed','explicit retry successful')
+    config_write('normal');attempt=uuid.uuid4().hex;retry={'app_id':aid,'key':badkey,'retry_request':req['id'],'attempt_id':attempt}
+    status,res=student.call('chat',retry);check(status==200 and res['data']['status']=='completed' and res['data']['attempt']==attempt,'explicit retry uses its own attempt ID')
+    status,replayed=student.call('chat',retry);check(status==200 and replayed['data']['attempt']==attempt,'repeated explicit retry POST is idempotent')
+    check(any(r['attempt']==attempt for r in student.call('view',app_id=aid)[1]['data']['requests']),'student view retains the attempt ID across reload')
     check(connection.execute('select count(*) from messages where request_id=? and role=?',(req['id'],'user')).fetchone()[0]==1,'retry does not duplicate student message')
     check(connection.execute('select count(*) from ai_attempts where request_id=?',(req['id'],)).fetchone()[0]==2,'attempt history preserved')
     config_write('partial');status,res=student.call('chat',{'app_id':aid,'key':uuid.uuid4().hex,'text':'Kısmi test'});check(res['data']['status']=='partial','partial response explicitly marked')
@@ -91,9 +94,11 @@ try:
         rid=connection.execute('select active_request from applications where id=?',(aid,)).fetchone()[0]
         if rid:break
         time.sleep(.05)
+    active_attempt=connection.execute('select attempt from ai_requests where id=?',(rid,)).fetchone()[0]
     connection.execute("update ai_requests set started_at='2020-01-01T00:00:00Z' where id=?",(rid,));connection.commit()
     check(researcher.call('admin',{'action':'resolve_request','id':rid,'reason':'SENTETİK fencing testi'},port=ports[1])[0]==200,'researcher resolves expired reservation')
-    late.result();check(connection.execute('select count(*) from messages where request_id=? and role=?',(rid,'assistant')).fetchone()[0]==0,'late fenced reply not committed')
+    _,closed=late.result();check(closed['data']['attempt']==active_attempt and closed['data']['status']=='failed','resolved request reports the original attempt as failed')
+    check(connection.execute('select count(*) from messages where request_id=? and role=?',(rid,'assistant')).fetchone()[0]==0,'late fenced reply not committed')
     submitted=connection.execute("select id from applications where user_id='test-student-6'").fetchone()[0]
     report=connection.execute('select id from reports where app_id=? and approved_at is not null',(submitted,)).fetchone()[0]
     s6=Client();s6.login('TEST-OGR-06');check(s6.call('report_data',id=report)[0]==403,'early report denied over HTTP')

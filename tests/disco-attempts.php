@@ -26,7 +26,7 @@ foreach([$first,$second] as $i=>$a){$id=$a['id'];$day=20+$i;
 }
 $before=[];foreach(['applications','snapshots','messages','events','analysis_runs','reports'] as $table)$before[$table]=$db->all('SELECT * FROM '.$table.' ORDER BY id');
 foreach(['visits','events'] as $view){
-    [$header,$rows]=discoRows($ex->disco($r,['case_id'=>'test-case-1','user_id'=>$u['id'],'view'=>$view]));
+    [$header,$rows]=discoRows($ex->disco($r,['include_test'=>1,'case_id'=>'test-case-1','user_id'=>$u['id'],'view'=>$view]));
     discoCheck(in_array('Deneme numarası',$header,true),$view.' has explicit attempt column');
     discoCheck(count(array_unique(array_column($rows,'Case ID')))===2,$view.' contains exactly two independent cases');
     discoCheck(count(array_unique(array_column($rows,'Participant')))===1&&count(array_unique(array_column($rows,'Vaka ID')))===1,$view.' retains shared participant and pedagogical case');
@@ -34,7 +34,7 @@ foreach(['visits','events'] as $view){
         discoCheck(count($part)>0&&array_unique(array_column($part,'Deneme numarası'))===[(string)($i+1)],$view.' every row identifies attempt '.($i+1));
         discoCheck(count(array_filter($part,fn($row)=>$view==='visits'?($row['Activity Code']??'')==='SUBMITTED':$row['Activity']==='Son teslim yapıldı'))===1,$view.' each attempt has its own submission');
         discoCheck(!array_filter($part,fn($row)=>$row['Complete Timestamp']>sprintf('2026-10-%02d 10:03:00.000',20+$i)),$view.' excludes post-submission navigation');
-        [$oneHeader,$one]=discoRows($ex->disco($r,['app_id'=>$a['id'],'view'=>$view]));
+        [$oneHeader,$one]=discoRows($ex->disco($r,['include_test'=>1,'app_id'=>$a['id'],'view'=>$view]));
         discoCheck(array_unique(array_column($one,'Case ID'))===[$a['id']]&&array_unique(array_column($one,'Deneme numarası'))===[(string)($i+1)],$view.' individual download contains only selected attempt');
         if($view==='visits'){
             $durations=array_map(fn($row)=>(float)($row['Duration Seconds']??0),$part);

@@ -264,7 +264,7 @@ def main():
             check(all(row['id']!=own_case for row in selected['cases']) and all(row['id']!=own_student for row in selected['participants']),'full export supplementary tables preserve workspace isolation')
             check(all(row['case_id']!=own_case for row in researcher.ok('download',format='json',all_data=1)['applications']),'all cases means own workspace only')
             import csv,io
-            url=base+'/api.php?'+urllib.parse.urlencode({'op':'download','format':'disco','case_id':'test-case-1'})
+            url=base+'/api.php?'+urllib.parse.urlencode({'op':'download','format':'disco','case_id':'test-case-1','include_test':1})
             with researcher.opener.open(url) as response: csv_text=response.read().decode('utf-8-sig')
             event_rows=list(csv.DictReader(io.StringIO(csv_text)))
             check(bool(event_rows) and all(row['Case ID'] and row['Activity'] and row['Start Timestamp'] and row['Complete Timestamp'] for row in event_rows),'Disco CSV has case/activity/start/complete columns')

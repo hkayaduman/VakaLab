@@ -1,6 +1,34 @@
 <?php
 declare(strict_types=1);
 final class Migration {
+    private const VERSIONS=[1,2,3,4,5];
+    private const RESET_COLUMNS=['user_id','requested_at','token_hash','password_stamp','expires_at'];
+
+    private static function columns(Db $db,string $table): array {
+        $rows=$db->sqlite()
+            ?$db->all('SELECT name,type FROM pragma_table_info(?)',[$table])
+            :$db->all('SELECT COLUMN_NAME AS name,DATA_TYPE AS type FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?',[$table]);
+        return array_column($rows,'type','name');
+    }
+
+    private static function checkFeature(Db $db,int $version): void {
+        if($version===4){
+            $missing=array_diff(self::RESET_COLUMNS,array_keys(self::columns($db,'password_resets')));
+            demand(!$missing,'Şema 004 eksik: password_resets sütunları '.implode(', ',$missing),503);
+        }else{
+            $type=self::columns($db,'case_versions')['body_html']??'';
+            demand(strtolower($type)==='longtext','Şema 005 eksik veya uyumsuz: case_versions.body_html LONGTEXT gerekli',503);
+        }
+    }
+
+    public static function verify(Db $db): void {
+        demand(isset(self::columns($db,'schema_migrations')['version']),'Şema sürüm tablosu eksik. Geçişi uygulayın.',503);
+        $missing=array_diff(self::VERSIONS,array_column($db->all('SELECT version FROM schema_migrations'),'version'));
+        demand(!$missing,'Eksik şema sürümleri: '.implode(', ',$missing),503);
+        self::checkFeature($db,4);
+        self::checkFeature($db,5);
+    }
+
     public static function run(Db $db): void {
         $exists=$db->sqlite()?$db->one("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_migrations'"):$db->one("SHOW TABLES LIKE 'schema_migrations'");
         if(!$exists){
@@ -49,5 +77,22 @@ final class Migration {
                 $db->insert('schema_migrations',['version'=>3,'applied_at'=>now()]);
             }
         }
+        foreach([4,5] as $version){
+            if($db->one('SELECT version FROM schema_migrations WHERE version=?',[$version]))continue;
+            $apply=function()use($db,$version){
+                if($db->one('SELECT version FROM schema_migrations WHERE version=?',[$version]))return;
+                if(!$db->sqlite())$db->pdo->exec('SET default_storage_engine=InnoDB');
+                // MariaDB/MySQL may have committed the ALTER before its version was recorded.
+                if($version!==5||!isset(self::columns($db,'case_versions')['body_html'])){
+                    $sql=file_get_contents(sprintf('%s/../migrations/%03d.sql',__DIR__,$version));
+                    demand($sql!==false,'Geçiş dosyası okunamadı: '.$version,503);
+                    $db->pdo->exec($sql);
+                }
+                self::checkFeature($db,$version);
+                $db->insert('schema_migrations',['version'=>$version,'applied_at'=>now()]);
+            };
+            if($db->sqlite())$db->tx($apply);else $apply();
+        }
+        self::verify($db);
     }
 }

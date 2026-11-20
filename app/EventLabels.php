@@ -30,6 +30,8 @@ final class EventLabels {
         $p=(is_array($event['payload']??null)?$event['payload']:(json_decode($event['payload']??'{}',true)?:[]));
         if($event['type']==='app_presence'){$name=($p['app_active']??false)?'Vaka sekmesi yeniden etkin':'Vaka sekmesi etkinliğini kaybetti';$description=($p['app_active']??false)?'Bölüm süresi yeniden başladı.':'Sayfa gizli veya pencere odaksız; vaka sekmesi yeniden etkin olana kadar bölüm süresi durur.';}
         if($event['type']==='section_open'&&!empty($p['locked'])){$name=$event['section']==='ai'?'Kilitli AI bölümünü görüntüleme':'Kilitli bölüm görüntüleme';$description='İstenen bölüm kilitliydi; erişim denemesi kaydedildi.';}
+        if(($event['quality']??null)===Telemetry::CUTOFF_UNVERIFIED)$description.=' Veri toplama sınırına göre zamanı doğrulanamadı. Yalnızca ham günlüğe alındı.';
+        if(($event['quality']??null)==='invalid_client_time')$description.=' Tarayıcı zaman damgası geçersiz.';
         return $event + ['type_tr'=>$name,'section_tr'=>self::SECTIONS[$event['section']] ?? 'Tanımlanmamış bölüm','event_category'=>$category,'event_description'=>$description];
     }
     public static function dictionary(): array {
@@ -39,6 +41,9 @@ final class EventLabels {
             ['field'=>'events.section / section_tr','meaning'=>'section bölüm kodu; section_tr Türkçe bölüm adı.'],
             ['field'=>'events.event_category / event_description','meaning'=>'Olay grubu ve Türkçe açıklaması. Açıklamalar gözlem sınırlarını belirtir, düşünme/okuma çıkarımı yapmaz.'],
             ['field'=>'events.client_at / received_at / client_seq','meaning'=>'client_at istemci UTC zamanı, received_at sunucuya ulaşma UTC zamanı. Gecikmeli gönderim olabilir; client_seq aynı sekme/oturumda sıra kontrolüdür. İstemci saatinin doğruluğu garanti edilmez.'],
+            ['field'=>'events.quality','meaning'=>'collection_cutoff_unverified yalnız ham gözlemdir. invalid_client_time geçersiz istemci tarihini işaretler.'],
+            ['field'=>'navigation_coverage','meaning'=>'Teslimde bildirilen ve henüz bulunmayan sıra numaraları, yalnız ham günlükte kalan olaylar ve başı eksik izler ayrı sayılır.'],
+            ['field'=>'navigation_visits.measurement_version','meaning'=>'presence-v4, eksik olay dizisi veya geçersiz saat için süre hesaplamaz.'],
         ];
         foreach (self::TYPES as $code=>[$name,$category,$description]) $rows[] = ['field'=>'events.type.'.$code,'meaning'=>$name.' · '.$category.' · '.$description];
         foreach (self::SECTIONS as $code=>$name) $rows[] = ['field'=>'events.section.'.$code,'meaning'=>$name];

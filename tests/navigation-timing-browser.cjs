@@ -35,6 +35,50 @@ const check=(ok,name)=>{if(!ok)throw Error(name);console.log(`PASS LIVE TIMING $
  await rp.evaluate(async id=>{await processView(id);document.querySelector('[data-process-panel="navigation"]').open=true;},id);
  const ui=await rp.locator('[data-process-panel="navigation"] table').first().locator('tbody tr').evaluateAll(rows=>rows.map(tr=>[...tr.children].map(td=>td.textContent.trim())));
  for(const section of new Set(comparisons.map(c=>c.section))){const visits=data.navigation.visits.filter(v=>v.section===section&&v.duration_seconds!==null),sum=visits.reduce((s,v)=>s+v.duration_seconds,0),label=await rp.evaluate(s=>processSections[s],section),row=ui.find(r=>r[0]===label);check(!!row&&row[3]===(sum>0&&sum<1?'1 sn altında':await rp.evaluate(s=>processDuration(s),sum)),`${section} UI total matches API including repeated visits`);}
+ await go('final');
+ const originalTab=await page.evaluate(()=>tab),popup=page.waitForEvent('popup');
+ await page.evaluate(()=>{window.open(location.href,'_blank');});
+ const duplicate=await popup;
+ await duplicate.locator('[data-case="test-case-1"]').click();
+ await duplicate.locator('[data-section="final"]').click();
+ check(await duplicate.locator('#final_decision').isDisabled(),'tab with inherited storage is read only');
+ check(await page.locator('#final_decision').isEnabled(),'original tab remains writable');
+ const duplicateTab=await duplicate.evaluate(()=>tab);
+ check(duplicateTab!==originalTab,'inherited tab gets a separate telemetry identity');
+ await duplicate.evaluate(()=>drainEvents());await page.evaluate(()=>drainEvents());
+ const raw=await rp.evaluate(id=>api('view',undefined,{app_id:id}),id);
+ check(raw.events.some(e=>e.tab_id===originalTab)&&raw.events.some(e=>e.tab_id===duplicateTab),'separate telemetry tab identities persist in the database');
+ await duplicate.close();await page.bringToFront();
+ const sequenceBeforeReload=await page.evaluate(()=>seq);
+ await page.reload();await page.locator('[data-case="test-case-1"]').click();await page.locator('[data-section="final"]').click();
+ check(await page.locator('#final_decision').isEnabled()&&await page.evaluate(id=>tab===id,originalTab),'normal reload keeps the telemetry tab identity without a false lock');
+ check(await page.evaluate(previous=>seq>previous,sequenceBeforeReload),'normal reload continues the existing event sequence');
+
+ await page.context().addInitScript(()=>{window.inheritedTelemetryTab=sessionStorage.getItem('vakalab:tab');});
+ const retainedKey=await page.evaluate(()=>{
+   const key=recoveryKey()+':observed-chat';
+   sessionStorage.setItem(key,JSON.stringify({attempt_id:'synthetic-observation'}));
+   return key;
+ });
+ const delayedPopup=page.waitForEvent('popup');
+ await page.evaluate(()=>{window.open(location.href,'_blank');});
+ const delayed=await delayedPopup;
+ await delayed.locator('[data-case="test-case-1"]').waitFor();
+ const delayedState=await delayed.evaluate(key=>({before:window.inheritedTelemetryTab,id:tab,copiedState:sessionStorage.getItem(key)}),retainedKey);
+ check(delayedState.before===originalTab&&delayedState.id!==originalTab,'copy splits the inherited tab identity while still on home');
+ check(delayedState.copiedState===null&&await page.evaluate(key=>sessionStorage.getItem(key)!==null,retainedKey),'only the copy discards inherited recovery state');
+
+ await page.bringToFront();await go('case');await go('profile');await go('initial');
+ await page.locator('#back').click();await page.locator('[data-case="test-case-1"]').waitFor();
+ await delayed.bringToFront();await delayed.locator('[data-case="test-case-1"]').click();
+ await delayed.locator('[data-section="final"]').click();await delayed.locator('[data-section="case"]').click();
+ await delayed.evaluate(()=>drainEvents());
+ check(await delayed.evaluate(expected=>!readOnlyTab&&tab===expected,delayedState.id),'delayed copy keeps its own telemetry identity after the original leaves the case');
+ const sequential=await rp.evaluate(id=>api('view',undefined,{app_id:id}),id);
+ const affected=sequential.events.filter(e=>[originalTab,delayedState.id].includes(e.tab_id));
+ const rawKeys=affected.map(e=>[e.session_id,e.tab_id,e.client_seq].join('/'));
+ check(affected.some(e=>e.tab_id===delayedState.id)&&new Set(rawKeys).size===rawKeys.length,'no duplicate raw sequence in the delayed copy scenario');
+ await delayed.close();
  check(errors.length===0,'tab timing journey has no JavaScript errors');const summary={checks:n,tolerance_ms:150,expected_total_seconds:expectedTotal,actual_total_seconds:actualTotal,comparisons};fs.writeFileSync(path.join(tmp,'navigation-live-timing-summary.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary));
  console.log(`TOTAL LIVE TIMING ${n} checks passed; all seven sections, independent monotonic measurements.`);
 }finally{if(browser)await browser.close();server.kill();}})().catch(e=>{console.error(e);process.exitCode=1;});
