@@ -110,13 +110,14 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
         const otherPage = await login(other.login);
         const firstPage = await login('TEST-ARASTIRMACI');
         const {id: caseId} = await call(otherPage, 'admin', {action: 'case', title: 'SENTETİK ikinci çalışma alanı', body: 'SENTETİK vaka metni', status: 'active'});
-        check(await status(otherPage, 'admin', {action: 'participants_bulk', rows: [{login: 'TEST-FORBIDDEN', password}]}) === 403 &&
-            await status(otherPage, 'admin', {action: 'assign', case_id: caseId, user_id: student.id, active: true}) === 403,
-            'researchers cannot bulk-create accounts or add arbitrary students');
+        check(await status(otherPage, 'admin', {action: 'assign', case_id: caseId, user_id: student.id, active: true}) === 403,
+            'researchers cannot assign arbitrary students');
         await call(admin, 'admin', {action: 'participant', id: student.id, login: student.login, metadata: {researcher_notes: 'SENTETİK özel profil notu'}});
         await call(admin, 'admin', {action: 'assign', case_id: caseId, user_id: student.id, active: true});
         await call(admin, 'admin', {action: 'assign', case_id: 'test-case-1', user_id: student.id, active: true});
         const studentPage = await login(student.login);
+        check(await status(studentPage, 'admin', {action: 'participants_bulk', rows: [{login: 'TEST-FORBIDDEN', password}]}) === 403,
+            'students cannot bulk-create accounts');
         const {id: appId} = await call(studentPage, 'start', {case_id: caseId});
         const {id: secondAppId} = await call(studentPage, 'start', {case_id: 'test-case-1'});
         check((await call(studentPage, 'cases')).filter(c => [caseId, 'test-case-1'].includes(c.id)).length === 2,
@@ -149,8 +150,9 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
             'researcher can open their case file without editing the student account or reading another case');
         await otherPage.reload();
         await otherPage.locator('[data-admin-tab="participants"]').click();
-        check(await otherPage.locator('#account-rows').getByText(student.login, {exact: true}).count() === 0 &&
-            await otherPage.locator('#bulk-participants').count() === 0, 'account management excludes assigned external students and the bulk button');
+        await otherPage.locator('#bulk-participants').waitFor();
+        check(await otherPage.locator('#account-rows').getByText(student.login, {exact: true}).count() === 0,
+            'account management excludes assigned external students');
         await otherPage.locator('[data-admin-tab="overview"]').click();
         await otherPage.locator('[data-process]').click();
         await otherPage.locator('#process-data').waitFor();
@@ -299,6 +301,67 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
         await call(admin, 'admin', {action: 'participant', id: student.id, login: student.login, name: student.name, status: 'active', password: newPassword});
         check(await status(studentPage, 'login', {login: student.login, password}) === 401 &&
               await status(studentPage, 'login', {login: student.login, password: newPassword}) === 200, 'super admin can reset a student password');
+
+        await otherPage.locator('#admin-back').click();
+        await otherPage.locator('[data-admin-tab="participants"]').click();
+        await otherPage.locator('#bulk-participants').click();
+        const researcherLogins = otherPage.locator('[data-bulk-login]');
+        const researcherPasswords = otherPage.locator('[data-bulk-password]');
+        const firstLogin = 'TEST-RESEARCHER-BULK-1';
+        const secondLogin = 'TEST-RESEARCHER-BULK-2';
+        await researcherLogins.nth(0).fill(firstLogin);
+        await researcherPasswords.nth(0).fill(password);
+        await researcherLogins.nth(2).fill(secondLogin);
+        await researcherPasswords.nth(2).fill('short');
+        await otherPage.locator('#commit').click();
+        await otherPage.getByText('3. satır: Parola', {exact: false}).waitFor();
+        check(!(await call(admin, 'dashboard')).users.some(u => u.login === firstLogin),
+            'an invalid researcher row prevents every account in the batch from being created');
+
+        await researcherPasswords.nth(2).fill(password);
+        await researcherLogins.nth(2).fill(single.login);
+        await otherPage.locator('#commit').click();
+        await otherPage.getByText('3. satır: Bu kullanıcı adı zaten kayıtlı', {exact: true}).waitFor();
+        const rolledBack = await call(admin, 'dashboard');
+        check(!rolledBack.users.some(u => u.login === firstLogin) && !rolledBack.audit.some(a => a.detail.includes(firstLogin)),
+            'a username in another workspace rolls back both the accounts and their audit entries');
+
+        await researcherLogins.nth(2).fill(secondLogin);
+        await otherPage.locator('#commit').click();
+        await otherPage.locator('dialog').waitFor({state: 'detached'});
+        await otherPage.locator('#account-rows').getByText(firstLogin, {exact: true}).waitFor();
+        await otherPage.locator('#account-rows').getByText(secondLogin, {exact: true}).waitFor();
+        const researcherDashboard = await call(otherPage, 'dashboard');
+        const createdStudents = researcherDashboard.users.filter(u => [firstLogin, secondLogin].includes(u.login));
+        const globalDashboard = await call(admin, 'dashboard');
+        check(createdStudents.length === 2 && createdStudents.every(u => u.owner_id === other.id && u.role === 'student' && u.status === 'active' &&
+              globalDashboard.users.some(globalUser => globalUser.id === u.id) && researcherDashboard.audit.some(a => a.actor === other.id && a.target === u.id && a.action === 'participant')),
+              'researcher bulk creation lists two owned active students with audit entries, also visible to the super admin');
+        const unrelated = await call(firstPage, 'dashboard');
+        check(createdStudents.every(u => !unrelated.users.some(row => row.id === u.id)) &&
+              await status(firstPage, 'admin', {action: 'participant', id: createdStudents[0].id, login: createdStudents[0].login}) === 403,
+              'another researcher cannot list or edit the bulk-created accounts');
+
+        await otherPage.locator('[data-admin-tab="cases"]').click();
+        await otherPage.locator('#assignment').click();
+        await otherPage.locator('#a-case').selectOption(caseId);
+        for (const user of createdStudents) await otherPage.locator(`[data-assign-student][value="${user.id}"]`).check();
+        await otherPage.locator('#commit').click();
+        await otherPage.locator('dialog').waitFor({state: 'detached'});
+        const assignments = (await call(otherPage, 'dashboard')).assignments;
+        const researcherStudent = await login(firstLogin);
+        check(createdStudents.every(u => assignments.some(a => a.case_id === caseId && a.user_id === u.id && Number(a.active))) &&
+              (await call(researcherStudent, 'cases')).some(c => c.id === caseId),
+              'the researcher can bulk-assign the new students and a new student can sign in and see the case');
+
+        const limitRows = Array.from({length: 101}, (_, index) => ({login: `TEST-RESEARCHER-LIMIT-${index + 1}`, password}));
+        check(await status(otherPage, 'admin', {action: 'participants_bulk', rows: limitRows}) === 422 &&
+              !(await call(otherPage, 'dashboard')).users.some(u => u.login === limitRows[0].login),
+              'a researcher batch with 101 rows is rejected without creating accounts');
+        const atLimit = await call(otherPage, 'admin', {action: 'participants_bulk', rows: limitRows.slice(0, 100)});
+        const limitStudents = (await call(otherPage, 'dashboard')).users.filter(u => u.login.startsWith('TEST-RESEARCHER-LIMIT-'));
+        check(atLimit.count === 100 && limitStudents.length === 100 && limitStudents.every(u => u.owner_id === other.id && u.role === 'student') &&
+              !limitStudents.some(u => u.login === limitRows[100].login), 'a researcher can create exactly 100 owned student accounts in one batch');
         check(errors.length === 0, 'no browser JavaScript errors across the roles');
         console.log(`TOTAL SUPER ADMIN ${count} checks passed on isolated SQLite and Chromium.`);
     } finally {

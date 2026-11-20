@@ -112,7 +112,7 @@ Kurulum kilidi, web kurucu olmaması + schema_migrations kaydı + benzersiz logi
 
 ### Süper Admin hesabı
 
-VakaLab tek bir kullanıcı havuzu kullanır. Süper Admin **Kullanıcılar → Toplu kullanıcı ekle** üzerinden kullanıcı adı ve şifre girerek tek seferde öğrenci hesapları oluşturabilir. Süper Admin herhangi bir öğrenciyi herhangi bir vakaya atayabilir. Araştırmacının kullanıcı yönetiminde kendi eklediği hesaplar görünür. Kendi vakasına atanan diğer öğrencilerin vaka dosyalarını da açabilir.
+VakaLab tek bir kullanıcı havuzu kullanır. Süper Admin ve araştırmacılar **Kullanıcılar → Toplu kullanıcı ekle** üzerinden kullanıcı adı ve şifre girerek tek seferde en fazla 100 öğrenci hesabı oluşturabilir. Süper Admin herhangi bir öğrenciyi herhangi bir vakaya atayabilir. Araştırmacının kullanıcı yönetiminde kendi eklediği hesaplar görünür. Kendi vakasına atanan diğer öğrencilerin vaka dosyalarını da açabilir.
 
 İlk Süper Admin hesabını sunucuda, yukarıdaki şekilde `VAKALAB_ADMIN_PASSWORD` ayarlandıktan sonra `php bin/console.php super-admin yonetici` ile oluşturun. SSH bulunmadığında `php bin/console.php super-admin-sql yonetici` çıktısını özel bir SQL dosyasına kaydedip içe aktarın. Bu rol mevcut kullanıcı tablosunu kullanır ve şema değişikliği gerektirmez.
 

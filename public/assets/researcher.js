@@ -78,7 +78,7 @@ function saveJsonFile(filename,data){const url=URL.createObjectURL(new Blob([JSO
 
 function accountsPanel(){
     const global=isSuperAdmin();
-    return `<div class="toolbar"><h2>Kullanıcılar</h2><div class="row"><button id="add-participant">+ Kullanıcı ekle</button>${global?'<button class="secondary" id="bulk-participants">Toplu kullanıcı ekle</button>':''}</div></div>
+    return `<div class="toolbar"><h2>Kullanıcılar</h2><div class="row"><button id="add-participant">+ Kullanıcı ekle</button><button class="secondary" id="bulk-participants">Toplu kullanıcı ekle</button></div></div>
     ${global?field('account-search','Hesap, rol veya ekleyen kullanıcıyı ara'):'<p class="muted">Burada eklediğiniz kullanıcıları yönetebilirsiniz.</p>'}
     <div class="card table-wrap"><table><thead><tr><th>Hesap</th><th>Ad soyad</th><th>Tür</th>${global?'<th>Ekleyen hesap</th>':''}<th>Durum</th><th></th></tr></thead><tbody id="account-rows"></tbody></table></div>
     <details id="account-reset-panel" class="card spaced"><summary>Parola yenileme talepleri</summary><button id="refresh-reset-requests" class="secondary spaced">Talepleri yenile</button><div id="account-reset-list" aria-live="polite"></div></details>`;

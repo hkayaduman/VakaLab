@@ -53,7 +53,7 @@ final class AccountAccess {
     }
 
     public function addStudents(array $actor,mixed $rows): array {
-        demand(Auth::isSuperAdmin($actor),'Süper Admin yetkisi gerekli',403);
+        Auth::staff($actor);
         demand(is_array($rows)&&array_is_list($rows)&&count($rows)<=100,'En fazla 100 satır gönderebilirsiniz');
         $students=[];
         foreach($rows as $index=>$row){

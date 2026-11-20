@@ -275,9 +275,11 @@ function chatHtml(){
     const pendingMessage=pending?.text&&!work.requests.some(r=>r.client_key===pending.key);
     const messages=work.messages.map(m=>`<div class="message ${m.role}" data-source="message:${m.id}"><strong>${m.role==='user'?'Siz':'AI'} · ${esc(m.status)} · #${m.seq}</strong>${esc(m.content)}</div>`).join('');
     return `<div class="toolbar"><div><span class="eyebrow">Vaka ile bağımsız sohbet</span><h2>AI ile etkileşim</h2></div></div>
-    <p class="muted">Gerçek kişilere ait tanımlayıcı bilgi paylaşmayın. Yalnız vaka ve bu sohbette gönderdiğiniz mesajlar AI'a iletilir.</p>
-    <div class="chat" id="chat">${messages}${pendingMessage?`<div class="message user" data-pending-message><strong>Siz</strong>${esc(pending.text)}</div>`:''}
-    ${busy?'<div class="chat-waiting" role="status">AI yanıt hazırlıyor… <span class="chat-waiting-dots" aria-hidden="true"><span></span><span></span><span></span></span></div>':!messages?'<p class="empty">Henüz mesaj yok.</p>':''}</div>
+    <p class="muted">Gerçek kişilere ait tanımlayıcı bilgi paylaşmayın. Yalnız vaka ve bu sohbette gönderdiğiniz mesajlar AI'a iletilir. AI hata yapabilir.</p>
+    <div class="chat" id="chat">
+    <div class="message assistant" data-chat-welcome><strong>AI</strong>Merhaba! Bu vakanın içeriğini biliyorum. Vaka hakkında sana nasıl yardımcı olabilirim?</div>
+    ${messages}${pendingMessage?`<div class="message user" data-pending-message><strong>Siz</strong>${esc(pending.text)}</div>`:''}
+    ${busy?'<div class="chat-waiting" role="status">AI yanıt hazırlıyor… <span class="chat-waiting-dots" aria-hidden="true"><span></span><span></span><span></span></span></div>':''}</div>
     ${field('question','Mesaj taslağı',busy?'':work.draft.question,'textarea',locked()||busy)}
     <div class="row spaced"><button id="send" ${locked()||busy?'disabled':''}>Mesajı gönder</button><small>Yanıt tamamlandığında gösterilir. Yanıtı beklerken diğer bölümlerde çalışabilirsiniz.</small></div>`;
 }
