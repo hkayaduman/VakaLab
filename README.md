@@ -1,8 +1,8 @@
 # VakaLab
 
-VakaLab, öğretmen adaylarının pedagojik vakalar üzerinde nasıl karar verdiğini incelemek için geliştirilmiş Türkçe bir araştırma uygulamasıdır. Öğrenciler önce kendi değerlendirmelerini yazar, ardından yapay zekâyla (AI) görüşür ve son kararlarını gerekçelendirir. Araştırmacılar bu yanıtları, sohbetleri ve bölüm geçişlerini aynı çalışma içinde inceleyebilir.
+VakaLab, katılımcıların bir vakayı nasıl değerlendirdiğini ve kararlarını nasıl gerekçelendirdiğini incelemek için geliştirilmiş Türkçe bir eğitim ve araştırma uygulamasıdır. Katılımcılar önce kendi değerlendirmelerini yazar, ardından yapay zekâyla (AI) görüşür ve son kararlarını gerekçelendirir. Araştırmacılar yanıtları, sohbetleri ve bölüm geçişlerini aynı çalışma içinde inceleyebilir.
 
-Sistem vaka temelli öğretim, öğretmen eğitimi ve yapay zekâ destekli karar verme üzerine pilot çalışmalar için kullanılabilir.
+Öğretmen eğitimi, üniversite dersleri, mesleki eğitim ve kurum içi eğitim gibi farklı ortamlarda kullanılabilir. Araştırmacılar vaka metinlerini, değerlendirme rubriklerini ve araştırma etiketlerini kendi alanlarına göre düzenleyebilir. Uygulamada katılımcı hesabı **Öğrenci** olarak adlandırılır.
 
 ## Öğrenci nasıl çalışır?
 
