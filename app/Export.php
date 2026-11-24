@@ -10,16 +10,20 @@ final class Export {
     }
     public function dataset(array $u,array $p,?string $disco=null): array {
         Auth::staff($u);$db=$this->app->db;$global=Auth::isSuperAdmin($u);
-        $scopeArgs=$global?[]:[$u['id']];$caseScope=$global?'':' WHERE c.owner_id=?';
-        $ownerScope=$global?'':' WHERE owner_id=?';
-        $where=$global?[]:['c.owner_id=?'];$args=$scopeArgs;
+        $anchor=null;
+        if(!empty($p['app_id']))$anchor=Scope::application($db,$u,$p['app_id'])['workspace_id'];
+        if(!empty($p['case_id']))$anchor=Scope::owned($db,$u,'cases',$p['case_id'])['workspace_id'];
+        $workspace=Workspace::selected($db,$u,$p['workspace_id']??$anchor);
+        $scopeArgs=[$workspace];$caseScope=' WHERE c.workspace_id=?';
+        $workspaceScope=' WHERE workspace_id=?';
+        $where=['c.workspace_id=?'];$args=$scopeArgs;
         if(empty($p['include_test']))$where[]='u.test=0 AND c.test=0';if(empty($p['include_practice']))$where[]='c.practice=0';if(empty($p['include_excluded']))$where[]='a.excluded=0';
         if(!empty($p['case_id'])){Scope::owned($db,$u,'cases',$p['case_id']);$where[]='c.id=?';$args[]=$p['case_id'];}if(!empty($p['app_id'])){$where[]='a.id=?';$args[]=$p['app_id'];}if(!empty($p['user_id'])){$where[]='a.user_id=?';$args[]=$p['user_id'];}
         $discoFields=$disco===null?'':',u.test AS student_test,c.test AS case_test,c.practice AS practice';
         $apps=$db->all('SELECT a.*,u.login,u.name'.$discoFields.' FROM applications a JOIN users u ON u.id=a.user_id JOIN cases c ON c.id=a.case_id'.($where?' WHERE '.implode(' AND ',$where):''),$args);$coded=!empty($p['coded']);
         $out=['cases'=>[],'case_versions'=>[],'participants'=>[],'assignments'=>[],'reports'=>[],'research_notes'=>[],'applications'=>[],'events'=>[],'server_events'=>[],'visits'=>[],'navigation_visits'=>[],'navigation_activities'=>[],'navigation_milestones'=>[],'navigation_coverage'=>[],'messages'=>[],'labels'=>[],'label_reviews'=>[],'label_batches'=>[],'drafts'=>[],'snapshots'=>[],'ai_requests'=>[],'ai_attempts'=>[],'analyses'=>[],'decisions'=>[],'definitions'=>[],'dictionary'=>[['field'=>'times','meaning'=>'UTC ISO 8601; client_at ayrı, received_at sunucu'],['field'=>'quality','meaning'=>'Gözlenen görünürlük okuma/düşünme değildir; AI süreleri öğrenciyle toplanmaz'],['field'=>'coded','meaning'=>'Kodlanmış çıktı metinleri ve kimlik eşlemesini içermez']]];
         if(!$coded){
-            $out['cases']=array_values(array_filter($db->all('SELECT * FROM cases'.$ownerScope,$scopeArgs),fn($c)=>(empty($p['case_id'])||$c['id']===$p['case_id'])&&(empty($p['app_id'])||in_array($c['id'],array_column($apps,'case_id'),true))&&(!empty($p['include_test'])||!$c['test'])&&(!empty($p['include_practice'])||!$c['practice'])));
+            $out['cases']=array_values(array_filter($db->all('SELECT * FROM cases'.$workspaceScope,$scopeArgs),fn($c)=>(empty($p['case_id'])||$c['id']===$p['case_id'])&&(empty($p['app_id'])||in_array($c['id'],array_column($apps,'case_id'),true))&&(!empty($p['include_test'])||!$c['test'])&&(!empty($p['include_practice'])||!$c['practice'])));
             $cids=array_column($out['cases'],'id');
             $out['case_versions']=array_values(array_filter($db->all('SELECT v.* FROM case_versions v JOIN cases c ON c.id=v.case_id'.$caseScope,$scopeArgs),fn($v)=>in_array($v['case_id'],$cids,true)));
             $out['assignments']=array_values(array_filter($db->all('SELECT s.* FROM assignments s JOIN cases c ON c.id=s.case_id'.$caseScope,$scopeArgs),fn($s)=>in_array($s['case_id'],$cids,true)&&(empty($p['user_id'])||$s['user_id']===$p['user_id'])&&(empty($p['app_id'])||in_array($s['user_id'],array_column($apps,'user_id'),true))));
@@ -53,16 +57,18 @@ final class Export {
         }
         if(!$coded){
             $ids=array_merge(array_column($out['labels'],'definition_id'),array_column($out['analyses'],'rubric_id'),array_column($out['cases'],'rubric_id'));
-            $defs=$db->all('SELECT * FROM definitions'.$ownerScope,$scopeArgs);
+            $defs=$db->all('SELECT * FROM definitions'.$workspaceScope,$scopeArgs);
             do{$before=count($ids);foreach($defs as $d)if(in_array($d['id'],$ids,true)&&$d['parent_id']&&!in_array($d['parent_id'],$ids,true))$ids[]=$d['parent_id'];}while(count($ids)>$before);
             $out['definitions']=array_values(array_filter($defs,fn($d)=>in_array($d['id'],$ids,true)));
         }
-        $navigationDefinitions=$this->labelNames($u);$out['navigation_visits']=Navigation::labelVisits($out['navigation_visits'],$out,$navigationDefinitions);$out['navigation_activities']=Navigation::activities($out['navigation_visits'],$out,$navigationDefinitions);
+        $navigationDefinitions=$this->labelNames($u,$workspace);$out['navigation_visits']=Navigation::labelVisits($out['navigation_visits'],$out,$navigationDefinitions);$out['navigation_activities']=Navigation::activities($out['navigation_visits'],$out,$navigationDefinitions);
         $db->audit($u['id'],'export','dataset','',['coded'=>$coded,'count'=>count($apps),'include_test'=>!empty($p['include_test'])]);return $out;
     }
-    private function labelNames(array $u): array {
-        $global=Auth::isSuperAdmin($u);
-        return $this->app->db->all("SELECT id,name FROM definitions WHERE family='label'".($global?'':' AND owner_id=?'),$global?[]:[$u['id']]);
+    private function labelNames(array $u,?string $workspace=null): array {
+        $db=$this->app->db;
+        if($workspace!==null)return $db->all("SELECT id,name FROM definitions WHERE family='label' AND workspace_id=?",[$workspace]);
+        if(Auth::isSuperAdmin($u))return $db->all("SELECT id,name FROM definitions WHERE family='label'");
+        return $db->all("SELECT d.id,d.name FROM definitions d JOIN workspace_memberships m ON m.workspace_id=d.workspace_id WHERE d.family='label' AND m.user_id=?",[$u['id']]);
     }
     public static function csv(array $rows): string {
         $f=fopen('php://temp','w+');fwrite($f,"\xEF\xBB\xBF");$keys=[];foreach($rows as $r)$keys=array_values(array_unique(array_merge($keys,array_keys($r))));fputcsv($f,$keys,',','"','');

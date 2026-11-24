@@ -10,7 +10,7 @@ body[data-ui-role="student"] {
     color: var(--ink);
 }
 body[data-ui-role="student"] .masthead {
-    height: 76px;
+    min-height: 76px;
     padding-inline: max(24px, calc((100vw - 1160px) / 2));
 }
 body[data-ui-role="student"] .brand { font-size: 24px; letter-spacing: -.8px; }

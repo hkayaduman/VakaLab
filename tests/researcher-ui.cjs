@@ -20,8 +20,8 @@ try{
  const newlogin='RESEARCHER-UI-'+tag.slice(0,8);await page.locator('#p-role').selectOption('researcher');await page.locator('#p-login').fill(newlogin);await page.locator('#p-name').fill('SENTETİK yeni araştırmacı');await page.locator('#p-password').fill(password);await page.locator('#commit').click();await page.locator('dialog').waitFor({state:'detached'});
  check(await page.getByText(newlogin,{exact:true}).count()===1,'researcher account created via short form');
  const otherContext=await browser.newContext(),other=await otherContext.newPage();await login(other,newlogin);await other.locator('#overview-case').waitFor();
- check(await other.locator('[data-overview-row]').count()===0,'new researcher has no other researcher students');
- await other.locator('[data-admin-tab="cases"]').click();check(await other.locator('[data-edit-case]').count()===0,'new researcher has no inherited cases');await otherContext.close();
+ check(await other.locator('[data-overview-row]').count()===7,'new researcher sees students assigned within the shared workspace');
+ await other.locator('[data-admin-tab="cases"]').click();await other.locator('[data-edit-case="test-case-1"]').waitFor();check(await other.locator('[data-edit-case]').count()===6,'new researcher can manage existing cases in the shared workspace');await otherContext.close();
  await page.locator('[data-admin-tab="overview"]').click();await page.locator('#overview-case').waitFor();
  await page.locator('#overview-case').selectOption('test-case-2');await page.locator('#overview-search').fill('TEST-OGR-05');
  check(await page.locator('[data-overview-row]').count()===1,'overview finds one student within selected case');
@@ -89,12 +89,16 @@ try{
  await page.locator('[data-admin-tab="cases"]').click();
  await page.locator('[data-edit-case="test-case-1"]').click();
  check((await page.locator('#c-body').innerText()).includes('[SENTETİK VAKA]'),'existing plain-text cases open in the editor');
+ check((await page.locator('#c-instructions').innerText())===await page.evaluate(()=>dash.cases.find(c=>c.id==='test-case-1').instructions),'existing plain-text instructions open in the editor');
  await page.locator('#dialog-close').click();
  await page.locator('dialog').waitFor({state:'detached'});
  await page.locator('#add-case').click();
  const editor=page.getByRole('textbox',{name:'Vaka metni',exact:true});
- check(await editor.isEditable()&&await page.locator('textarea#c-instructions').isEditable(),'visual editor is confined to the case body');
- check(await page.locator('.case-editor').evaluate(e=>e.getBoundingClientRect().right<=innerWidth),'formatting toolbar fits the mobile dialog');
+ const instructions=page.getByRole('textbox',{name:'Öğrenci yönergeleri',exact:true});
+ const bodyTools=page.getByRole('group',{name:'Vaka metni biçimi'});
+ const instructionTools=page.getByRole('group',{name:'Öğrenci yönergeleri biçimi'});
+ check(await editor.isEditable()&&await instructions.isEditable(),'body and instructions have separate visual editors');
+ check(await page.locator('.case-editor').evaluateAll(editors=>editors.every(e=>e.getBoundingClientRect().right<=innerWidth)),'both formatting toolbars fit the mobile dialog');
  await page.setViewportSize({width:1440,height:1000});
  const richCaseTitle='SENTETİK biçimlendirilmiş vaka';
  await page.locator('#c-title').fill(richCaseTitle);
@@ -102,7 +106,7 @@ try{
  await page.locator('#dialog-error').waitFor({state:'visible'});
  check((await page.locator('#dialog-error').innerText()).includes('Başlık ve metin gerekli'),'an empty editor cannot save a case');
  await editor.fill('Önemli Gerekçe Kanıt');
- const selectText=async(label)=>editor.evaluate((element,label)=>{
+ const selectText=async(target,label)=>target.evaluate((element,label)=>{
     element.focus();
     const texts=document.createTreeWalker(element,NodeFilter.SHOW_TEXT);
     for(let node=texts.nextNode();node;node=texts.nextNode()){
@@ -118,34 +122,48 @@ try{
     }
     throw new Error('Selectable text missing: '+label);
  },label);
- await selectText('Önemli');
- await page.getByRole('button',{name:'Kalın',exact:true}).click();
- await selectText('Gerekçe');
- await page.getByRole('button',{name:'İtalik',exact:true}).click();
- await selectText('Kanıt');
- const underline=page.getByRole('button',{name:'Altı çizili',exact:true});
+ await selectText(editor,'Önemli');
+ await bodyTools.getByRole('button',{name:'Kalın',exact:true}).click();
+ await selectText(editor,'Gerekçe');
+ await bodyTools.getByRole('button',{name:'İtalik',exact:true}).click();
+ await selectText(editor,'Kanıt');
+ const underline=bodyTools.getByRole('button',{name:'Altı çizili',exact:true});
  await underline.click();
  check(await editor.locator('u').innerText()==='Kanıt'&&await underline.getAttribute('aria-pressed')==='true','underline is visible and the toolbar reports it as active');
  await underline.click();
  check(await editor.locator('u').count()===0,'pressing underline again removes it from the selection');
  await underline.click();
- await page.getByRole('button',{name:'Madde işaretli liste',exact:true}).click();
+ await bodyTools.getByRole('button',{name:'Madde işaretli liste',exact:true}).click();
  check(await editor.locator('ul li').count()===1&&await editor.locator('b,strong').innerText()==='Önemli'&&
     await editor.locator('i,em').innerText()==='Gerekçe','bold, italic and list are visible while editing');
  await page.locator('#c-status').selectOption('active');
- await page.locator('#c-instructions').fill('SENTETİK yönerge');
+ const bodyMarkup=await editor.innerHTML();
+ await instructions.fill('Dikkat Açıklama Örnek');
+ for(const [word,format] of [['Dikkat','Kalın'],['Açıklama','İtalik'],['Örnek','Altı çizili']]){
+    await selectText(instructions,word);
+    await instructionTools.getByRole('button',{name:format,exact:true}).click();
+ }
+ await instructionTools.getByRole('button',{name:'Madde işaretli liste',exact:true}).click();
+ const checkInstructions=async(target,where)=>check(await target.locator('ul li b,ul li strong').innerText()==='Dikkat'&&
+    await target.locator('ul li i,ul li em').innerText()==='Açıklama'&&
+    await target.locator('ul li u').evaluate(el=>el.textContent==='Örnek'&&getComputedStyle(el).textDecorationLine.includes('underline')),where);
+ await checkInstructions(instructions,'all four instruction formats work in the editor');
+ check(await editor.innerHTML()===bodyMarkup,'formatting instructions does not alter the case body');
  await page.locator('#commit').click();
  await page.locator('dialog').waitFor({state:'detached'});
  const richCase=await page.evaluate(title=>dash.cases.find(c=>c.title===title),richCaseTitle);
  check(richCase.body==='Önemli Gerekçe Kanıt'&&richCase.body_html.includes('<strong>Önemli</strong>')&&richCase.body_html.includes('<u>Kanıt</u>'),'stored version retains formatted markup and the plain text used by analysis');
+ check(richCase.instructions==='Dikkat Açıklama Örnek'&&richCase.instructions_html.includes('<strong>Dikkat</strong>'),'saved instructions keep both HTML and plain text');
  await page.locator('[data-preview="'+richCase.id+'"]').click();
- check(await page.locator('dialog .case-body ul li em').innerText()==='Gerekçe'&&
-    await page.locator('dialog .case-body ul li u').innerText()==='Kanıt','researcher preview renders the saved formatting');
+ check(await page.locator('dialog .case-body:not(.case-instructions) ul li em').innerText()==='Gerekçe'&&
+    await page.locator('dialog .case-body:not(.case-instructions) ul li u').innerText()==='Kanıt','researcher preview renders the saved case body formatting');
+ await checkInstructions(page.locator('dialog .case-instructions'),'researcher preview renders formatted instructions');
  await page.locator('#dialog-close').click();
  await page.locator('dialog').waitFor({state:'detached'});
  await page.locator('[data-edit-case="'+richCase.id+'"]').click();
  check(await editor.locator('ul li strong').innerText()==='Önemli'&&
     await editor.locator('ul li u').innerText()==='Kanıt','reopening the editor restores the saved formatting');
+ await checkInstructions(instructions,'reopened editor restores formatted instructions');
  await page.locator('#dialog-close').click();
  await page.locator('dialog').waitFor({state:'detached'});
  await page.evaluate(cid=>api('admin',{action:'assign',case_id:cid,user_id:'test-student-5',active:true}),richCase.id);
@@ -156,10 +174,24 @@ try{
     await student.locator('[data-source="case"] ul li em').innerText()==='Gerekçe'&&
     await student.locator('[data-source="case"] ul li u').evaluate(el=>el.textContent==='Kanıt'&&getComputedStyle(el).textDecorationLine.includes('underline')),
     'student sees the same bold, italic, underline and list in the assigned case');
- const safeCase=await page.evaluate(()=>api('admin',{action:'case',title:'SENTETİK izinli biçim',body_html:'<div><strong class="sample">Metin</strong> <a href="#example">örnek</a></div>'}));
+ await checkInstructions(student.locator('.case-instructions'),'student sees the four saved instruction formats');
+ const appId=await student.evaluate(()=>work.application.id);
+ await page.locator('[data-edit-case="'+richCase.id+'"]').click();
+ await instructions.fill('');
+ await page.locator('#commit').click();
+ await page.locator('dialog').waitFor({state:'detached'});
+ const cleared=await page.evaluate(id=>dash.cases.find(c=>c.id===id),richCase.id);
+ check(cleared.instructions===''&&cleared.instructions_html===null,'instructions can be cleared in a new case version');
+ await page.evaluate(id=>processView(id),appId);
+ const processCase=page.locator('[data-process-panel="case"]');
+ await processCase.locator('summary').click();
+ await checkInstructions(processCase.locator('.case-instructions'),'student process record shows the original formatted instructions');
+ const safeCase=await page.evaluate(()=>api('admin',{action:'case',title:'SENTETİK izinli biçim',body_html:'<div><strong class="sample">Metin</strong> <a href="#example">örnek</a></div>',instructions_html:'<p><em class="sample">Yönerge</em> <a href="#example">örnek</a></p>'}));
  const safeVersion=await page.evaluate(async id=>(await api('dashboard')).cases.find(c=>c.id===id),safeCase.id);
  check(safeVersion.body_html==='<div><strong>Metin</strong> örnek</div>'&&safeVersion.body==='Metin örnek',
     'server allows only supported markup and strips attributes');
+ check(safeVersion.instructions_html==='<p><em>Yönerge</em> örnek</p>'&&safeVersion.instructions==='Yönerge örnek',
+    'server applies the same markup rules to instructions');
 
  check(errors.length===0,'new workflows have no JavaScript page errors: '+errors.join('; '));await studentContext.close();console.log(`TOTAL NEW UI ${count} checks passed. Isolated SQLite/mock, Chrome desktop/mobile emulation.`);
 }finally{if(browser)await browser.close();if(server)server.kill();fs.closeSync(log);}})().catch(e=>{console.error(e);process.exitCode=1;});

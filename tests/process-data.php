@@ -7,7 +7,12 @@ $c=require __DIR__.'/../config/example.php';$c['dsn']='sqlite::memory:';$c['db_u
 $r=$db->one("SELECT * FROM users WHERE id='test-researcher'");$u=$db->one("SELECT * FROM users WHERE id='test-student-4'");$a=$db->one('SELECT * FROM applications WHERE user_id=?',[$u['id']]);$id=$a['id'];
 $before=[];foreach(['applications','reports','snapshots','draft_revisions','messages','events'] as $table)$before[$table]=$db->all('SELECT * FROM '.$table.' ORDER BY id');
 denyProcess(fn()=>$service->generate($u,$id),'student cannot trigger research labeling',403);
-$other=$admin->mutate($r,'participant',['role'=>'researcher','login'=>'isolated','name'=>'Test','password'=>uid(),'status'=>'active']);$other=$db->one('SELECT * FROM users WHERE id=?',[$other['id']]);denyProcess(fn()=>$service->generate($other,$id),'other workspace cannot label messages',403);
+$other=$admin->mutate($r,'participant',['role'=>'researcher','login'=>'isolated','name'=>'Test','password'=>uid(),'status'=>'active']);
+$db->insert('workspaces',['id'=>'isolated','name'=>'SENTETİK ayrı alan']);
+$db->q('DELETE FROM workspace_memberships WHERE user_id=?',[$other['id']]);
+Workspace::grant($db,'isolated',$other['id']);
+$other=$db->one('SELECT * FROM users WHERE id=?',[$other['id']]);
+denyProcess(fn()=>$service->generate($other,$id),'other workspace cannot label messages',403);
 $analyzed=$db->one("SELECT id FROM applications WHERE user_id='test-student-6' AND case_id='test-case-1'");$prior=count($app->view($r,$analyzed['id'])['label_batches']);$service->generate($r,$analyzed['id']);checkProcess(count($app->view($r,$analyzed['id'])['label_batches'])===$prior,'analysis step6 labels reused without another generation');
 $result=$service->generate($r,$id);checkProcess(count($result['labels'])===2,'all conversation messages covered including empty selection');$view=$app->view($r,$id);$mid=$view['messages'][0]['id'];$assistant=$view['messages'][1]['id'];checkProcess(count($view['label_batches'])===1,'generation metadata preserved');checkProcess($result['labels'][$assistant]===[],'assistant not mislabeled as student request');
 $cached=$service->generate($r,$id);checkProcess($cached['batch_id']===$result['batch_id']&&count($app->view($r,$id)['label_batches'])===1,'unchanged input uses cached labels');

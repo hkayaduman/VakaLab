@@ -38,6 +38,23 @@ demand($db->all('SELECT * FROM schema_migrations ORDER BY version')===$verified,
 demand($db->one('SELECT body_html FROM case_versions')['body_html']==='<p>Fixture</p>','Rerun overwrote existing case HTML');
 echo "PASS recover a missing 005 marker and rerun without changing data\n";
 
+$instructionsBefore=$db->all('SELECT id,instructions FROM case_versions ORDER BY id');
+$db->pdo->exec('ALTER TABLE case_versions DROP COLUMN instructions_html');
+$db->q('DELETE FROM schema_migrations WHERE version=7');
+expectSchemaFailure($db,'7');
+Migration::run($db);
+demand($db->all('SELECT id,instructions FROM case_versions ORDER BY id')===$instructionsBefore,'Migration changed historical instructions');
+demand(!$db->all('SELECT id FROM case_versions WHERE instructions_html IS NOT NULL'),'Migration altered the format of historical instructions');
+$db->q("UPDATE case_versions SET instructions_html='<p>Fixture</p>'");
+$db->q('DELETE FROM schema_migrations WHERE version=7');
+Migration::run($db);
+Migration::run($db);
+demand($db->one('SELECT instructions_html FROM case_versions')['instructions_html']==='<p>Fixture</p>','Rerun overwrote existing instructions HTML');
+echo "PASS upgrade from 006 and recover a missing 007 marker without changing instructions\n";
+
+$db->pdo->exec('ALTER TABLE case_versions DROP COLUMN instructions_html');
+expectSchemaFailure($db,'case_versions.instructions_html');
+$db->pdo->exec('ALTER TABLE case_versions ADD COLUMN instructions_html LONGTEXT');
 $db->pdo->exec('ALTER TABLE case_versions DROP COLUMN body_html');
 expectSchemaFailure($db,'case_versions.body_html');
 $db->pdo->exec('ALTER TABLE case_versions ADD COLUMN body_html LONGTEXT');

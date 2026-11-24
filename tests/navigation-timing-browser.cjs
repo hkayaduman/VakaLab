@@ -15,6 +15,10 @@ const check=(ok,name)=>{if(!ok)throw Error(name);console.log(`PASS LIVE TIMING $
  await go('profile');for(const name of ['knowledge','confidence','difficulty','severity'])await page.locator('#'+name).selectOption('5');
  await go('initial');for(const name of ['problem','decision','reason'])await page.locator('#'+name).fill('SENTETİK zaman denetimi '+name);
  await page.locator('#initial').click();await page.locator('#work-confirm-accept').click();await page.locator('#send').waitFor();await page.waitForFunction(()=>!dirty&&!saving);
+ await page.evaluate(()=>drainEvents());
+ const activeSectionSequence=await page.evaluate(()=>seq);
+ await go('ai');
+ check(await page.evaluate(sequence=>seq===sequence,activeSectionSequence),'reselecting the active AI section records no new event');
  await page.evaluate(()=>{window.timingMarks=[];document.addEventListener('click',e=>{const b=e.target.closest('[data-section]');if(b)window.timingMarks.push({section:b.dataset.section,wall:Date.now(),perf:performance.now()});},true);});
  const order=['case','profile','initial','ai','final','reflection','confirm','case'];
  for(let i=0;i<order.length;i++){await go(order[i]);await page.evaluate(ms=>new Promise(r=>setTimeout(r,ms)),250+i*50);}

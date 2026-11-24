@@ -75,10 +75,10 @@ def main():
         "$c['ai']['provider']='mock';$c['ai']['mode']='normal';return $c;",
         encoding='utf-8')
     password = uuid.uuid4().hex
-    env = os.environ | {'VAKALAB_CONFIG': str(config), 'VAKALAB_SEED_PASSWORD': password}
+    env = os.environ | {'VAKALAB_CONFIG': str(config), 'VAKALAB_SEED_PASSWORD': password, 'VAKALAB_ADMIN_PASSWORD': password}
     # No inherited test DSN or local config can redirect this fixture.
-    for command in ['migrate', 'seed']:
-        result = subprocess.run([PHP, 'bin/console.php', command], cwd=ROOT,
+    for command in [('migrate',), ('seed',), ('super-admin', 'TEST-PUBLICATION-ROOT')]:
+        result = subprocess.run([PHP, 'bin/console.php', *command], cwd=ROOT,
                                 env=env, capture_output=True, text=True)
         if result.returncode:
             raise RuntimeError(f'Fixture {command} failed: {result.stderr}')
@@ -218,7 +218,9 @@ def main():
 
             print('SCENARIO B: independent researcher workspaces, bulk operations, deletion, Disco', flush=True)
             other_login='RESEARCHER-'+tag[:8]
-            rid=admin('participant', login=other_login, password=password, role='researcher', name='SENTETİK araştırmacı')['id']
+            super_admin=Client(base,password,'TEST-PUBLICATION-ROOT')
+            workspace=super_admin.ok('admin',{'action':'workspace_create','name':'SENTETİK ayrı alan'})['id']
+            rid=super_admin.ok('admin',{'action':'participant','login':other_login,'password':password,'role':'researcher','name':'SENTETİK araştırmacı','workspace_id':workspace})['id']
             outsider=Client(base,password,other_login)
             empty=outsider.ok('dashboard')
             check(empty['cases']==[] and empty['applications']==[] and empty['assignments']==[] and empty['definitions']==[], 'new researcher has empty isolated workspace')

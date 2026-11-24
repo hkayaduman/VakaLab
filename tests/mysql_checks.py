@@ -21,7 +21,7 @@ try:
     env=os.environ|{'VAKALAB_TEST_DSN':f'mysql:host=127.0.0.1;port={port};dbname={name};charset=utf8mb4','VAKALAB_TEST_USER':'root','VAKALAB_TEST_PASSWORD':password}
     subprocess.run([php,'tests/db-idle-timeout.php'],cwd=root,env=env,check=True)
     subprocess.run([php,'tests/run.php'],cwd=root,env=env,check=True)
-    for suffix,script in [('attempts','tests/new-attempt.php'),('disco','tests/disco-attempts.php'),('holistic','tests/holistic-review.php'),('review_fixes','tests/review-regressions.php'),('telemetry','tests/telemetry-integrity.php')]:
+    for suffix,script in [('attempts','tests/new-attempt.php'),('disco','tests/disco-attempts.php'),('holistic','tests/holistic-review.php'),('review_fixes','tests/review-regressions.php'),('telemetry','tests/telemetry-integrity.php'),('workspaces','tests/workspaces.php')]:
         extra_name=name+'_'+suffix
         subprocess.run(client+['-e',f'CREATE DATABASE {extra_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'],check=True,capture_output=True)
         extra_env=env|{'VAKALAB_TEST_DSN':f'mysql:host=127.0.0.1;port={port};dbname={extra_name};charset=utf8mb4'}
@@ -30,10 +30,10 @@ try:
     with open(dump,'wb') as out:subprocess.run([str(home/'bin/mariadb-dump.exe'),f'--defaults-extra-file={client_config}','--skip-ssl','--single-transaction',name],stdout=out,check=True)
     restore=name+'_restore';subprocess.run(client+['-e',f'CREATE DATABASE {restore} CHARACTER SET utf8mb4'],check=True,capture_output=True)
     with open(dump,'rb') as source:subprocess.run(client+[restore],stdin=source,check=True,capture_output=True)
-    for table in ['users','applications','messages','snapshots','reports','analysis_steps','decisions','events']:
+    for table in ['users','applications','messages','snapshots','reports','analysis_steps','decisions','events','workspaces','workspace_memberships']:
         query=f'SELECT (SELECT COUNT(*) FROM {name}.{table})=(SELECT COUNT(*) FROM {restore}.{table})'
         res=subprocess.run(client+['-N','-e',query],capture_output=True,text=True,check=True);assert res.stdout.strip()=='1',table
-    print('BACKUP RESTORE: 8 table counts match in separate restored database.',flush=True)
+    print('BACKUP RESTORE: 10 table counts match in separate restored database.',flush=True)
     print('MYSQL schema, seed, workflow, FK, formats: passed on isolated MariaDB.',flush=True)
 finally:
     subprocess.run([str(home/'bin/mariadb-admin.exe'),f'--defaults-extra-file={client_config}','--skip-ssl','shutdown'],capture_output=True)

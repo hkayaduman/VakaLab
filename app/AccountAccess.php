@@ -13,7 +13,7 @@ final class AccountAccess {
         return $name;
     }
 
-    private static function password(mixed $password): string {
+    public static function password(mixed $password): string {
         demand(is_string($password)&&mb_strlen($password)>=12&&strlen($password)<=72&&!str_contains($password,"\0"),'Parola 12 karakter ile 72 bayt arasında olmalı');
         return $password;
     }
@@ -36,13 +36,16 @@ final class AccountAccess {
         $login=self::loginName($input['login']??null);
         $password=self::password($input['password']??null);
         $name=self::profileName($input['name']??null);
+        $workspace=$input['workspace_id']??Workspace::DEFAULT_ID;
+        demand(is_string($workspace)&&(bool)$this->db->one('SELECT id FROM workspaces WHERE id=?',[$workspace]),'Geçerli bir çalışma alanı seçin');
         try {
-            return $this->db->tx(function()use($login,$password,$name){
+            return $this->db->tx(function()use($login,$password,$name,$workspace){
                 demand(!$this->db->one('SELECT id FROM users WHERE login=?',[$login]),'Bu numara zaten kayıtlı',409);
                 $id=uid();
                 $this->db->insert('users',['id'=>$id,'login'=>$login,'name'=>$name,'password'=>password_hash($password,PASSWORD_DEFAULT),
                     'role'=>'student','status'=>'active','owner_id'=>null,'metadata'=>'{}','test'=>$this->test?1:0,'created_at'=>now()]);
-                $this->db->audit($id,'account_registered',$id);
+                Workspace::grant($this->db,$workspace,$id);
+                $this->db->audit($id,'account_registered',$id,'',['workspace_id'=>$workspace]);
                 return ['ok'=>true,'login'=>$login];
             });
         } catch(PDOException $e) {
@@ -52,8 +55,9 @@ final class AccountAccess {
         }
     }
 
-    public function addStudents(array $actor,mixed $rows): array {
+    public function addStudents(array $actor,mixed $rows,mixed $workspaceId=null): array {
         Auth::staff($actor);
+        $workspace=Workspace::required($this->db,$actor,$workspaceId);
         demand(is_array($rows)&&array_is_list($rows)&&count($rows)<=100,'En fazla 100 satır gönderebilirsiniz');
         $students=[];
         foreach($rows as $index=>$row){
@@ -71,7 +75,8 @@ final class AccountAccess {
             $students[$number]=['login'=>$login,'password'=>password_hash($password,PASSWORD_DEFAULT)];
         }
         demand((bool)$students,'En az bir öğrenci girin');
-        return $this->db->tx(function()use($actor,$students){
+        return $this->db->tx(function()use($actor,$students,$workspace){
+            Workspace::requireAccess($this->db,$actor,$workspace);
             foreach($students as $number=>$student){
                 $id=uid();
                 $duplicate="$number. satır: Bu kullanıcı adı zaten kayıtlı";
@@ -83,7 +88,8 @@ final class AccountAccess {
                     if(in_array((int)($e->errorInfo[1]??0),[19,1062,2067],true))throw new Fault($duplicate,409);
                     throw $e;
                 }
-                $this->db->audit($actor['id'],'participant',$id,'',['login'=>$student['login'],'role'=>'student','status'=>'active','created'=>true]);
+                Workspace::grant($this->db,$workspace,$id);
+                $this->db->audit($actor['id'],'participant',$id,'',['login'=>$student['login'],'role'=>'student','status'=>'active','created'=>true,'workspace_id'=>$workspace]);
             }
             return ['count'=>count($students)];
         });
@@ -133,7 +139,7 @@ final class AccountAccess {
     public function resetRequests(array $actor): array {
         Auth::staff($actor);
         $global=Auth::isSuperAdmin($actor);
-        $scope=$global?"u.role IN ('student','researcher')":"u.role='student' AND u.owner_id=?";
+        $scope=$global?"u.role IN ('student','researcher')":"u.role='student' AND u.owner_id=? AND EXISTS (SELECT 1 FROM workspace_memberships a JOIN workspace_memberships b ON b.workspace_id=a.workspace_id WHERE a.user_id=u.id AND b.user_id=u.owner_id)";
         $rows=$this->db->all("SELECT u.id,u.login,u.name,r.requested_at,r.expires_at FROM password_resets r JOIN users u ON u.id=r.user_id WHERE u.status='active' AND ".$scope.' ORDER BY r.requested_at DESC',$global?[]:[$actor['id']]);
         foreach($rows as &$row)$row['expires_at']=$row['expires_at']===null?null:gmdate('c',(int)$row['expires_at']);
         return $rows;
@@ -145,7 +151,7 @@ final class AccountAccess {
         demand(is_string($id)&&$id!=='','Hesap gerekli');
         return $this->db->tx(function()use($actor,$id){
             $user=$this->db->one('SELECT * FROM users WHERE id=?'.$this->lock(),[$id]);
-            $allowed=self::canRecover($user)&&(Auth::isSuperAdmin($actor)||($user['role']==='student'&&$user['owner_id']===$actor['id']));
+            $allowed=self::canRecover($user)&&(Auth::isSuperAdmin($actor)||($user['role']==='student'&&$user['owner_id']===$actor['id']&&$this->db->one('SELECT a.workspace_id FROM workspace_memberships a JOIN workspace_memberships b ON b.workspace_id=a.workspace_id WHERE a.user_id=? AND b.user_id=?',[$actor['id'],$id])));
             demand($allowed,'Bu hesap için yenileme kodu oluşturamazsınız',403);
             demand((bool)$this->db->one('SELECT user_id FROM password_resets WHERE user_id=?',[$id]),'Hesap için bekleyen parola talebi yok',404);
             $code=uid();$expires=time()+30*60;

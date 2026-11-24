@@ -1,6 +1,7 @@
 'use strict';
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let viewId=null,visitEditedFields=new Set();
+let workspaceId='',registrationWorkspaces=[];
 let me,csrf,work,section='case',saveTimer,saveChain=Promise.resolve(),dirty=false,saving=false,conflict=false,busy=false,readOnlyTab=false,events=[],seq=0,dash,leaseTimer,heartbeatTimer,lastInput=Date.now(),lastEvent=0;
 const pendingChats=new Map();
 let tab=sessionStorage.getItem('vakalab:tab')||crypto.randomUUID();sessionStorage.setItem('vakalab:tab',tab);
@@ -70,8 +71,40 @@ const pretty=x=>`<pre>${esc(JSON.stringify(typeof x==='string'?JSON.parse(x):x,n
 const field=(key,label,value='',type='text',disabled=false,hint='')=>`<label for="${esc(key)}">${esc(label)}${hint?`<small>${esc(hint)}</small>`:''}</label>${type==='textarea'?`<textarea id="${esc(key)}" ${disabled?'disabled':''}>${esc(value)}</textarea>`:`<input id="${esc(key)}" type="${esc(type)}" value="${esc(value)}" ${disabled?'disabled':''}>`}`;
 const numberField=(key,label,value,disabled=false,hint='')=>`<label for="${esc(key)}">${esc(label)}${hint?`<small>${esc(hint)}</small>`:''} <small>0–10 · Bir değer seçin</small></label><select id="${esc(key)}" ${disabled?'disabled':''}><option value="">Seçilmedi</option>${Array.from({length:11},(_,i)=>`<option value="${i}" ${value===i?'selected':''}>${i}</option>`).join('')}</select>`;
 function getValue(key){return $('#'+key)?.value??'';}
-function download(params){window.open('api.php?'+new URLSearchParams({op:'download',...params}),'_blank','noopener');}
-async function init(){await claimTabIdentity();csrf=(await api('token')).csrf;try{me=await api('me');await home();}catch(e){if(e.status===401)login();else notify(e.message);}}
+function download(params){window.open('api.php?'+new URLSearchParams({op:'download',workspace_id:workspaceId,...params}),'_blank','noopener');}
+async function init(){await claimTabIdentity();const token=await api('token');csrf=token.csrf;registrationWorkspaces=token.workspaces;try{await enterAccount();}catch(e){if(e.status===401)login();else notify(e.message);}}
+async function enterAccount(){
+    me=await api('me');
+    const previous=sessionStorage.getItem('workspace:'+me.id);
+    workspaceId=me.workspaces.some(w=>w.id===previous)?previous:(me.workspaces[0]?.id||'');
+    await home();
+}
+function workspaceOptions(items=me.workspaces){return items.map(w=>[w.id,w.name]);}
+function renderWorkspaceSelector(){
+    const identity=$('#identity');
+    if(!me.workspaces.length)return;
+    identity.insertAdjacentHTML('afterbegin',`<div class="workspace-picker">${select('active-workspace','Çalışma alanı',workspaceOptions(),workspaceId)}</div>`);
+    const picker=$('#active-workspace');
+    picker.onchange=async()=>{
+        const previous=workspaceId,next=picker.value;
+        picker.disabled=true;
+        try{
+            if(work){
+                if(dirty)await save();
+                event('section_leave',{reason:'home'});
+                await drainEvents();
+            }
+            workspaceId=next;
+            sessionStorage.setItem('workspace:'+me.id,next);
+            await home();
+        }catch(e){
+            workspaceId=previous;
+            sessionStorage.setItem('workspace:'+me.id,previous);
+            picker.value=previous;
+            notify(e.message);
+        }finally{picker.disabled=false;}
+    };
+}
 const accountPages={
     login:{title:'Çalışma alanınıza hoş geldiniz.',help:'Öğrenci numaranız veya kullanıcı adınızla giriş yapın.',button:'Giriş yap →',op:'login'},
     register:{title:'Kayıt ol',help:'Öğrenci numaranızla hesabınızı oluşturun. Vakalarınız atama yapıldığında görünür.',button:'Öğrenci hesabı oluştur',op:'register'},
@@ -85,7 +118,7 @@ function login(mode='login',loginValue='',message=''){
     $('#root').innerHTML=`<div class="card login"><div class="eyebrow">Pedagojik vaka araştırması</div><h1>${screen.title}</h1><p class="muted">${screen.help}</p>
     <p id="auth-feedback" role="status" ${message?'':'hidden'}>${esc(message)}</p>
     <form id="login-form">${field('login',loginLabel,loginValue)}
-    ${mode==='register'?field('account-name','Ad soyad'):''}
+    ${mode==='register'?field('account-name','Ad soyad')+select('registration-workspace','Çalışma alanı',workspaceOptions(registrationWorkspaces),'default'):''}
     ${mode==='reset'?field('account-code','Yenileme kodu'):''}
     ${mode!=='recover'?field('password',newPassword?'Yeni parola (en az 12 karakter)':'Parola','','password'):''}
     ${newPassword?field('password-confirm','Yeni parolayı tekrar girin','','password'):''}
@@ -114,9 +147,9 @@ function login(mode='login',loginValue='',message=''){
             const input={login:loginName};
             if(mode!=='recover')input.password=password;
             if(mode==='reset')input.code=getValue('account-code');
-            if(mode==='register')input.name=getValue('account-name');
+            if(mode==='register'){input.name=getValue('account-name');input.workspace_id=getValue('registration-workspace');}
             const r=await api(screen.op,input);
-            if(mode==='login'){csrf=r.csrf;me=await api('me');await home();}
+            if(mode==='login'){csrf=r.csrf;await enterAccount();}
             else if(mode==='recover')login('reset',loginName,'Bu hesap uygunsa talep yetkili kişiye ulaştı. Kodu aldığınızda buraya girin.');
             else login('login',r.login,mode==='register'?'Hesabınız oluşturuldu. Parolanızla giriş yapın.':'Parolanız yenilendi. Yeni parolanızla giriş yapın.');
         }catch(e){notify(e.message);}
@@ -141,9 +174,11 @@ async function acquireLease(preserveLocalWork=false){
         clearInterval(leaseTimer);readOnlyTab=true;renderWork();
     },5000);
 }
-async function home(){document.body.dataset.uiRole=me.role;releaseLease();clearInterval(heartbeatTimer);work=null;$('#identity').innerHTML=`<span>${esc(me.login)} · ${roleTitle(me.role)}</span><button class="secondary" id="my-profile">Profilim</button><button class="secondary" id="logout">Çıkış</button>`;handler('#my-profile',showProfile);handler('#logout',async()=>{if(dirty&&!(await confirmStudent('Kaydedilmemiş metin var. Çıkışta bu sekmedeki kurtarma taslakları temizlenir. Çıkılsın mı?')))return;event('section_leave',{reason:'logout'});await drainEvents();await api('logout',{});releaseLease();clearInterval(heartbeatTimer);work=null;viewId=null;for(const k of Object.keys(sessionStorage))if(k.startsWith('vakalab:')&&(!k.endsWith(':events')||sessionStorage.getItem(k)==='[]'))sessionStorage.removeItem(k);location.reload();});$('#banner').textContent=me.mock?'SENTETİK TEST ORTAMI · Mock yanıtlar gerçek AI değerlendirmesi değildir.':'';if(me.role==='researcher'||isSuperAdmin())await adminHome();else{await studentHome();replayTelemetry();}}
-async function studentHome(){const cases=await api('cases');$('#root').innerHTML=`<div class="eyebrow">Çalışma alanım</div><h1>Her vaka, yeni bir bakış açısı.</h1><p class="intro">Önce kendi değerlendirmenizi oluşturun. Ardından AI ile etkileşime geçip nihai kararınızı ve yansıtmanızı hazırlayın. Yanıtlarınız bölüm geçişlerinde korunur.</p><div class="toolbar"><h2>Vakalarım <span class="pill">${cases.length} atama</span></h2></div><div class="cards">${cases.map((c,i)=>`<article class="card"><div class="case-num"><strong>${String(i+1).padStart(2,'0')}</strong><span class="pill">${c.collection_closed_at&&!Number(c.allow_late)?'Veri toplama kapalı':esc(stateName(c.state))}</span></div><h2>${esc(c.title)}</h2><p class="muted">${c.practice?'Deneme vakası · Araştırma dışı':'Pedagojik vaka · Bireysel çalışma'}${c.attempt_no?' · Deneme '+c.attempt_no:''}</p><button data-case="${esc(c.id)}" ${c.collection_closed_at&&!Number(c.allow_late)&&!c.app_id?'disabled':''}>${c.state==='submitted'||(c.collection_closed_at&&!Number(c.allow_late))?'Görüntüle':c.app_id?'Devam et':'Başla'} →</button></article>`).join('')||'<div class="empty">Henüz atanmış aktif vaka yok.</div>'}</div>`;document.querySelectorAll('[data-case]').forEach(b=>b.onclick=async()=>{try{const a=await api('start',{case_id:b.dataset.case});await openWork(a.id);}catch(e){notify(e.message);}});}
+async function home(){document.body.dataset.uiRole=me.role;releaseLease();clearInterval(heartbeatTimer);work=null;$('#identity').innerHTML=`<span>${esc(me.login)} · ${roleTitle(me.role)}</span><div class="identity-actions"><button class="secondary" id="my-profile">Profilim</button><button class="secondary" id="logout">Çıkış</button></div>`;renderWorkspaceSelector();handler('#my-profile',showProfile);handler('#logout',async()=>{if(dirty&&!(await confirmStudent('Kaydedilmemiş metin var. Çıkışta bu sekmedeki kurtarma taslakları temizlenir. Çıkılsın mı?')))return;event('section_leave',{reason:'logout'});await drainEvents();await api('logout',{});releaseLease();clearInterval(heartbeatTimer);work=null;viewId=null;for(const k of Object.keys(sessionStorage))if(k.startsWith('vakalab:')&&(!k.endsWith(':events')||sessionStorage.getItem(k)==='[]'))sessionStorage.removeItem(k);location.reload();});$('#banner').textContent=me.mock?'SENTETİK TEST ORTAMI · Mock yanıtlar gerçek AI değerlendirmesi değildir.':'';if(me.role==='researcher'||isSuperAdmin())await adminHome();else{await studentHome();replayTelemetry();}}
+async function studentHome(){const cases=await api('cases',undefined,{workspace_id:workspaceId});$('#root').innerHTML=`<div class="eyebrow">Çalışma alanım</div><h1>Her vaka, yeni bir bakış açısı.</h1><p class="intro">Önce kendi değerlendirmenizi oluşturun. Ardından AI ile etkileşime geçip nihai kararınızı ve yansıtmanızı hazırlayın. Yanıtlarınız bölüm geçişlerinde korunur.</p><div class="toolbar"><h2>Vakalarım <span class="pill">${cases.length} atama</span></h2></div><div class="cards">${cases.map((c,i)=>`<article class="card"><div class="case-num"><strong>${String(i+1).padStart(2,'0')}</strong><span class="pill">${c.collection_closed_at&&!Number(c.allow_late)?'Veri toplama kapalı':esc(stateName(c.state))}</span></div><h2>${esc(c.title)}</h2><p class="muted">${c.practice?'Deneme vakası · Araştırma dışı':'Pedagojik vaka · Bireysel çalışma'}${c.attempt_no?' · Deneme '+c.attempt_no:''}</p><button data-case="${esc(c.id)}" ${c.collection_closed_at&&!Number(c.allow_late)&&!c.app_id?'disabled':''}>${c.state==='submitted'||(c.collection_closed_at&&!Number(c.allow_late))?'Görüntüle':c.app_id?'Devam et':'Başla'} →</button></article>`).join('')||'<div class="empty">Henüz atanmış aktif vaka yok.</div>'}</div>`;document.querySelectorAll('[data-case]').forEach(b=>b.onclick=async()=>{try{const a=await api('start',{case_id:b.dataset.case});await openWork(a.id);}catch(e){notify(e.message);}});}
 function caseBodyMarkup(version){return version?.body_html??esc(version?.body);}
+function caseInstructionsMarkup(version){return version?.instructions_html??esc(version?.instructions);}
+function caseInstructionsBlock(version){return version.instructions?`<div class="prose case-body case-instructions">${caseInstructionsMarkup(version)}</div>`:'';}
 function showDialog(html,fn){
     const d=document.createElement('dialog');d.innerHTML=html+'<button class="secondary spaced" id="dialog-close">Kapat / İptal</button>';
     const error=document.createElement('div');error.id='dialog-error';error.className='dialog-error';error.setAttribute('role','alert');error.tabIndex=-1;error.hidden=true;
@@ -285,7 +320,7 @@ function chatHtml(){
 }
 function renderWork(){const a=work.application,d=work.draft,initialLock=!!a.initial_at||locked();$('#root').innerHTML=`<div class="student-work-heading"><div class="toolbar"><div><div class="eyebrow">Vaka çalışma alanı · sürüm ${work.version.version} · Deneme ${a.attempt_no}</div><h1>${esc(a.case_title||'Pedagojik vaka')}</h1></div><div class="row"><span class="pill">${esc(stateName(a.state))}</span><span id="save-status" class="status">${dirty?'Kaydedilmemiş değişiklik var':'Sunucudaki sürüm yüklendi'}</span><button id="back" class="secondary">← Vakalarım</button></div></div>${work.attempts?.length>1?`<div class="row" aria-label="Vaka denemeleri">${work.attempts.map(t=>`<button class="secondary" data-student-attempt="${t.id}" ${t.id===a.id?'disabled':''}>Deneme ${t.attempt_no} · ${esc(stateName(t.state))}</button>`).join('')}</div>`:''}</div><div class="workspace-top"><nav class="tabs" aria-label="Çalışma bölümleri">${Object.entries(names).map(([k,v],i)=>studentTabHtml(k,v,i,initialLock)).join('')}</nav></div><div class="section">${a.collection_closed_at&&!Number(a.allow_late)?'<p class="warning">Bu vakada veri toplama kapalı. Kayıtlarınızı görüntüleyebilirsiniz; değişiklik yapılamaz.</p>':''}${readOnlyTab?'<p class="warning">Bu vaka başka sekmede açık. Bu sekme salt okunur. Diğer sekmeyi kapattıktan 20 saniye sonra yeniden yükleyin.</p>':''}${conflict?'<p class="warning">Sürüm çakışması: taslağı kopyalayıp sunucu sürümünü yeniden yükleyin.</p>':''}${section==='confirm'?'<div id="validation-summary" class="validation-summary" role="alert" hidden></div>':''}<div class="card" id="section-body"></div>${section==='confirm'?reportLinks():''}</div>`;
     let html='';if(sectionLocked(section))html='<h2>Bu bölüm henüz açık değil</h2><p>Başlangıç değerlendirmenizi kesinleştirdiğinizde AI sohbeti, nihai değerlendirme, yansıtma ve son teslim bölümleri açılacaktır.</p>';
-    else if(section==='case')html=`<span class="eyebrow">Vaka metni · sürüm ${work.version.version}</span><h2>Durumu inceleyin</h2><div class="prose case-body" data-source="case">${caseBodyMarkup(work.version)}</div><p class="prose">${esc(work.version.instructions)}</p>`;
+    else if(section==='case')html=`<span class="eyebrow">Vaka metni · sürüm ${work.version.version}</span><h2>Durumu inceleyin</h2><div class="prose case-body" data-source="case">${caseBodyMarkup(work.version)}</div>${caseInstructionsBlock(work.version)}`;
     else if(section==='profile')html=`<span class="eyebrow">Başlangıç profili</span><h2>Bu vakaya ilişkin görüşünüz</h2><p class="muted">Her alan başlangıçta boştur. Profiliniz başlangıç yanıtınızla birlikte kesinleşir.</p><div class="grid">${[
         ['knowledge','Ön bilgi — Vakada geçen konular, kavramlar ve kurallar hakkında ne kadar bilginiz var?','Puan verirken vakayla ilgili konularda önceden bildiklerinizi düşünün. Örneğin grup çalışmasında görevlerin nasıl paylaşıldığı, grup üyelerinin katkılarının nasıl adil değerlendirildiği veya bir ödevde yapay zekâ kullanımına hangi kuralların uygulandığı gibi.'],
         ['confidence','Başlangıç güveni — Bu vakada uygun bir karar verebileceğinize ne kadar güveniyorsunuz?'],
@@ -299,7 +334,7 @@ function renderWork(){const a=work.application,d=work.draft,initialLock=!!a.init
     else if(section==='confirm')html=`<div class="toolbar"><div><span class="eyebrow">Çalışmayı tamamla</span><h2>Son teslim</h2><p class="muted">Nihai yanıt ve yansıtma birlikte kilitlenir. Sürecinizi sonrasında görüntüleyebilirsiniz.</p></div><button id="submit" aria-describedby="submit-help" ${!canSubmit()?'disabled':''}>Vakayı tamamla ve tüm yanıtlarımı kesinleştir</button></div><div id="submit-help" class="submit-help" aria-live="polite"></div>${a.submitted_at?`<p>Teslim: ${displayTime(a.submitted_at)}</p>`:''}`;
     if(section==='ai'&&!sectionLocked(section))html+=(work.requests||[]).filter(r=>r.status==='failed').map(r=>`<p class="warning">Başarısız AI isteği ${esc(r.id.slice(0,8))}. Öğrenci mesajı korunuyor. <button class="secondary" data-retry-request="${r.id}" ${locked()||busy?'disabled':''}>Aynı mesajı yeniden dene</button></p>`).join('');
     $('#section-body').innerHTML=html;bindFields(['knowledge','confidence','difficulty','severity','problem','decision','reason','question','final_decision','final_reason','final_confidence','final_difficulty','final_severity','reflection']);
-    document.querySelectorAll('[data-section]').forEach(b=>{b.onpointerdown=e=>{if(dirty&&e.button===0)e.preventDefault();};b.onclick=async()=>{const old=section;try{if(dirty)await save();section=b.dataset.section;scrolls[old]=window.scrollY;renderWork();window.scrollTo(0,scrolls[section]||0);event('section_open',{locked:sectionLocked(section)});}catch(e){notify(e.message);}};});
+    document.querySelectorAll('[data-section]').forEach(b=>{b.onpointerdown=e=>{if(dirty&&e.button===0)e.preventDefault();};b.onclick=async()=>{const destination=b.dataset.section;if(destination===section)return;try{if(dirty)await save();if(destination===section)return;const old=section;section=destination;scrolls[old]=window.scrollY;renderWork();window.scrollTo(0,scrolls[section]||0);event('section_open',{locked:sectionLocked(section)});}catch(e){notify(e.message);}};});
     document.querySelectorAll('[data-student-attempt]').forEach(b=>b.onclick=async()=>{try{if(dirty)await save();event('section_leave',{reason:'home'});await drainEvents();releaseLease();clearInterval(heartbeatTimer);await openWork(b.dataset.studentAttempt);}catch(e){notify(e.message);}});
     handler('#back',async()=>{if(dirty)await save();event('section_leave',{reason:'home'});await drainEvents();await home();});handler('#initial',async()=>{if(!validateBeforeConfirm('initial'))return;if(!(await confirmStudent('Başlangıç yanıtınız ve vaka profili yanıtlarınız bundan sonra değiştirilemeyecek. Devam etmek istiyor musunuz?')))return;if(!validateBeforeConfirm('initial'))return;await save('initial');event('workflow_confirmed',{kind:'initial'});validationScope=null;section='ai';renderWork();event('section_open');});
     handler('#submit',async()=>{if(!validateBeforeConfirm('submit'))return;if(!canSubmit()){notify('Teslim için kayıt ve AI işlemlerinin tamamlanmasını bekleyin.');return;}if(!(await confirmStudent('Yeni mesaj ve düzenleme yapılamayacak; tüm süreci görüntüleyebileceksiniz. Teslim edilsin mi?')))return;if(!validateBeforeConfirm('submit')||!canSubmit())return;await save('submit');clearInterval(heartbeatTimer);await drainEvents();validationScope=null;renderWork();notify('Vaka teslim edildi.');});handler('#send',sendChat);
@@ -753,7 +788,7 @@ function labelNames(ids){return ids.length?ids.map(id=>{const d=dash.definitions
 function labelCurrent(mid,v){const state=labelReviewState(v,mid);return `<p class="label-current"><b>Güncel araştırmacı seçimi:</b> ${esc(state.history.length?labelNames(state.current):'Henüz karar verilmedi')}</p>${state.aiKnown?`<p class="muted"><b>AI önerisi (araştırmacı seçimi değildir):</b> ${esc(labelNames(state.ai))}</p>`:'<p class="muted">AI etiket önerisi henüz hazırlanmadı.</p>'}`;}
 function labelForm(mid,v,id){
     const state=labelReviewState(v,mid),message=v.messages.find(m=>m.id===mid),selected=state.history.length?state.current:state.ai;
-    const labels=dash.definitions.filter(d=>d.owner_id===v.application.case_owner_id&&d.family==='label'&&JSON.parse(d.body).target_role===message.role&&!d.deleted_at&&(!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id)||state.current.includes(d.id)));
+    const labels=dash.definitions.filter(d=>d.workspace_id===v.application.workspace_id&&d.family==='label'&&JSON.parse(d.body).target_role===message.role&&!d.deleted_at&&(!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id)||state.current.includes(d.id)));
     showDialog(`<h2>Mesaj etiketlerini düzenle</h2><p><b>#${message.seq} · ${message.role==='user'?'Öğrenci':'AI'} mesajı</b></p><blockquote class="label-context">${esc(message.content)}</blockquote>${labelCurrent(mid,v)}<fieldset class="label-options"><legend>Yeni seçim</legend><p class="muted">Araştırmacı seçimi varsa o seçim, yoksa AI önerileri işaretlidir. Eklemek için işaretleyin, kaldırmak için işareti kaldırın. Hiçbiri seçili değilse etiketler temizlenir.</p>${labels.map(l=>`<label class="inline-check"><input type="checkbox" data-choose-label="${esc(l.id)}" ${selected.includes(l.id)?'checked':''}>${esc(l.name)} · v${l.version}</label>`).join('')}</fieldset><div id="label-change-preview" class="label-change" aria-live="polite"></div>${field('reason','Değişiklik gerekçesi (zorunlu)','','textarea')}<p class="muted">Kaydetmek için seçiminizi açıklayan kısa bir gerekçe yazın.</p><button id="commit" class="spaced">Etiket değişikliğini kaydet</button><details class="label-history"><summary>Değişiklik geçmişi (${state.history.length} karar)</summary>${state.history.length?[...state.history].reverse().map((r,i)=>`<article class="label-review"><h3>Karar ${state.history.length-i}${i===0?' · Güncel':''}</h3><p>${displayTime(r.created_at)} · ${esc(dash.users.find(u=>u.id===r.actor)?.login||r.actor)}</p><p><b>Önceki seçim:</b> ${esc(labelNames(r.before))}</p><p><b>Yeni seçim:</b> ${esc(labelNames(r.ids))}</p><p><b>Eklenenler:</b> ${esc(labelNames(r.added))}</p><p><b>Kaldırılanlar:</b> ${esc(labelNames(r.removed))}</p><p><b>Gerekçe:</b> ${esc(r.reason)}</p></article>`).join(''):'<p>Henüz araştırmacı kararı kaydedilmedi.</p>'}</details>`,async()=>{const ids=[...document.querySelectorAll('[data-choose-label]:checked')].map(e=>e.dataset.chooseLabel);await api('admin',{action:'labels',message_id:mid,labels:ids,reason:getValue('reason')});await processView(id);notify('Etiketler kaydedildi. Güncel seçim: '+labelNames(ids));});
     const preview=()=>{const ids=[...document.querySelectorAll('[data-choose-label]:checked')].map(e=>e.dataset.chooseLabel),added=ids.filter(x=>!state.current.includes(x)),removed=state.current.filter(x=>!ids.includes(x));$('#label-change-preview').innerHTML=`<h3>Kaydedilecek değişiklik</h3><p><b>Önce:</b> ${esc(labelNames(state.current))}</p><p><b>Sonra:</b> ${esc(labelNames(ids))}</p><p><b>Eklenenler:</b> ${esc(labelNames(added))}</p><p><b>Kaldırılanlar:</b> ${esc(labelNames(removed))}</p>${!added.length&&!removed.length?'<p>Seçim değişmedi.</p>':''}`;};
     document.querySelectorAll('[data-choose-label]').forEach(el=>el.addEventListener('change',preview));preview();

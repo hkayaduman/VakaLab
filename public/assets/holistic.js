@@ -3,7 +3,7 @@ const holisticDrafts=new Map();
 function holisticState(v){
     const reports=[...v.reports].filter(r=>processObject(r.body).review_version===3).sort((a,b)=>Number(b.version)-Number(a.version));
     const report=reports[0],body=processObject(report?.body),saved=holisticDrafts.get(v.application.id),draft=saved&&(saved.dirty||Number(saved.version)>=Number(report?.version||0))?saved:undefined;
-    const rubrics=dash.definitions.filter(d=>d.owner_id===v.application.case_owner_id&&d.family==='rubric'&&!d.deleted_at&&!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id));
+    const rubrics=dash.definitions.filter(d=>d.workspace_id===v.application.workspace_id&&d.family==='rubric'&&!d.deleted_at&&!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id));
     const rubricId=draft?.rubricId||body.rubric_id||dash.cases.find(c=>c.id===v.application.case_id)?.rubric_id||rubrics[0]?.id||'';
     const definition=dash.definitions.find(d=>d.id===rubricId),rubric=definition?processObject(definition.body):body.rubric;
     return {report,body,draft,rubrics,rubricId,rubric,questions:v.review_questions||body.questions||[]};

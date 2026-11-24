@@ -20,7 +20,8 @@ function parseCsv(text){const records=[];let row=[],field='',quoted=false;for(le
  chromeProcess=spawn(process.env.CHROME_BIN||chromium.executablePath(),['--remote-debugging-port=18768','--no-first-run','--no-default-browser-check','--disable-features=CalculateNativeWinOcclusion','--window-position=-32000,-32000',`--user-data-dir=${path.join(tmp,'journey-chrome-'+tag)}`],{windowsHide:true,stdio:'ignore'});
  for(let i=0;i<100;i++){try{if((await fetch('http://127.0.0.1:18768/json/version')).ok)break;}catch{}await pause(100);}
  browser=await chromium.connectOverCDP('http://127.0.0.1:18768',{noDefaults:true});
- const context=browser.contexts()[0],page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.bringToFront();await login(page,'TEST-OGR-05');
+ const context=browser.contexts()[0],other=await context.newPage();await other.goto('about:blank');
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.bringToFront();await login(page,'TEST-OGR-05');
  const open=async cid=>{await page.locator(`[data-case="${cid}"]`).click();await page.waitForFunction(()=>!!work?.application?.id);};
  const go=async sec=>{await page.locator(`[data-section="${sec}"]`).click();await page.waitForFunction(s=>section===s&&!dirty&&!saving,sec,{polling:100});};
  const home=async()=>{await page.locator('#back').click();await page.waitForFunction(()=>work===null,null,{polling:100});await page.getByRole('heading',{name:'Vakalarım'}).waitFor();};
@@ -30,7 +31,7 @@ function parseCsv(text){const records=[];let row=[],field='',quoted=false;for(le
  await page.evaluate(()=>api('events',{app_id:work.application.id,events:[{key:crypto.randomUUID(),tab:'journey-old-tab',seq:1,at:'2026-10-19T09:00:00Z',type:'section_open',section:'case',payload:{view_id:'journey-stale-view',app_active:true,visible:true,focused:true}}]}));
  await page.locator('#question').fill('SENTETİK karma akış: farklı bir bakış açısı açıkla.');const chat=page.waitForRequest(r=>r.url().includes('op=chat')&&r.method()==='POST');await page.locator('#send').click();await chat;
  await go('final');
- const other=await context.newPage();await other.goto('about:blank');await other.bringToFront();await page.waitForFunction(()=>document.hidden||!document.hasFocus(),null,{polling:100});
+ await other.bringToFront();await page.waitForFunction(()=>document.hidden||!document.hasFocus(),null,{polling:100});
  await page.waitForFunction(()=>!busy&&work.messages.some(m=>m.role==='assistant'),null,{polling:100,timeout:15000});await page.evaluate(()=>drainEvents());
  await page.bringToFront();await page.waitForFunction(()=>!document.hidden&&document.hasFocus(),null,{polling:100});await pause(350);await go('ai');await pause(450);await go('reflection');await page.locator('#reflection').fill('SENTETİK karma akış yansıtması');await page.waitForFunction(()=>!dirty&&!saving,null,{polling:100});await home();await pause(750);
  await open('test-case-1');await go('confirm');await page.waitForFunction(()=>canSubmit());await page.locator('#submit').click();await page.locator('#work-confirm').waitFor();await pause(500);await page.locator('#work-confirm-cancel').click();check(await page.evaluate(()=>work.application.state!=='submitted'),'cancelling keeps mixed journey open');

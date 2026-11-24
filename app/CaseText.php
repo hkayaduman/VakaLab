@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 final class CaseText {
-    public static function fromEditor(mixed $value): array {
-        demand(is_string($value),'Vaka metni geçersiz');
+    public static function fromEditor(mixed $value,string $label='Vaka metni'): array {
+        demand(is_string($value),$label.' geçersiz');
         $document=new DOMDocument();
         $document->loadHTML('<!doctype html><html><head><meta charset="UTF-8"></head><body>'.$value.'</body></html>',
             LIBXML_NONET|LIBXML_NOERROR|LIBXML_NOWARNING);

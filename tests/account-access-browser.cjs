@@ -92,8 +92,8 @@ function check(condition, label) {
         check((await call(student, 'cases')).length === 0, 'new student can sign in without access to other workspaces');
         await call(admin,'admin',{action:'assign',case_id:'test-case-1',user_id:account.id,active:true});
         const assigned = await call(owner, 'dashboard');
-        check(!assigned.users.some(u=>u.id===account.id) && assigned.case_students.some(u=>u.id===account.id),
-            'self-registered student appears only within the assigned researcher case');
+        check(assigned.users.some(u=>u.id===account.id&&u.metadata==='{}') && assigned.assignments.some(a=>a.user_id===account.id&&a.case_id==='test-case-1'&&Number(a.active)),
+            'self-registered student is a workspace member with a separate case assignment');
         check((await call(student,'cases')).some(c=>c.id==='test-case-1'),'super admin can assign a directly registered student without linking an owner');
 
         const updateProfile = async (page, name) => {

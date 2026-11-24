@@ -21,11 +21,13 @@ foreach($tables as $table)$baseline[$table]=$db->all('SELECT * FROM '.$table.' O
 Migration::run($db);
 foreach($tables as $table){$after=$db->all('SELECT * FROM '.$table.' ORDER BY id');if($table==='applications')foreach($after as &$row)unset($row['attempt_no']);unset($row);attemptCheck($after===$baseline[$table],'migration preserves '.$table);}
 $once=$db->all('SELECT * FROM schema_migrations');Migration::run($db);attemptCheck($once===$db->all('SELECT * FROM schema_migrations'),'migration idempotent');
+attemptCheck(Workspace::member($db,Workspace::DEFAULT_ID,'history-user'),'workspace migration enrolls existing student');
 Seed::run($db,$c,uid());
 $app=new App($db,$c);$admin=new Admin($app);$r=$db->one("SELECT * FROM users WHERE id='test-researcher'");
 $previous=$db->one("SELECT * FROM applications WHERE state='submitted' AND user_id LIKE 'test-%' LIMIT 1");$u=$db->one('SELECT * FROM users WHERE id=?',[$previous['user_id']]);$id=$previous['id'];
 $old=$app->view($r,$id);
-$foreign=$r;$foreign['id']='history-user';
+$foreign=['id'=>'outside-researcher','role'=>'researcher'];
+$db->insert('users',$foreign+['login'=>'outside-researcher','name'=>'Outside researcher','password'=>'unused','metadata'=>'{}','created_at'=>now()]);
 attemptDenied(fn()=>$admin->mutate($foreign,'new_attempt',['app_id'=>$id,'reason'=>'test']),'other researcher cannot restart unowned work');
 attemptDenied(fn()=>$admin->mutate($u,'new_attempt',['app_id'=>$id,'reason'=>'test']),'student cannot open attempt');
 attemptDenied(fn()=>$admin->mutate($r,'new_attempt',['app_id'=>$id]),'reason required');

@@ -59,9 +59,13 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
         check(await admin.getByRole('heading', {name: 'Sistem yönetimi'}).isVisible(), 'CLI account opens the global panel');
         await admin.locator('[data-admin-tab="participants"]').click();
         await admin.getByText('TEST-OGR-07', {exact: true}).waitFor();
-        const addAccount = async (role, login) => {
+        const secondWorkspace=(await call(admin,'admin',{action:'workspace_create',name:'SENTETİK ikinci alan'})).id;
+        await admin.reload();
+        await admin.locator('[data-admin-tab="participants"]').click();
+        const addAccount = async (role, login, workspace='default') => {
             await admin.locator('#add-participant').click();
             await admin.locator('#p-role').selectOption(role);
+            await admin.locator('#account-workspace').selectOption(workspace);
             await admin.locator('#p-login').fill(login);
             await admin.locator('#p-name').fill(login);
             await admin.locator('#p-password').fill(password);
@@ -69,10 +73,10 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
             await admin.locator('dialog').waitFor({state: 'detached'});
             return (await call(admin, 'dashboard')).users.find(user => user.login === login);
         };
-        const other = await addAccount('researcher', 'TEST-OTHER-RESEARCHER');
+        const other = await addAccount('researcher', 'TEST-OTHER-RESEARCHER', secondWorkspace);
         const single = await addAccount('student', 'TEST-SINGLE-STUDENT');
         const adminId = (await call(admin, 'me')).id;
-        check(other.owner_id === adminId && single.owner_id === adminId, 'single accounts are created without a workspace selector');
+        check(other.owner_id === adminId && single.owner_id === adminId, 'single accounts retain the creating actor');
         await admin.locator('#account-search').fill('TEST-SUPER-ADMIN');
         check(await admin.locator('#account-rows').getByText(single.login, {exact: true}).count() > 0, 'account search matches the creating account');
         await admin.locator('#account-search').clear();
@@ -80,7 +84,7 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
         await admin.locator('#bulk-participants').click();
         const logins = admin.locator('[data-bulk-login]');
         const passwords = admin.locator('[data-bulk-password]');
-        check(await logins.count() === 3 && await admin.locator('dialog select').count() === 0, 'bulk dialog opens a table without a workspace selector');
+        check(await logins.count() === 3 && await admin.locator('#bulk-workspace').inputValue() === 'default', 'bulk dialog defaults to the system workspace');
         await admin.locator('#add-account-row').click();
         await admin.getByRole('button', {name: '4. satırı kaldır'}).click();
         check(await logins.count() === 3, 'rows can be added and removed');
@@ -113,6 +117,7 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
         check(await status(otherPage, 'admin', {action: 'assign', case_id: caseId, user_id: student.id, active: true}) === 403,
             'researchers cannot assign arbitrary students');
         await call(admin, 'admin', {action: 'participant', id: student.id, login: student.login, metadata: {researcher_notes: 'SENTETİK özel profil notu'}});
+        await call(admin,'admin',{action:'workspace_memberships',user_id:student.id,workspace_ids:['default',secondWorkspace]});
         await call(admin, 'admin', {action: 'assign', case_id: caseId, user_id: student.id, active: true});
         await call(admin, 'admin', {action: 'assign', case_id: 'test-case-1', user_id: student.id, active: true});
         const studentPage = await login(student.login);
@@ -120,7 +125,8 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
             'students cannot bulk-create accounts');
         const {id: appId} = await call(studentPage, 'start', {case_id: caseId});
         const {id: secondAppId} = await call(studentPage, 'start', {case_id: 'test-case-1'});
-        check((await call(studentPage, 'cases')).filter(c => [caseId, 'test-case-1'].includes(c.id)).length === 2,
+        check((await call(studentPage, 'cases')).some(c=>c.id==='test-case-1') &&
+            (await call(studentPage, 'cases', undefined, {workspace_id:secondWorkspace})).some(c=>c.id===caseId),
             'one student login opens cases belonging to two researchers');
         const secondStudentPage = await browser.newPage();
         await secondStudentPage.goto(url);
@@ -132,15 +138,15 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
             'each bulk-created account can sign in with its own password');
 
         const all = await call(admin, 'dashboard');
+        const targetDashboard = await call(admin, 'dashboard', undefined, {workspace_id:secondWorkspace});
         check(all.users.length === 13 && all.users.every(user => !('password' in user)), 'global dashboard lists every account without password hashes');
-        check(all.cases.some(c => c.id === caseId) && all.cases.some(c => c.id === 'test-case-1'), 'global dashboard includes both workspaces');
-        check(all.assignments.some(a => a.case_id === caseId && a.user_id === student.id) && all.audit.some(a => a.actor === adminId && a.action === 'assign') && !JSON.stringify(all.audit).includes(secondPassword) && !JSON.stringify(all.audit).includes(password), 'global dashboard includes assignments and audit history');
+        check(targetDashboard.cases.some(c=>c.id===caseId) && all.cases.some(c => c.id === 'test-case-1'), 'super admin can inspect both workspaces');
+        check(targetDashboard.assignments.some(a => a.case_id === caseId && a.user_id === student.id) && all.audit.some(a => a.actor === adminId && a.action === 'assign') && !JSON.stringify(all.audit).includes(secondPassword) && !JSON.stringify(all.audit).includes(password), 'super admin sees scoped assignments and audit history');
         const first = await call(firstPage, 'dashboard');
         const second = await call(otherPage, 'dashboard');
-        check(!first.users.some(u => [other.id, student.id].includes(u.id)) && !first.cases.some(c => c.id === caseId) && !first.audit.some(a => a.actor === other.id), 'first researcher cannot see the other workspace');
-        check(second.cases.length === 1 && !second.users.some(u => u.id === student.id) &&
-            second.case_students.some(u => u.id === student.id && !('metadata' in u)) &&
-            !second.case_students.some(u => u.id === 'test-student-6'), 'externally created students appear only as scoped case participants');
+        check(!first.users.some(u => u.id===other.id) && !first.cases.some(c => c.id === caseId) && !first.audit.some(a => a.actor === other.id), 'first researcher cannot see the other workspace');
+        check(second.cases.length === 1 && second.users.some(u => u.id === student.id&&u.metadata==='{}') &&
+            !second.users.some(u => u.id === 'test-student-6'), 'shared students are scoped to memberships and private profile fields are withheld');
         check(await status(firstPage, 'view', undefined, {app_id: appId}) === 403 && await status(studentPage, 'dashboard') === 403, 'workspace and dashboard authorization is enforced by the API');
         check((await call(admin, 'view', undefined, {app_id: appId})).application.case_owner_id === other.id, 'super admin can open work from the second workspace');
 
@@ -167,7 +173,8 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
         check(view.messages.length > 0 && view.steps.length === 8 && view.reports.length === 2, 'super admin can see chat, evaluation history and reports');
         check((await call(admin, 'report_data', undefined, {id: view.reports[0].id})).report.internal !== undefined, 'super admin can read an unpublished report with its internal content');
         const packet = await admin.evaluate(async () => (await fetch('api.php?op=download&format=json&all_data=1')).json());
-        check(packet.applications.some(a => a.id === seeded.id) && packet.applications.some(a => a.id === appId), 'global export includes both workspaces');
+        check(packet.applications.some(a => a.id === seeded.id) &&
+            (await admin.evaluate(async id=>(await (await fetch('api.php?'+new URLSearchParams({op:'download',format:'json',all_data:1,workspace_id:id}))).json()),secondWorkspace)).applications.some(a=>a.id===appId), 'super admin can export both workspaces separately');
 
         await admin.locator('[data-admin-tab="overview"]').click();
         await admin.locator('#overview-case').selectOption('test-case-1');
@@ -211,8 +218,9 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
 
         await admin.locator('#admin-back').click();
         await admin.locator('[data-admin-tab="definitions"]').click();
+        await admin.locator('#active-workspace').selectOption(secondWorkspace);
+        await admin.waitForFunction(id=>dash.workspace_id===id,secondWorkspace);
         await admin.locator('#add-rubric').click();
-        await admin.locator('#workspace-owner').selectOption(other.id);
         await admin.locator('#d-name').fill('SENTETİK yönetici rubriği');
         await admin.locator('#r-text').fill('SENTETİK değerlendirme yönergesi');
         await admin.locator('[data-rubric-field="name"]').fill('Gerekçe');
@@ -226,10 +234,9 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
         await admin.locator('#commit').click();
         await admin.locator('dialog').waitFor({state: 'detached'});
         const createdRubric = (await call(otherPage, 'dashboard')).definitions.find(d => d.name === 'SENTETİK yönetici rubriği');
-        check(createdRubric?.owner_id === other.id, 'super admin creates a rubric in the selected researcher workspace');
+        check(createdRubric?.workspace_id === secondWorkspace, 'super admin creates a rubric in the selected researcher workspace');
 
         await admin.locator('#add-label').click();
-        await admin.locator('#workspace-owner').selectOption(other.id);
         await admin.locator('#d-name').fill('SENTETİK yönetici etiketi');
         await admin.locator('#d-target-role').selectOption('user');
         await admin.locator('#d-body').fill('SENTETİK etiket açıklaması');
@@ -241,7 +248,7 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
         await admin.locator('#commit').click();
         await admin.locator('dialog').waitFor({state: 'detached'});
         const updatedLabel = (await call(otherPage, 'dashboard')).definitions.find(d => d.parent_id === createdLabel.id);
-        check(updatedLabel?.owner_id === other.id && Number(updatedLabel.version) === 2, 'editing a label creates a version under its original owner');
+        check(updatedLabel?.workspace_id === secondWorkspace && Number(updatedLabel.version) === 2, 'editing a label creates a version under its original owner');
         check(await status(admin, 'admin', {action: 'labels', message_id: message.id, labels: [updatedLabel.id], reason: 'Test'}) === 403 &&
               await status(admin, 'holistic', {action: 'generate', app_id: seeded.id, rubric_id: createdRubric.id}) === 403,
               'global access preserves workspace restrictions for labels and rubrics');
@@ -250,10 +257,12 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
               'super admin can remove the full definition version chain from active use');
 
         await admin.locator('[data-admin-tab="cases"]').click();
+        await admin.locator('#active-workspace').selectOption('default');
+        await admin.waitForFunction(()=>dash.workspace_id==='default');
         await admin.locator('#add-case').click();
         await admin.locator('#c-title').fill('SENTETİK yönetici vakası');
         await admin.locator('#c-body').fill('SENTETİK vaka metni');
-        check(await admin.locator('#workspace-owner').count() === 0, 'case creation uses the logged-in creator without a workspace selector');
+        check(await admin.locator('#workspace-owner').count() === 0, 'case creation uses the active workspace shown in the panel');
         await admin.locator('#commit').click();
         await admin.locator('dialog').waitFor({state: 'detached'});
         const createdCase = (await call(admin, 'dashboard')).cases.find(c => c.title === 'SENTETİK yönetici vakası');
@@ -278,8 +287,8 @@ const status = (page, op, body, params) => page.evaluate(async ({op, body, param
         check(Number(managed.cases.find(c => c.id === createdCase.id).version) === 2 && managed.assignments.some(a => a.case_id === createdCase.id && a.user_id === student.id && Number(a.allow_late) === 1),
               'super admin versions cases, assigns students, closes collection and grants extra time');
         check(await status(otherPage, 'admin', {action: 'assign', case_id: createdCase.id, user_id: student.id, active: true}) === 403 &&
-              await status(firstPage, 'admin', {action: 'case', id: createdCase.id}) === 403 &&
-              await status(firstPage, 'admin', {action: 'case', owner_id: other.id, title: 'Test', body: 'Test'}) === 403,
+              await status(firstPage, 'admin', {action: 'case', id: caseId, title:'Test',body:'Test'}) === 403 &&
+              await status(firstPage, 'admin', {action: 'case', workspace_id: secondWorkspace, title: 'Test', body: 'Test'}) === 403,
               'assignment and workspace ownership checks reject out-of-scope writes');
         const own = await call(admin, 'admin', {action: 'case', title: 'SENTETİK süper admin alanı', body: 'Test'});
         check((await call(admin, 'dashboard')).cases.find(c => c.id === own.id)?.owner_id === all.users.find(u => u.role === 'super_admin').id,

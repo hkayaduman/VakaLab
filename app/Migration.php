@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 final class Migration {
-    private const VERSIONS=[1,2,3,4,5];
+    private const VERSIONS=[1,2,3,4,5,6,7];
     private const RESET_COLUMNS=['user_id','requested_at','token_hash','password_stamp','expires_at'];
 
     private static function columns(Db $db,string $table): array {
@@ -15,9 +15,14 @@ final class Migration {
         if($version===4){
             $missing=array_diff(self::RESET_COLUMNS,array_keys(self::columns($db,'password_resets')));
             demand(!$missing,'Şema 004 eksik: password_resets sütunları '.implode(', ',$missing),503);
+        }elseif($version===5||$version===7){
+            $column=$version===5?'body_html':'instructions_html';
+            $type=self::columns($db,'case_versions')[$column]??'';
+            demand(strtolower($type)==='longtext',sprintf('Şema %03d eksik veya uyumsuz: case_versions.%s LONGTEXT gerekli',$version,$column),503);
         }else{
-            $type=self::columns($db,'case_versions')['body_html']??'';
-            demand(strtolower($type)==='longtext','Şema 005 eksik veya uyumsuz: case_versions.body_html LONGTEXT gerekli',503);
+            foreach(['workspaces'=>['id','name'],'workspace_memberships'=>['workspace_id','user_id'],'cases'=>['workspace_id'],'definitions'=>['workspace_id','origin_id']] as $table=>$columns)
+                demand(!array_diff($columns,array_keys(self::columns($db,$table))),'Şema 006 eksik: '.$table,503);
+            demand((bool)$db->one('SELECT id FROM workspaces WHERE id=?',[Workspace::DEFAULT_ID]),'Varsayılan çalışma alanı eksik',503);
         }
     }
 
@@ -27,6 +32,8 @@ final class Migration {
         demand(!$missing,'Eksik şema sürümleri: '.implode(', ',$missing),503);
         self::checkFeature($db,4);
         self::checkFeature($db,5);
+        self::checkFeature($db,6);
+        self::checkFeature($db,7);
     }
 
     public static function run(Db $db): void {
@@ -90,6 +97,41 @@ final class Migration {
                 }
                 self::checkFeature($db,$version);
                 $db->insert('schema_migrations',['version'=>$version,'applied_at'=>now()]);
+            };
+            if($db->sqlite())$db->tx($apply);else $apply();
+        }
+        if(!$db->one('SELECT version FROM schema_migrations WHERE version=6')){
+            $schema=function()use($db){
+                if(!$db->sqlite())$db->pdo->exec('SET default_storage_engine=InnoDB');
+                foreach(explode(';',file_get_contents(__DIR__.'/../migrations/006.sql')) as $sql)
+                    if(trim($sql)!=='')$db->pdo->exec($sql);
+                if(!$db->one('SELECT id FROM workspaces WHERE id=?',[Workspace::DEFAULT_ID]))
+                    $db->insert('workspaces',['id'=>Workspace::DEFAULT_ID,'name'=>'Varsayılan çalışma alanı']);
+                foreach(['cases','definitions'] as $table){
+                    if(isset(self::columns($db,$table)['workspace_id']))continue;
+                    $column="ADD COLUMN workspace_id VARCHAR(64) NOT NULL DEFAULT 'default'";
+                    $reference='REFERENCES workspaces(id)';
+                    $db->pdo->exec('ALTER TABLE '.$table.' '.$column.($db->sqlite()?'':', ADD FOREIGN KEY (workspace_id) '.$reference));
+                }
+                if(!isset(self::columns($db,'definitions')['origin_id']))
+                    $db->pdo->exec('ALTER TABLE definitions ADD COLUMN origin_id VARCHAR(64)');
+            };
+            $data=function()use($db){
+                foreach($db->all("SELECT id FROM users WHERE role IN ('student','researcher')") as $user)
+                    Workspace::grant($db,Workspace::DEFAULT_ID,$user['id']);
+                self::checkFeature($db,6);
+                $db->insert('schema_migrations',['version'=>6,'applied_at'=>now()]);
+            };
+            if($db->sqlite())$db->tx(function()use($schema,$data){$schema();$data();});
+            else{$schema();$db->tx($data);}
+        }
+        if(!$db->one('SELECT version FROM schema_migrations WHERE version=7')){
+            $apply=function()use($db){
+                if($db->one('SELECT version FROM schema_migrations WHERE version=7'))return;
+                if(!isset(self::columns($db,'case_versions')['instructions_html']))
+                    $db->pdo->exec(file_get_contents(__DIR__.'/../migrations/007.sql'));
+                self::checkFeature($db,7);
+                $db->insert('schema_migrations',['version'=>7,'applied_at'=>now()]);
             };
             if($db->sqlite())$db->tx($apply);else $apply();
         }

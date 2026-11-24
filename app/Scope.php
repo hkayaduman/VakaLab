@@ -4,20 +4,24 @@ final class Scope {
     public static function owned(Db $db,array $u,string $table,string $id): array {
         Auth::staff($u);demand(in_array($table,['users','cases','definitions'],true),'Geçersiz kapsam');
         $row=$db->one('SELECT * FROM '.$table.' WHERE id=?',[$id]);
-        $allowed=$row&&(Auth::isSuperAdmin($u)||$row['owner_id']===$u['id']);
-        demand($allowed,'Bu kayıt çalışma alanınıza ait değil',403);return $row;
+        demand((bool)$row,'Bu kayıt çalışma alanınıza ait değil',403);
+        if($table==='users'){
+            $shared=$row['owner_id']===$u['id']&&$db->one('SELECT a.workspace_id FROM workspace_memberships a JOIN workspace_memberships b ON b.workspace_id=a.workspace_id WHERE a.user_id=? AND b.user_id=?',[$u['id'],$id]);
+            demand(Auth::isSuperAdmin($u)||$shared,'Bu hesabı düzenleme yetkiniz yok',403);
+        }else Workspace::requireAccess($db,$u,$row['workspace_id']);
+        return $row;
     }
-    public static function workspaceDefinition(Db $db,array $u,string $id,?string $owner): array {
+    public static function workspaceDefinition(Db $db,array $u,string $id,string $workspace): array {
         $definition=self::owned($db,$u,'definitions',$id);
-        demand($owner!==null&&$definition['owner_id']===$owner,'Tanım bu çalışma alanına ait değil',403);
+        demand($definition['workspace_id']===$workspace,'Tanım bu çalışma alanına ait değil',403);
         return $definition;
     }
     public static function application(Db $db,array $u,string $id): array {
         Auth::staff($u);
-        $a=Auth::isSuperAdmin($u)
-            ?$db->one('SELECT * FROM applications WHERE id=?',[$id])
-            :$db->one('SELECT a.* FROM applications a JOIN cases c ON c.id=a.case_id WHERE a.id=? AND c.owner_id=?',[$id,$u['id']]);
-        demand((bool)$a,'Bu çalışma alanına erişemezsiniz',403);return $a;
+        $a=$db->one('SELECT a.*,c.workspace_id FROM applications a JOIN cases c ON c.id=a.case_id WHERE a.id=?',[$id]);
+        demand((bool)$a,'Bu çalışma alanına erişemezsiniz',403);
+        Workspace::requireAccess($db,$u,$a['workspace_id']);
+        return $a;
     }
     public static function run(Db $db,array $u,string $rid): array {
         $r=$db->one('SELECT * FROM analysis_runs WHERE id=?',[$rid]);demand((bool)$r,'Analiz yok',404);self::application($db,$u,$r['app_id']);return $r;

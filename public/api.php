@@ -10,7 +10,7 @@ try{
     $accountForms=['register','request_password_reset','reset_password'];
     $writes=['login','logout','start','save','initial','submit','chat','events','onboarding','admin','new_run','step','decision','report','message_labels','holistic','update_profile','change_password','password_reset_code',...$accountForms];
     if(in_array($op,$writes,true))demand($_SERVER['REQUEST_METHOD']==='POST','POST gerekli',405);
-    if($op==='token'){Migration::verify($db);$result=['csrf'=>$_SESSION['csrf']];}
+    if($op==='token'){Migration::verify($db);$result=['csrf'=>$_SESSION['csrf'],'workspaces'=>Workspace::all($db)];}
     elseif($op==='login'){$u=$auth->login($p['login']??'',$p['password']??'');$result=['role'=>$u['role'],'csrf'=>$_SESSION['csrf']];}
     elseif(in_array($op,$accountForms,true)){
         $auth->rateLimit('account:'.$op,60);
@@ -33,15 +33,15 @@ try{
         $u=$auth->user();$session=$_SESSION['telemetry']??'';session_write_close(); // crucial: no PHP session lock in AI or DB work
         $app=new App($db,$config);$id=$p['app_id']??$_GET['app_id']??'';
         switch($op){
-        case 'me':$result=['id'=>$u['id'],'login'=>$u['login'],'name'=>$u['name'],'role'=>$u['role'],'metadata'=>array_intersect_key(obj($u['metadata']),array_flip(['program','year'])),'test'=>(bool)$u['test'],'config'=>array_intersect_key($config,array_flip(['timezone','autosave_ms','heartbeat_ms','idle_ms','consent_text'])),'mock'=>$config['ai']['provider']==='mock'];if($u['role']==='student')$result['telemetry_session']=$session;break;
+        case 'me':$result=['id'=>$u['id'],'login'=>$u['login'],'name'=>$u['name'],'role'=>$u['role'],'metadata'=>array_intersect_key(obj($u['metadata']),array_flip(['program','year'])),'test'=>(bool)$u['test'],'config'=>array_intersect_key($config,array_flip(['timezone','autosave_ms','heartbeat_ms','idle_ms','consent_text'])),'mock'=>$config['ai']['provider']==='mock','workspaces'=>Workspace::visible($db,$u)];if($u['role']==='student')$result['telemetry_session']=$session;break;
         case 'onboarding':demand($u['role']==='student','Öğrenci gerekli',403);$meta=obj($u['metadata']);foreach(['program','year'] as $k)$meta[$k]=substr((string)($p[$k]??''),0,3000);$db->q('UPDATE users SET metadata=? WHERE id=?',[js($meta),$u['id']]);$db->audit($u['id'],'onboarding',$u['id']);$result=['ok'=>true];break;
-        case 'cases':$result=$db->all("SELECT c.id,c.title,c.position,c.practice,c.status,c.collection_closed_at,s.allow_late,a.id app_id,a.attempt_no,a.state,a.last_section FROM cases c JOIN assignments s ON s.case_id=c.id AND s.user_id=? AND s.active=1 LEFT JOIN applications a ON a.case_id=c.id AND a.user_id=s.user_id AND a.attempt_no=(SELECT MAX(ax.attempt_no) FROM applications ax WHERE ax.case_id=c.id AND ax.user_id=s.user_id) WHERE c.stop_access=0 AND (c.status='active' OR (c.status='closed' AND a.id IS NOT NULL)) ORDER BY c.position",[$u['id']]);break;
+        case 'cases':demand($u['role']==='student','Öğrenci hesabı gerekli',403);$workspace=Workspace::selected($db,$u,$_GET['workspace_id']??null);$result=$db->all("SELECT c.id,c.title,c.position,c.practice,c.status,c.collection_closed_at,s.allow_late,a.id app_id,a.attempt_no,a.state,a.last_section FROM cases c JOIN assignments s ON s.case_id=c.id AND s.user_id=? AND s.active=1 LEFT JOIN applications a ON a.case_id=c.id AND a.user_id=s.user_id AND a.attempt_no=(SELECT MAX(ax.attempt_no) FROM applications ax WHERE ax.case_id=c.id AND ax.user_id=s.user_id) WHERE c.workspace_id=? AND c.stop_access=0 AND (c.status='active' OR (c.status='closed' AND a.id IS NOT NULL)) ORDER BY c.position",[$u['id'],$workspace]);break;
         case 'start':$result=$app->start($u,$p['case_id']);break;
         case 'view':$result=$app->view($u,$id);break;
         case 'save':case 'initial':case 'submit':$result=$app->save($u,$id,$p,$op,$session);break;
         case 'chat':$result=$app->chat($u,$id,$p);break;
         case 'events':$result=(new Telemetry($app))->ingest($u,$id,$p,$session);break;
-        case 'dashboard':$result=(new Admin($app))->dashboard($u);break;
+        case 'dashboard':$result=(new Admin($app))->dashboard($u,$_GET['workspace_id']??null);break;
         case 'admin':$result=(new Admin($app))->mutate($u,$p['action'],$p);break;
         case 'update_profile':$result=(new AccountAccess($db,$config['env']==='test'))->updateProfile($u,$p);break;
         case 'password_reset_requests':$result=(new AccountAccess($db,$config['env']==='test'))->resetRequests($u);break;

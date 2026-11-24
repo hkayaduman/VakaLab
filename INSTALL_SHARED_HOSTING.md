@@ -2,7 +2,7 @@
 
 ## Güncel kodu devreye alma
 
-Bu çalışma ağacındaki güncel kod, 001–005 şemasını kullanır. Uygulama dosyalarını devreye almadan önce web kökü dışında veritabanı yedeği alın ve geçişi ayrı bir kopyada doğrulayın. Dağıtım sırasında hedef veritabanında sırasıyla çalıştırın.
+Bu çalışma ağacındaki güncel kod, 001–007 şemasını kullanır. Uygulama dosyalarını devreye almadan önce web kökü dışında veritabanı yedeği alın ve geçişi ayrı bir kopyada doğrulayın. Dağıtım sırasında hedef veritabanında sırasıyla çalıştırın.
 
 ~~~text
 php bin/console.php migrate
@@ -81,6 +81,26 @@ php bin/console.php migrate
 
 SSH yoksa phpMyAdmin → hedef **boş** DB → migrations/001.sql import. Başarılı olduğunu ve tüm tabloları doğruladıktan sonra:
 
+Ardından çalışma alanı geçişini (006) çalıştırın. CLI varsa `php bin/console.php migrate` bu işlemi yapar. SSH yoksa phpMyAdmin'de önce `migrations/006.sql` dosyasını içe aktarın. Şeması 005 olan bir veritabanında aşağıdaki işlemleri bir kez uygulayın.
+
+```sql
+INSERT INTO workspaces (id, name) VALUES ('default', 'Varsayılan çalışma alanı');
+ALTER TABLE cases ADD COLUMN workspace_id VARCHAR(64) NOT NULL DEFAULT 'default',
+  ADD FOREIGN KEY (workspace_id) REFERENCES workspaces(id);
+ALTER TABLE definitions ADD COLUMN workspace_id VARCHAR(64) NOT NULL DEFAULT 'default',
+  ADD FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
+  ADD COLUMN origin_id VARCHAR(64);
+START TRANSACTION;
+INSERT INTO workspace_memberships (workspace_id, user_id)
+SELECT 'default', id FROM users WHERE role IN ('student', 'researcher');
+INSERT INTO schema_migrations (version, applied_at)
+VALUES (6, DATE_FORMAT(UTC_TIMESTAMP(6), '%Y-%m-%dT%H:%i:%s.%fZ'));
+COMMIT;
+```
+
+006 geçişinden sonra phpMyAdmin'de `migrations/007.sql` dosyasını içe aktarın. `SHOW COLUMNS FROM case_versions LIKE 'instructions_html'` çıktısında `LONGTEXT` sütununu gördükten sonra aynı INSERT kalıbıyla sürüm 7 kaydını ekleyin. Uygulamayı erişime açmadan önce `SELECT version FROM schema_migrations ORDER BY version` sorgusu 1–7 sürümlerini göstermeli.
+
+
 ```sql
 INSERT INTO schema_migrations(version, applied_at)
 VALUES (1, DATE_FORMAT(UTC_TIMESTAMP(6), '%Y-%m-%dT%H:%i:%s.%fZ'));
@@ -120,7 +140,7 @@ VakaLab tek bir kullanıcı havuzu kullanır. Süper Admin ve araştırmacılar 
 
 001–003 geçişleri tamamlanmış bir kurulumda önce `004` (parola yenileme), ardından `005` (biçimli vaka metni) uygulanır. CLI varsa yedekten sonra `php bin/console.php migrate` ve `php bin/console.php schema-check` komutlarını çalıştırın.
 
-SSH yoksa phpMyAdmin'de `migrations/004.sql` dosyasını içe aktarın. `SHOW COLUMNS FROM password_resets` çıktısında `user_id`, `requested_at`, `token_hash`, `password_stamp` ve `expires_at` sütunlarını gördükten sonra yukarıdaki INSERT kalıbıyla sürüm 4 kaydını ekleyin. Ardından `migrations/005.sql` dosyasını içe aktarın. `SHOW COLUMNS FROM case_versions LIKE 'body_html'` çıktısında `LONGTEXT` sütununu gördükten sonra sürüm 5 kaydını ekleyin. Kod erişime açılmadan önce kontrol sorgusu `SELECT version FROM schema_migrations ORDER BY version` şema 1–5 kayıtlarını göstermeli.
+SSH yoksa phpMyAdmin'de `migrations/004.sql` dosyasını içe aktarın. `SHOW COLUMNS FROM password_resets` çıktısında `user_id`, `requested_at`, `token_hash`, `password_stamp` ve `expires_at` sütunlarını gördükten sonra yukarıdaki INSERT kalıbıyla sürüm 4 kaydını ekleyin. Ardından `migrations/005.sql` dosyasını içe aktarın. `SHOW COLUMNS FROM case_versions LIKE 'body_html'` çıktısında `LONGTEXT` sütununu gördükten sonra sürüm 5 kaydını ekleyin. Kod erişime açılmadan önce kontrol sorgusu `SELECT version FROM schema_migrations ORDER BY version` bu adımda şema 1–5 kayıtlarını göstermeli.
 
 - **Kayıt ol** ile öğrenci kendi hesabını açar. Süper Admin, Kullanıcılar bölümünden yeni öğrenciyi bir araştırmacıya bağlar. Araştırmacı daha sonra vaka atar.
 - **Şifremi unuttum** ile kullanıcı talep oluşturur. Öğrenci talepleri bağlı araştırmacının ve Süper Admin’in Kullanıcılar sekmesinde görünür. Araştırmacı taleplerini Süper Admin işler. Hesap sahibini doğruladıktan sonra 30 dakika geçerli tek kullanımlık kodu özel olarak iletin. Parola yenilenince eski oturumlar geçersiz olur.

@@ -17,6 +17,7 @@ button.field-link{padding:4px 2px;border:0;border-radius:2px;background:transpar
 .case-body{white-space:pre-wrap;overflow-wrap:anywhere}
 .case-body ul{padding-inline-start:1.6em;margin-block:.35em}
 .case-body p{margin-block:.35em}
+.case-instructions{margin-block:1em}
 .case-editor{border:1px solid #b5c8bf;border-radius:7px;background:white}
 .case-editor-tools{display:flex;flex-wrap:wrap;gap:6px;padding:7px;border-bottom:1px solid var(--line);background:var(--paper);border-radius:7px 7px 0 0}
 .case-editor-tools button{min-width:34px;padding:5px 9px}
@@ -59,6 +60,65 @@ button.field-link{padding:4px 2px;border:0;border-radius:2px;background:transpar
 
 .holistic-workspace fieldset{border:0;padding:0;margin:0;min-inline-size:0}.holistic-workspace fieldset>button{margin-bottom:1rem}
 .question-review{border:1px solid var(--line,#dce4de);border-radius:14px;padding:clamp(16px,3vw,28px);margin:24px 0;background:#fff;min-width:0}.question-review .question-answer{padding:16px;border-left:4px solid #246b55;background:#f3f7f4;margin-bottom:24px;overflow-wrap:anywhere}.question-review textarea{min-height:120px}.question-review h3{overflow-wrap:anywhere}.holistic-workspace #holistic-report{min-height:140px}
+
+.masthead {
+    height: auto;
+    min-height: 86px;
+    padding-block: 12px;
+}
+#identity {
+    flex: 1 1 0;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+#identity > span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+.identity-actions {
+    display: flex;
+    flex: none;
+    gap: inherit;
+}
+.workspace-picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    max-width: 100%;
+}
+.workspace-picker label {
+    margin: 0;
+    font-size: .75rem;
+    white-space: nowrap;
+}
+.workspace-picker select {
+    width: 14rem;
+    min-width: 0;
+    padding: 5px 8px;
+    text-overflow: ellipsis;
+}
+@media (max-width: 700px) {
+    .masthead {
+        min-height: 72px;
+        flex-wrap: wrap;
+    }
+    #identity {
+        flex-basis: 100%;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+    #identity:empty {
+        display: none;
+    }
+    .workspace-picker {
+        grid-column: 1 / -1;
+    }
+    .workspace-picker select {
+        flex: 1 1 0;
+    }
+}
 
 .auth-links {
     display: flex;

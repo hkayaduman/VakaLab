@@ -1,5 +1,9 @@
 # Değişiklik günlüğü
 
+## 0.4.0 — 2026-11-24 — Çalışma alanları ve vaka düzenleme
+
+Kullanıcılar birden fazla çalışma alanına üye olabilir. Vaka atamaları ve dışa aktarmalar çalışma alanı kapsamını izler. Öğrenci yönergeleri kalın, italik, altı çizili metin ve madde işaretli listeleri destekler. Altbilgi uygulama sürümünü gösterir.
+
 ## 0.3.2 — 2026-10-26 — İnceleme düzeltmeleri ve sekme/süre doğrulaması
 
 Öğrenciye dönen başlangıç, kayıt, başlangıç kesinleştirme ve teslim yanıtları aynı izin listesinden geçer; özel analiz dışı bırakma gerekçesi ve araştırmacı alanları gönderilmez. Ağ belirsizliğinde sohbet istek kimliği gönderilen metinle birlikte korunur; değişen mesaj yeni kimlik alır, sunucu aynı kimliğin farklı metinle kullanımını 409 ile reddeder. Başarısız sohbeti yeniden denemenin geç yanıtı başka vakanın mesaj veya bekleme durumunu değiştirmez; açık vakadaki yeniden deneme yanıt gelişi de süre çizelgesine kaydedilir.

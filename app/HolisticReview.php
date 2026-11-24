@@ -9,7 +9,7 @@ final class HolisticReview {
     }
     public function payload(array $u,string $id,string $rubricId): array {
         $a=$this->app->access($u,$id);demand($a['state']==='submitted','Önce öğrenci teslimini tamamlamalı',409);
-        $definition=Scope::workspaceDefinition($this->app->db,$u,$rubricId,$a['case_owner_id']);
+        $definition=Scope::workspaceDefinition($this->app->db,$u,$rubricId,$a['workspace_id']);
         demand($definition['family']==='rubric'&&!$definition['archived']&&!$definition['deleted_at'],'Etkin bir rubrik seçin');
         $rubric=obj($definition['body']);Rules::rubric($rubric);$draft=obj($a['draft']);Rules::submitted($draft);
         $case=$this->app->db->one('SELECT body FROM case_versions WHERE id=?',[$a['version_id']]);$questions=[];$sources=[];
@@ -30,7 +30,8 @@ final class HolisticReview {
         demand(array_key_exists('version',$p)&&(int)$p['version']===(int)($row['version']??0),'Rapor değişti. Güncel raporu açıp tekrar deneyin',409);
     }
     private function begin(array $u,string $id,array $payload,string $mode): array {
-        $db=$this->app->db;$run=['id'=>uid(),'app_id'=>$id,'rubric_id'=>$payload['rubric_id'],'created_at'=>now()];$db->insert('analysis_runs',$run);
+        $db=$this->app->db;$access=Scope::application($db,$u,$id);Scope::workspaceDefinition($db,$u,$payload['rubric_id'],$access['workspace_id']);
+        $run=['id'=>uid(),'app_id'=>$id,'rubric_id'=>$payload['rubric_id'],'created_at'=>now()];$db->insert('analysis_runs',$run);
         $db->audit($u['id'],'analysis_run',$run['id'],'',['review_version'=>3,'mode'=>$mode]);
         $step=['id'=>uid(),'run_id'=>$run['id'],'step'=>1,'attempt'=>1,'status'=>$mode==='ai'?'running':'completed','input'=>js($payload),'output'=>'{}','model'=>$mode==='ai'?$this->app->config['ai']['model']:'researcher','directive'=>'holistic-v2','created_at'=>now()];
         $db->insert('analysis_steps',$step);return $step;
@@ -73,7 +74,7 @@ final class HolisticReview {
         Auth::staff($u);
         $db=$this->app->db;$id=$p['app_id']??'';Scope::application($db,$u,$id);$action=$p['action']??'';
         if(in_array($action,['approve','show','hide'],true))return $db->tx(function()use($db,$u,$p,$id,$action){
-            $db->lock($id);$this->idle($id);$r=$this->latest($id);demand($r&&$r['id']===($p['report_id']??null),'Güncel raporu seçin',409);$this->version($r,$p);
+            $db->lock($id);Scope::application($db,$u,$id);$this->idle($id);$r=$this->latest($id);demand($r&&$r['id']===($p['report_id']??null),'Güncel raporu seçin',409);$this->version($r,$p);
             if($action==='approve')$db->q('UPDATE reports SET approved_at=? WHERE id=?',[now(),$r['id']]);
             elseif($action==='show'){demand((bool)$r['approved_at'],'Önce raporu onaylayın',409);demand(Scope::collectionClosed($this->app->access($u,$id)),'Öğrenciye göstermek için bu vakada veri toplamayı kapatın',409);$db->q('UPDATE reports SET published_at=? WHERE id=?',[now(),$r['id']]);}
             else $db->q('UPDATE reports SET published_at=NULL WHERE id=?',[$r['id']]);

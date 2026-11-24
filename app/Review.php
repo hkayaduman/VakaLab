@@ -74,7 +74,8 @@ final class Review {
     public function step(array $u,array $run,int $step,bool $repeat): array {
         $db=$this->app->db;$rid=$run['id'];demand(in_array($step,self::ORDER,true),'Geçersiz değerlendirme bölümü');
         $s=$db->tx(function()use($db,$u,$run,$rid,$step,$repeat){
-            $db->one('SELECT id FROM analysis_runs WHERE id=?'.($db->sqlite()?'':' FOR UPDATE'),[$rid]);
+            $db->lock($run['app_id']);
+            $run=Scope::run($db,$u,$rid);
             demand(!$db->one("SELECT id FROM analysis_steps WHERE run_id=? AND status='running'",[$rid]),'Bir değerlendirme zaten hazırlanıyor',409);
             $previous=$this->current($rid,$step);
             if($previous){if($step===8){$body=$this->assemble($run);demand(array_column(obj($previous['output'])['parts'],'decision_id')!==array_column($body['parts'],'decision_id'),'Kararlar zaten birleştirildi',409);}else demand($repeat&&in_array($step,self::HUMAN,true),'Bu bölüm için yeniden hazırla düğmesini kullanın',409);}

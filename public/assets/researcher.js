@@ -9,11 +9,8 @@ const ownerName=id=>dash.users.find(u=>u.id===id)?.login||'—';
 const caseStudent=id=>dash.users.find(u=>u.id===id)||dash.case_students.find(u=>u.id===id);
 const caseStudents=()=>[...dash.users.filter(u=>u.role==='student'),...dash.case_students];
 const caseOption=c=>[c.id,isSuperAdmin()?c.title+' · '+ownerName(c.owner_id):c.title];
-const definitionOwnerOptions=()=>[
-    ...dash.users.filter(u=>u.role==='researcher').map(u=>[u.id,u.login+(u.name?' · '+u.name:'')]),
-    [me.id,'Kendi vakalarım']
-];
-const definitionOwnerField=()=>isSuperAdmin()?select('workspace-owner','Kullanacak araştırmacı',definitionOwnerOptions(),me.id):'';
+const accountWorkspaceField=(id,preferDefault=false)=>select(id,'Çalışma alanı',workspaceOptions(),
+    preferDefault&&me.workspaces.some(w=>w.id==='default')?'default':workspaceId);
 const latestDefinitions=()=>dash.definitions.filter(d=>!d.deleted_at&&!Number(d.archived)&&!dash.definitions.some(n=>n.parent_id===d.id));
 const overviewChoice={caseId:'',query:'',status:''};
 function overviewPanel(){
@@ -50,7 +47,7 @@ function definitionDetails(d){
     if(d.family==='label')return `<p><b>Grup:</b> ${esc(({user:'Öğrenci mesajı',assistant:'AI yanıtı'})[body.target_role]||'Grup seçilmedi · Düzenleyerek seçin')}</p>${body.target_role==='user'?`<p><b>Konu kapsamı:</b> ${esc(({pedagogical:'Pedagojik vaka ve kavramlar',outside:'Pedagoji dışındaki talepler',any:'Her iki kapsam'})[body.topic_scope]||'Kapsam seçilmedi')}</p>`:''}<p class="prose">${esc(body.description||'Açıklama eklenmemiş.')}</p>`;
     return `<p class="prose">${esc(body.text)}</p>${body.dimensions.map(dim=>`<section class="rubric-dimension-summary"><h4>${esc(dim.name||dim.id)} · ${esc(dim.min)}–${esc(dim.max)} puan · Ağırlık ${esc(dim.weight)}</h4>${dim.levels.map(l=>`<p><b>${esc(l.name)} (${esc(l.score)} puan):</b> ${esc(l.description)}</p>`).join('')}</section>`).join('')}`;
 }
-const auditNames={profile_updated:'Profil güncellendi',password_changed:'Parola değiştirildi',account_invite:'Kayıt daveti oluşturuldu',account_registered:'Öğrenci kaydoldu',password_reset_issued:'Parola yenileme kodu oluşturuldu',password_reset_completed:'Parola yenilendi',new_attempt:'Yeni deneme açıldı',message_labels_ai:'AI mesaj etiketleri hazırlandı',participant:'Kullanıcı kaydedildi',case:'Vaka sürümü kaydedildi',assign:'Atama güncellendi',assign_bulk:'Toplu atama',late_access:'Ek süre güncellendi',collection:'Veri toplama durumu değişti',definition:'Rubrik / etiket kaydedildi',delete_definition:'Rubrik / etiket silindi',labels:'Mesaj etiketleri incelendi',note:'İç not eklendi',exclude:'Analiz kapsamı değişti',resolve_request:'Takılı AI isteği kapatıldı',resolve_analysis:'Takılı analiz adımı kapatıldı',analysis_run:'Analiz başlatıldı',analysis_step:'Analiz adımı çalıştırıldı',decision:'Araştırmacı kararı kaydedildi',report_edit_feedback:'Rapor geri bildirimi düzenlendi',report_create:'Rapor sürümü oluşturuldu',report_approve:'Rapor onaylandı',report_publish:'Rapor yayımlandı',export:'Veri paketi hazırlandı',download:'Dosya indirildi',save:'Çalışma kaydedildi',initial:'Başlangıç kesinleştirildi',submit:'Son teslim yapıldı',onboarding:'Katılım bilgileri güncellendi',close_study:'Eski global kapanış kaydı'};
+const auditNames={profile_updated:'Profil güncellendi',password_changed:'Parola değiştirildi',account_invite:'Kayıt daveti oluşturuldu',account_registered:'Öğrenci kaydoldu',password_reset_issued:'Parola yenileme kodu oluşturuldu',password_reset_completed:'Parola yenilendi',new_attempt:'Yeni deneme açıldı',message_labels_ai:'AI mesaj etiketleri hazırlandı',workspace_create:'Çalışma alanı oluşturuldu',workspace_memberships:'Alan üyelikleri güncellendi',move_case:'Vaka başka alana taşındı',participant:'Kullanıcı kaydedildi',case:'Vaka sürümü kaydedildi',assign:'Atama güncellendi',assign_bulk:'Toplu atama',late_access:'Ek süre güncellendi',collection:'Veri toplama durumu değişti',definition:'Rubrik / etiket kaydedildi',delete_definition:'Rubrik / etiket silindi',labels:'Mesaj etiketleri incelendi',note:'İç not eklendi',exclude:'Analiz kapsamı değişti',resolve_request:'Takılı AI isteği kapatıldı',resolve_analysis:'Takılı analiz adımı kapatıldı',analysis_run:'Analiz başlatıldı',analysis_step:'Analiz adımı çalıştırıldı',decision:'Araştırmacı kararı kaydedildi',report_edit_feedback:'Rapor geri bildirimi düzenlendi',report_create:'Rapor sürümü oluşturuldu',report_approve:'Rapor onaylandı',report_publish:'Rapor yayımlandı',export:'Veri paketi hazırlandı',download:'Dosya indirildi',save:'Çalışma kaydedildi',initial:'Başlangıç kesinleştirildi',submit:'Son teslim yapıldı',onboarding:'Katılım bilgileri güncellendi',close_study:'Eski global kapanış kaydı'};
 function auditEntry(row){
     let d={};try{d=typeof row.detail==='string'?JSON.parse(row.detail):row.detail||{};}catch{}
     let title=auditNames[row.action]||'İşlem kaydedildi';
@@ -88,7 +85,8 @@ function bindAccounts(){
     const render=()=>{
         const query=getValue('account-search').trim().toLocaleLowerCase('tr');
         const shown=query?accounts.filter(u=>[u.login,u.name,roleTitle(u.role),ownerName(u.owner_id)].join(' ').toLocaleLowerCase('tr').includes(query)):accounts;
-        $('#account-rows').innerHTML=shown.map(u=>`<tr><td>${esc(u.login)}</td><td>${esc(u.name)}</td><td>${esc(roleTitle(u.role))}</td>${global?`<td>${esc(ownerName(u.owner_id))}</td>`:''}<td>${esc(accountStatus(u.status))}</td><td>${u.role==='super_admin'?'':`<button class="secondary" data-edit-user="${esc(u.id)}">Düzenle</button>`}</td></tr>`).join('')||`<tr><td colspan="${global?6:5}">Eşleşen kullanıcı yok.</td></tr>`;
+        $('#account-rows').innerHTML=shown.map(u=>`<tr><td>${esc(u.login)}</td><td>${esc(u.name)}</td><td>${esc(roleTitle(u.role))}</td>${global?`<td>${esc(ownerName(u.owner_id))}</td>`:''}<td>${esc(accountStatus(u.status))}</td><td>${u.role==='super_admin'?'':`<button class="secondary" data-edit-user="${esc(u.id)}">Düzenle</button>${global?` <button class="secondary" data-user-memberships="${esc(u.id)}">Çalışma alanları</button>`:''}`}</td></tr>`).join('')||`<tr><td colspan="${global?6:5}">Eşleşen kullanıcı yok.</td></tr>`;
+        document.querySelectorAll('[data-user-memberships]').forEach(b=>b.onclick=()=>workspaceMembershipForm(accounts.find(u=>u.id===b.dataset.userMemberships)));
         document.querySelectorAll('[data-edit-user]').forEach(b=>b.onclick=()=>participantForm(accounts.find(u=>u.id===b.dataset.editUser)));
     };
     $('#account-search')?.addEventListener('input',render);
@@ -151,27 +149,30 @@ function assessmentHistory(v){
     return `${reportRows||'<p>Henüz rapor yok.</p>'}${runs||'<p>Henüz değerlendirme yok.</p>'}`;
 }
 async function adminHome(){
-    dash=await api('dashboard');
-    $('#root').innerHTML=`<div class="eyebrow">${roleTitle(me.role)} paneli · ${esc(me.login)}</div><h1>${isSuperAdmin()?'Sistem yönetimi':'Araştırmacı paneli'}</h1><p class="intro">${isSuperAdmin()?'Hesapları yönetin ve araştırma kayıtlarını görüntüleyin.':'Vakalarınızı, katılımcılarınızı ve değerlendirmelerinizi yönetin.'}</p><nav class="tabs">${[['overview','Genel durum'],['participants','Kullanıcılar'],['cases','Vakalar ve atamalar'],['definitions','Rubrikler ve etiketler'],['exports','Veri indirme'],['system','İşlem geçmişi']].map(([k,l])=>`<button data-admin-tab="${k}" class="${adminTab===k?'active':''}">${l}</button>`).join('')}</nav><div id="admin-body" class="spaced"></div>`;
+    dash=await api('dashboard',undefined,{workspace_id:workspaceId});
+    $('#root').innerHTML=`<div class="eyebrow">${roleTitle(me.role)} paneli · ${esc(me.login)}</div><h1>${isSuperAdmin()?'Sistem yönetimi':'Araştırmacı paneli'}</h1><p class="intro">${isSuperAdmin()?'Hesapları yönetin ve araştırma kayıtlarını görüntüleyin.':'Vakalarınızı, katılımcılarınızı ve değerlendirmelerinizi yönetin.'}</p><nav class="tabs">${[['overview','Genel durum'],['participants','Kullanıcılar'],['cases','Vakalar ve atamalar'],['definitions','Rubrikler ve etiketler'],['exports','Veri indirme'],['system','İşlem geçmişi'],...(isSuperAdmin()?[['workspaces','Çalışma alanları']]:[])].map(([k,l])=>`<button data-admin-tab="${k}" class="${adminTab===k?'active':''}">${l}</button>`).join('')}</nav><div id="admin-body" class="spaced"></div>`;
     document.querySelectorAll('[data-admin-tab]').forEach(b=>b.onclick=()=>{adminTab=b.dataset.adminTab;adminHome().catch(e=>notify(e.message));});renderAdmin();
 }
 function renderAdmin(){
     const global=isSuperAdmin(),defs=global?dash.definitions:latestDefinitions();let html='';
     if(adminTab==='overview')html=overviewPanel();
     if(adminTab==='participants')html=accountsPanel();
-    if(adminTab==='cases')html=`<div class="toolbar"><h2>Vakalar ve atamalar</h2><div class="row"><button id="add-case">+ Vaka ekle</button><button class="secondary" id="assignment">Toplu atama / Ek süre</button></div></div><div class="cards">${dash.cases.map(c=>`<div class="card"><span class="pill">${caseStatus(c.status)} · v${c.version}</span><h2>${esc(c.title)}</h2>${global?`<p class="muted">Araştırmacı · ${esc(ownerName(c.owner_id))}</p>`:''}<p>${c.collection_closed_at?'Veri toplama kapalı · '+displayTime(c.collection_closed_at):'Veri toplama açık'}</p><div class="row"><button class="secondary" data-assigned="${esc(c.id)}">Atanan öğrencileri göster (${dash.assignments.filter(a=>a.case_id===c.id&&(global||Number(a.active))).length})</button><button class="secondary" data-preview="${esc(c.id)}">${global?'Vaka ayrıntıları':'Öğrenci önizlemesi'}</button><button class="secondary" data-edit-case="${esc(c.id)}">Düzenle</button><button class="${c.collection_closed_at?'':'danger'}" data-collection="${esc(c.id)}">${c.collection_closed_at?'Veri toplamayı aç':'Veri toplamayı kapat'}</button></div></div>`).join('')||(global?'<div class="empty">Henüz vaka yok.</div>':'<div class="empty">İlk vakanızı ekleyin.</div>')}</div>`;
+    if(adminTab==='cases')html=`<div class="toolbar"><h2>Vakalar ve atamalar</h2><div class="row"><button id="add-case">+ Vaka ekle</button><button class="secondary" id="assignment">Toplu atama / Ek süre</button></div></div><div class="cards">${dash.cases.map(c=>`<div class="card"><span class="pill">${caseStatus(c.status)} · v${c.version}</span><h2>${esc(c.title)}</h2>${global?`<p class="muted">Araştırmacı · ${esc(ownerName(c.owner_id))}</p>`:''}<p>${c.collection_closed_at?'Veri toplama kapalı · '+displayTime(c.collection_closed_at):'Veri toplama açık'}</p><div class="row"><button class="secondary" data-assigned="${esc(c.id)}">Atanan öğrencileri göster (${dash.assignments.filter(a=>a.case_id===c.id&&(global||Number(a.active))).length})</button><button class="secondary" data-preview="${esc(c.id)}">${global?'Vaka ayrıntıları':'Öğrenci önizlemesi'}</button><button class="secondary" data-edit-case="${esc(c.id)}">Düzenle</button>${global?`<button class="secondary" data-move-case="${esc(c.id)}">Alanı değiştir</button>`:''}<button class="${c.collection_closed_at?'':'danger'}" data-collection="${esc(c.id)}">${c.collection_closed_at?'Veri toplamayı aç':'Veri toplamayı kapat'}</button></div></div>`).join('')||(global?'<div class="empty">Henüz vaka yok.</div>':'<div class="empty">İlk vakanızı ekleyin.</div>')}</div>`;
     if(adminTab==='definitions')html=`<div class="toolbar"><h2>Rubrikler ve etiketler</h2><div class="row"><button id="add-rubric">+ Rubrik</button><button class="secondary" id="add-label">+ Etiket</button></div></div>${defs.map(d=>`<div class="card"><div class="toolbar"><h3>${esc(d.name)} <span class="pill">${d.family==='rubric'?'Rubrik':'Etiket · '+(({user:'Öğrenci mesajı',assistant:'AI yanıtı'})[JSON.parse(d.body).target_role]||'Grup seçilmedi')} · v${d.version}</span></h3>${global?`<p class="muted">${esc(ownerName(d.owner_id))}${d.deleted_at?' · Silindi':Number(d.archived)?' · Arşiv':''}</p>`:''}${!d.deleted_at&&!dash.definitions.some(n=>n.parent_id===d.id)?`<div class="row"><button class="secondary" data-edit-def="${esc(d.id)}">Düzenle</button><button class="danger" data-delete-def="${esc(d.id)}">Sil</button></div>`:''}</div><details><summary>Tanım</summary>${definitionDetails(d)}</details></div>`).join('')||'<div class="empty">Henüz rubrik veya etiket yok.</div>'}`;
     if(adminTab==='exports')html=`<div class="card"><h2>Vaka verilerini indir</h2>${select('export-case','Hangi vaka?',[['','Tüm vakalar'],...dash.cases.map(caseOption)])}<p class="muted">Seçilen kapsamdaki tüm kayıtlar indirilir; test, deneme ve analiz dışı kayıtlar durum bilgileriyle birlikte korunur. Excel ve JSON metinleri ve kimlikleri içerir.</p><div class="row spaced"><button data-export="xlsx">Excel indir</button><button class="secondary" data-export="json">Tüm verileri JSON indir</button></div><hr><h3>Disco için süreç verisi</h3><p>Her öğrenci-vaka denemesi ayrı süreçtir. Aynı öğrencinin tekrarları farklı Case ID ve Deneme numarası ile ayrılır; Participant aynı kalır. Geçiş ve süre dosyası her kapanan bölüm ziyaretini giriş/çıkış zamanı ve geçen saniyesiyle verir. Son teslimden sonrası sayılmaz. Ayrıntılı dosya mesajları, soru etiketlerini ve AI yanıt beklemelerini ayrıca içerir; öğrenci kimliği kodlanır. Periyodik teknik kayıtlar bu dosyaya girmez; AI süreleri ayrı kaynakla gösterilir.</p><label class="inline-check"><input id="disco-all-data" type="checkbox">Test, pratik ve analiz dışı denemeleri de dahil et</label><button data-export="disco">Disco: geçişler ve süreler</button><button class="secondary" id="export-disco-events">Disco: ayrıntılı olaylar ve AI</button><details class="spaced"><summary>Disco içe aktarma eşleştirmesi</summary><p>Case ID → Case, Deneme numarası → ek özellik (filtreleme), Activity → Activity, Start Timestamp ve Complete Timestamp → Timestamp, Resource → Resource. Zaman biçimi: yyyy-MM-dd HH:mm:ss.SSS (UTC). Quality ve Time Source gözlemin kaynağını belirtir; etkinlik aralıkları okuma/düşünme süresi değildir.</p></details></div>`;
     if(adminTab==='system')html=auditPanel();
+    if(adminTab==='workspaces'&&global)html=workspacePanel();
     $('#admin-body').innerHTML=html;
     if(adminTab==='overview')bindOverview();
     handler('#export-disco-events',()=>download({format:'disco',view:'events',case_id:getValue('export-case'),all_data:$('#disco-all-data').checked?1:0}));
     if(adminTab==='system')bindAudit();
+    if(adminTab==='workspaces'&&global)bindWorkspacePanel();
     document.querySelectorAll('[data-assigned]').forEach(b=>b.onclick=()=>assignedStudents(b.dataset.assigned));
     document.querySelectorAll('[data-process]').forEach(b=>b.onclick=()=>processView(b.dataset.process).catch(e=>notify(e.message)));
     if(adminTab==='participants')bindAccounts();
+    document.querySelectorAll('[data-move-case]').forEach(b=>b.onclick=()=>moveCaseForm(b.dataset.moveCase));
     handler('#add-case',()=>caseForm());document.querySelectorAll('[data-edit-case]').forEach(b=>b.onclick=()=>caseForm(dash.cases.find(c=>c.id===b.dataset.editCase)));
-    document.querySelectorAll('[data-preview]').forEach(b=>b.onclick=()=>{const c=dash.cases.find(c=>c.id===b.dataset.preview);showDialog(`<h2>${esc(c.title)} · v${c.version}</h2><div class="prose case-body">${caseBodyMarkup(c)}</div><p class="prose">${esc(c.instructions)}</p>${global&&c.notes?`<h3>Araştırmacı notları</h3><p class="prose">${esc(c.notes)}</p>`:''}`);});
+    document.querySelectorAll('[data-preview]').forEach(b=>b.onclick=()=>{const c=dash.cases.find(c=>c.id===b.dataset.preview);showDialog(`<h2>${esc(c.title)} · v${c.version}</h2><div class="prose case-body">${caseBodyMarkup(c)}</div>${caseInstructionsBlock(c)}${global&&c.notes?`<h3>Araştırmacı notları</h3><p class="prose">${esc(c.notes)}</p>`:''}`);});
     document.querySelectorAll('[data-collection]').forEach(b=>b.onclick=async()=>{const c=dash.cases.find(c=>c.id===b.dataset.collection);if(!confirm(`${c.title}: veri toplama ${c.collection_closed_at?'açılsın':'kapatılsın'} mı? Mevcut kayıtlar korunur; kişiye verilen ek süreler kapanır.`))return;try{await api('admin',{action:'collection',case_id:c.id,closed:!c.collection_closed_at});await adminHome();}catch(e){notify(e.message);}});
     handler('#assignment',assignmentForm);handler('#add-rubric',()=>definitionForm('rubric'));handler('#add-label',()=>definitionForm('label'));
     document.querySelectorAll('[data-edit-def]').forEach(b=>b.onclick=()=>{const d=dash.definitions.find(d=>d.id===b.dataset.editDef);definitionForm(d.family,d);});
@@ -180,10 +181,10 @@ function renderAdmin(){
 }
 function participantForm(u){
     const m=u?JSON.parse(u.metadata):{};
-    showDialog(`<h2>${u?'Kullanıcıyı düzenle':'Kullanıcı ekle'}</h2>${u?`<p>${esc(roleTitle(u.role))}</p>`:select('p-role','Hesap türü',[['student','Öğrenci'],['researcher','Araştırmacı']])}${field('p-login','Öğrenci numarası / kullanıcı adı',u?.login)}${field('p-name','Ad soyad',u?.name)}${field('p-password',u?'Yeni parola (boşsa korunur)':'Parola (en az 12 karakter)','','password')}${select('p-status','Hesap durumu',[['active','Etkin'],['frozen','Dondurulmuş'],['archived','Arşiv']],u?.status||'active')}<details class="spaced"><summary>Ek bilgiler (isteğe bağlı)</summary>${field('p-program','Program',m.program)}${field('p-year','Sınıf',m.year)}${field('p-notes','Özel not',m.researcher_notes,'textarea')}</details><button class="spaced" id="commit">Kaydet</button>`,async()=>{
+    showDialog(`<h2>${u?'Kullanıcıyı düzenle':'Kullanıcı ekle'}</h2>${u?`<p>${esc(roleTitle(u.role))}</p>`:select('p-role','Hesap türü',[['student','Öğrenci'],['researcher','Araştırmacı']])+accountWorkspaceField('account-workspace')}${field('p-login','Öğrenci numarası / kullanıcı adı',u?.login)}${field('p-name','Ad soyad',u?.name)}${field('p-password',u?'Yeni parola (boşsa korunur)':'Parola (en az 12 karakter)','','password')}${select('p-status','Hesap durumu',[['active','Etkin'],['frozen','Dondurulmuş'],['archived','Arşiv']],u?.status||'active')}<details class="spaced"><summary>Ek bilgiler (isteğe bağlı)</summary>${field('p-program','Program',m.program)}${field('p-year','Sınıf',m.year)}${field('p-notes','Özel not',m.researcher_notes,'textarea')}</details><button class="spaced" id="commit">Kaydet</button>`,async()=>{
         const role=u?.role||getValue('p-role');
         const identity=u?{id:u.id}:{};
-        await api('admin',{action:'participant',...identity,role,login:getValue('p-login'),name:getValue('p-name'),password:getValue('p-password'),status:getValue('p-status'),metadata:{program:getValue('p-program'),year:getValue('p-year'),researcher_notes:getValue('p-notes')}});
+        await api('admin',{action:'participant',...identity,role,workspace_id:u?undefined:getValue('account-workspace'),login:getValue('p-login'),name:getValue('p-name'),password:getValue('p-password'),status:getValue('p-status'),metadata:{program:getValue('p-program'),year:getValue('p-year'),researcher_notes:getValue('p-notes')}});
         await adminHome();
     });
 }
@@ -191,6 +192,7 @@ function bulkParticipantsForm(){
     const maxRows=100;
     const dialog=showDialog(`<h2>Toplu kullanıcı ekle</h2>
         <p>Her satırda bir öğrenci hesabı oluşturulur. Parola en az 12 karakter olmalıdır.</p>
+        ${accountWorkspaceField('bulk-workspace',true)}
         <div class="table-wrap"><table class="bulk-accounts">
         <thead><tr><th scope="col">Satır</th><th scope="col">Kullanıcı adı</th><th scope="col">Şifre</th><th scope="col">İşlem</th></tr></thead>
         <tbody id="bulk-account-rows"></tbody></table></div>
@@ -200,7 +202,7 @@ function bulkParticipantsForm(){
             login:row.querySelector('[data-bulk-login]').value,
             password:row.querySelector('[data-bulk-password]').value
         }));
-        const {count}=await api('admin',{action:'participants_bulk',rows});
+        const {count}=await api('admin',{action:'participants_bulk',workspace_id:getValue('bulk-workspace'),rows});
         notify(`${count} öğrenci hesabı oluşturuldu.`);
         await adminHome();
     });
@@ -228,26 +230,26 @@ function bulkParticipantsForm(){
     add.onclick=()=>addRow().querySelector('[data-bulk-login]').focus();
     body.querySelector('[data-bulk-login]').focus();
 }
-function caseEditor(c){
-    return `<label id="case-body-label">Vaka metni</label>
+function caseEditor(id,label,markup){
+    return `<label id="${id}-label">${label}</label>
         <div class="case-editor">
-            <div class="case-editor-tools" role="group" aria-label="Vaka metni biçimi">
+            <div class="case-editor-tools" role="group" aria-label="${label} biçimi">
                 <button type="button" class="secondary" data-case-format="bold" aria-label="Kalın" aria-pressed="false" title="Kalın"><strong>B</strong></button>
                 <button type="button" class="secondary" data-case-format="italic" aria-label="İtalik" aria-pressed="false" title="İtalik"><em>I</em></button>
                 <button type="button" class="secondary" data-case-format="underline" aria-label="Altı çizili" aria-pressed="false" title="Altı çizili"><u>U</u></button>
                 <button type="button" class="secondary" data-case-format="insertUnorderedList" aria-label="Madde işaretli liste" aria-pressed="false">• Liste</button>
             </div>
-            <div id="c-body" class="case-body case-editor-input" contenteditable="true" role="textbox" aria-labelledby="case-body-label" aria-multiline="true">${caseBodyMarkup(c)}</div>
+            <div id="${id}" class="case-body case-editor-input" contenteditable="true" role="textbox" aria-labelledby="${id}-label" aria-multiline="true">${markup}</div>
         </div>`;
 }
-function bindCaseEditor(dialog){
-    const editor=dialog.querySelector('#c-body');
-    const buttons=[...dialog.querySelectorAll('[data-case-format]')];
+function bindCaseEditor(container,dialog){
+    const editor=container.querySelector('.case-editor-input');
+    const buttons=container.querySelectorAll('[data-case-format]');
     let range=null;
     const remember=()=>{
         const selection=window.getSelection();
         if(!selection.rangeCount||!editor.contains(selection.anchorNode)||!editor.contains(selection.focusNode)){
-            if(!range)buttons.forEach(button=>button.setAttribute('aria-pressed','false'));
+            if(!container.contains(document.activeElement))buttons.forEach(button=>button.setAttribute('aria-pressed','false'));
             return;
         }
         range=selection.getRangeAt(0).cloneRange();
@@ -277,13 +279,13 @@ function bindCaseEditor(dialog){
 }
 function caseForm(c){
     const renderRubrics=()=>{
-        const owner=c?c.owner_id:me.id;
-        const rubrics=dash.definitions.filter(d=>d.owner_id===owner&&d.family==='rubric'&&!d.deleted_at&&!Number(d.archived)&&
+        const workspace=c?.workspace_id||workspaceId;
+        const rubrics=dash.definitions.filter(d=>d.workspace_id===workspace&&d.family==='rubric'&&!d.deleted_at&&!Number(d.archived)&&
             (d.id===c?.rubric_id||!dash.definitions.some(n=>n.parent_id===d.id)));
         $('#case-rubric-field').innerHTML=select('c-rubric','Rubrik',[['','Henüz bağlı değil'],...rubrics.map(d=>[d.id,d.name+' · v'+d.version])],c?.rubric_id||'');
     };
-    const dialog=showDialog(`<h2>${c?'Vakayı düzenle':'Vaka oluştur'}</h2>${field('c-title','Başlık',c?.title)}${field('c-position','Sıra',c?.position||1,'number')}${caseEditor(c)}${field('c-instructions','Öğrenci yönergeleri',c?.instructions,'textarea')}${select('c-status','Durum',[['draft','Taslak'],['active','Aktif'],['closed','Yeni başlangıçlara kapalı'],['archived','Arşiv']],c?.status||'draft')}<div id="case-rubric-field"></div><details class="spaced"><summary>Ek ayarlar</summary>${field('c-notes','Özel notlar',c?.notes,'textarea')}<label class="inline-check"><input type="checkbox" id="c-practice" ${Number(c?.practice)?'checked':''}>Deneme vakası</label><label class="inline-check"><input type="checkbox" id="c-stop" ${Number(c?.stop_access)?'checked':''}>Vaka görüntüleme erişimini de durdur</label></details><button class="spaced" id="commit">Vakayı kaydet</button>`,async()=>{await api('admin',{action:'case',...(c?{id:c.id}:{}),title:getValue('c-title'),body_html:$('#c-body').innerHTML,instructions:getValue('c-instructions'),notes:getValue('c-notes'),position:Number(getValue('c-position')),status:getValue('c-status'),rubric_id:getValue('c-rubric'),practice:$('#c-practice').checked,stop_access:$('#c-stop').checked});await adminHome();});
-    bindCaseEditor(dialog);
+    const dialog=showDialog(`<h2>${c?'Vakayı düzenle':'Vaka oluştur'}</h2>${field('c-title','Başlık',c?.title)}${field('c-position','Sıra',c?.position||1,'number')}${caseEditor('c-body','Vaka metni',caseBodyMarkup(c))}${caseEditor('c-instructions','Öğrenci yönergeleri',caseInstructionsMarkup(c))}${select('c-status','Durum',[['draft','Taslak'],['active','Aktif'],['closed','Yeni başlangıçlara kapalı'],['archived','Arşiv']],c?.status||'draft')}<div id="case-rubric-field"></div><details class="spaced"><summary>Ek ayarlar</summary>${field('c-notes','Özel notlar',c?.notes,'textarea')}<label class="inline-check"><input type="checkbox" id="c-practice" ${Number(c?.practice)?'checked':''}>Deneme vakası</label><label class="inline-check"><input type="checkbox" id="c-stop" ${Number(c?.stop_access)?'checked':''}>Vaka görüntüleme erişimini de durdur</label></details><button class="spaced" id="commit">Vakayı kaydet</button>`,async()=>{await api('admin',{action:'case',workspace_id:workspaceId,...(c?{id:c.id}:{}),title:getValue('c-title'),body_html:$('#c-body').innerHTML,instructions_html:$('#c-instructions').innerHTML,notes:getValue('c-notes'),position:Number(getValue('c-position')),status:getValue('c-status'),rubric_id:getValue('c-rubric'),practice:$('#c-practice').checked,stop_access:$('#c-stop').checked});await adminHome();});
+    dialog.querySelectorAll('.case-editor').forEach(editor=>bindCaseEditor(editor,dialog));
     renderRubrics();
 }
 function assignmentForm(caseId){
@@ -294,7 +296,8 @@ function assignmentForm(caseId){
     const renderStudents=()=>{
         const selectedCase=dash.cases.find(c=>c.id===getValue('a-case'));
         const assignments=new Map(dash.assignments.filter(a=>a.case_id===selectedCase.id).map(a=>[a.user_id,a]));
-        const eligible=students.filter(u=>isSuperAdmin()||u.owner_id===me.id||Number(assignments.get(u.id)?.active));
+        const removing=getValue('a-active')==='0';
+        const eligible=students.filter(u=>removing?Number(assignments.get(u.id)?.active):dash.member_ids.includes(u.id));
         const checked=new Set([...list.querySelectorAll('[data-assign-student]:checked')].map(n=>n.value));
         list.innerHTML=eligible.map(u=>{
             const a=assignments.get(u.id);
@@ -309,6 +312,7 @@ function assignmentForm(caseId){
     };
     renderStudents();
     $('#a-case').onchange=renderStudents;
+    $('#a-active').onchange=renderStudents;
     selectAll.onchange=()=>list.querySelectorAll('[data-assign-student]').forEach(n=>n.checked=selectAll.checked);
     list.onchange=()=>{
         const all=[...list.querySelectorAll('[data-assign-student]')],selected=all.filter(n=>n.checked).length;
@@ -318,11 +322,11 @@ function assignmentForm(caseId){
 }
 function definitionForm(family,d){
     if(family==='rubric'){rubricForm(d);return;}
-    showDialog(`<h2>Etiket ${d?'düzenle':'ekle'}</h2>${d?'':definitionOwnerField()}${field('d-name','Ad',d?.name)}${select('d-target-role','Etiket grubu',[['','Grup seçin'],['user','Öğrenci mesajı'],['assistant','AI yanıtı']],d?JSON.parse(d.body).target_role||'':'')}<p class="muted">Bu etiket yalnız seçtiğiniz gruptaki mesajlarda kullanılabilir.</p>${select('d-topic-scope','Konu kapsamı (öğrenci etiketleri)',[['','Kapsam seçin'],['pedagogical','Pedagojik vaka ve kavramlar'],['outside','Pedagoji dışındaki talepler'],['any','Her iki kapsam']],d?JSON.parse(d.body).topic_scope||'':'pedagogical')}${field('d-body','Açıklama',d?JSON.parse(d.body).description:'','textarea')}<button class="spaced" id="commit">Kaydet</button>`,async()=>{await api('admin',{action:'definition',family:'label',name:getValue('d-name'),body:{description:getValue('d-body'),target_role:getValue('d-target-role'),topic_scope:getValue('d-topic-scope')||null},parent_id:d?.id||null,owner_id:getValue('workspace-owner')||me.id});await adminHome();});
+    showDialog(`<h2>Etiket ${d?'düzenle':'ekle'}</h2>${field('d-name','Ad',d?.name)}${select('d-target-role','Etiket grubu',[['','Grup seçin'],['user','Öğrenci mesajı'],['assistant','AI yanıtı']],d?JSON.parse(d.body).target_role||'':'')}<p class="muted">Bu etiket yalnız seçtiğiniz gruptaki mesajlarda kullanılabilir.</p>${select('d-topic-scope','Konu kapsamı (öğrenci etiketleri)',[['','Kapsam seçin'],['pedagogical','Pedagojik vaka ve kavramlar'],['outside','Pedagoji dışındaki talepler'],['any','Her iki kapsam']],d?JSON.parse(d.body).topic_scope||'':'pedagogical')}${field('d-body','Açıklama',d?JSON.parse(d.body).description:'','textarea')}<button class="spaced" id="commit">Kaydet</button>`,async()=>{await api('admin',{action:'definition',family:'label',name:getValue('d-name'),body:{description:getValue('d-body'),target_role:getValue('d-target-role'),topic_scope:getValue('d-topic-scope')||null},parent_id:d?.id||null,workspace_id:workspaceId});await adminHome();});
 }
 function rubricForm(def){
     const original=def?JSON.parse(def.body):{text:'',dimensions:[]};
-    showDialog(`<h2>${def?'Rubriği düzenle':'Rubrik oluştur'}</h2>${def?'':definitionOwnerField()}<p class="muted">1. Rubriğe ad ve açıklama verin. 2. Ölçmek istediğiniz boyutları ekleyin. 3. Her boyutun düzeylerini puan ve açıklamalarıyla tanımlayın. Sistem teknik yapıyı kendisi oluşturur.</p>${field('d-name','Rubrik adı',def?.name)}${field('r-text','Genel değerlendirme yönergesi',original.text,'textarea')}<p class="muted">Örneğin hangi kanıtların değerlendirileceğini ve puanlama yaklaşımını açıklayın.</p><div id="rubric-dimensions"></div><button type="button" class="secondary spaced" id="add-dimension">+ Değerlendirme boyutu ekle</button><p class="muted">Ağırlık 1 tüm boyutları eşit etkiler. Ağırlık 2, aynı puan ölçeğindeki bir boyutun ortalamaya iki kat etki etmesini sağlar.</p><p id="rubric-count" aria-live="polite"></p><button class="spaced" id="commit">Rubriği kaydet</button>`,async()=>{
+    showDialog(`<h2>${def?'Rubriği düzenle':'Rubrik oluştur'}</h2><p class="muted">1. Rubriğe ad ve açıklama verin. 2. Ölçmek istediğiniz boyutları ekleyin. 3. Her boyutun düzeylerini puan ve açıklamalarıyla tanımlayın. Sistem teknik yapıyı kendisi oluşturur.</p>${field('d-name','Rubrik adı',def?.name)}${field('r-text','Genel değerlendirme yönergesi',original.text,'textarea')}<p class="muted">Örneğin hangi kanıtların değerlendirileceğini ve puanlama yaklaşımını açıklayın.</p><div id="rubric-dimensions"></div><button type="button" class="secondary spaced" id="add-dimension">+ Değerlendirme boyutu ekle</button><p class="muted">Ağırlık 1 tüm boyutları eşit etkiler. Ağırlık 2, aynı puan ölçeğindeki bir boyutun ortalamaya iki kat etki etmesini sağlar.</p><p id="rubric-count" aria-live="polite"></p><button class="spaced" id="commit">Rubriği kaydet</button>`,async()=>{
         const error=(el,message)=>{el.setAttribute('aria-invalid','true');el.focus();throw new Error(message);};
         document.querySelectorAll('dialog [aria-invalid]').forEach(el=>el.removeAttribute('aria-invalid'));
         if(!getValue('d-name').trim())error($('#d-name'),'Rubrik adını doldurun.');
@@ -342,7 +346,7 @@ function rubricForm(def){
             });
             return {...row.rubricSource,id:row.rubricSource.id,name,min,max,weight,levels};
         });
-        await api('admin',{action:'definition',family:'rubric',name:getValue('d-name').trim(),body:{...original,text:getValue('r-text').trim(),dimensions},parent_id:def?.id||null,owner_id:getValue('workspace-owner')||me.id});await adminHome();notify('Rubrik kaydedildi.');
+        await api('admin',{action:'definition',family:'rubric',name:getValue('d-name').trim(),body:{...original,text:getValue('r-text').trim(),dimensions},parent_id:def?.id||null,workspace_id:workspaceId});await adminHome();notify('Rubrik kaydedildi.');
     });
     const makeField=(key,label,value,type='text',placeholder='')=>{const id='rubric-'+crypto.randomUUID();return `<label for="${id}">${label}</label>${type==='textarea'?`<textarea id="${id}" data-rubric-field="${key}" placeholder="${esc(placeholder)}">${esc(value??'')}</textarea>`:`<input id="${id}" data-rubric-field="${key}" type="${type}" ${type==='number'?'step="any"':''} value="${esc(value??'')}" placeholder="${esc(placeholder)}">`}`;};
     const update=()=>{const dimensions=[...$('#rubric-dimensions').children];dimensions.forEach((row,i)=>{row.querySelector('legend').textContent=`${i+1}. Değerlendirme boyutu`;row.querySelector('[data-remove-dimension]').disabled=dimensions.length===1;const levels=[...row.querySelector('.rubric-levels').children];levels.forEach((l,n)=>{l.querySelector('[data-level-title]').textContent=`${n+1}. başarı düzeyi`;l.querySelector('[data-remove-level]').disabled=levels.length===1;});});$('#rubric-count').textContent=`${dimensions.length} boyut · ${document.querySelectorAll('[data-rubric-level]').length} başarı düzeyi`;};
@@ -353,4 +357,35 @@ function rubricForm(def){
         dimension.levels.forEach(l=>addLevel(row,l));row.querySelector('[data-add-level]').onclick=()=>{addLevel(row);update();};row.querySelector('[data-remove-dimension]').onclick=()=>{row.remove();update();};$('#rubric-dimensions').append(row);update();
     };
     if(original.dimensions.length)original.dimensions.forEach(d=>addDimension(d));else addDimension();$('#add-dimension').onclick=()=>addDimension();
+}
+
+function workspacePanel(){
+    const rows=me.workspaces.map(w=>`<li>${esc(w.name)}${w.id==='default'?' (Varsayılan)':''}</li>`).join('');
+    return `<div class="card"><h2>Çalışma alanları</h2><ul>${rows}</ul><button id="workspace-create">Çalışma alanı ekle</button></div>`;
+}
+function bindWorkspacePanel(){
+    handler('#workspace-create',()=>showDialog(`<h2>Çalışma alanı ekle</h2>${field('workspace-name','Alan adı')}<button id="commit">Kaydet</button>`,async()=>{
+        await api('admin',{action:'workspace_create',name:getValue('workspace-name')});
+        me=await api('me');
+        await home();
+    }));
+}
+function workspaceMembershipForm(user){
+    const selected=new Set(dash.memberships.filter(m=>m.user_id===user.id).map(m=>m.workspace_id));
+    const options=me.workspaces.map(w=>`<label class="inline-check"><input type="checkbox" value="${esc(w.id)}" data-workspace-membership ${selected.has(w.id)?'checked':''}>${esc(w.name)}</label>`).join('');
+    const dialog=showDialog(`<h2>${esc(user.login)} · Çalışma alanları</h2><div class="selection-list">${options}</div><button id="commit">Kaydet</button>`,async()=>{
+        const workspace_ids=[...dialog.querySelectorAll('[data-workspace-membership]:checked')].map(input=>input.value);
+        await api('admin',{action:'workspace_memberships',user_id:user.id,workspace_ids});
+        await adminHome();
+    });
+}
+function moveCaseForm(id){
+    const c=dash.cases.find(row=>row.id===id);
+    const options=workspaceOptions(me.workspaces.filter(w=>w.id!==c.workspace_id));
+    if(!options.length){notify('Önce hedef çalışma alanını oluşturun.');return;}
+    showDialog(`<h2>Vakayı başka alana taşı</h2><p>${esc(c.title)}</p><p>Atamalar ve araştırma kayıtları vakayla birlikte taşınır. İlgili hesaplar hedef alana üye olur.</p>${select('move-workspace','Hedef çalışma alanı',options)}<button id="commit">Vakayı taşı</button>`,async()=>{
+        await api('admin',{action:'move_case',case_id:id,workspace_id:getValue('move-workspace')});
+        await adminHome();
+        notify('Vaka taşındı.');
+    });
 }
